@@ -1,0 +1,157 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container mt-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i> Ajouter un Nouveau Client
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <!-- Message d'information -->
+                <div id="dedieMessage" class="alert alert-info" style="display: none;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Contrat Symétrique :</strong> Download et Upload = Capacité
+                </div>
+
+                <form method="post" action="{% url 'clients:enregistrer_client' %}" enctype="multipart/form-data" id="clientForm">
+                    {% csrf_token %}
+
+                    <div class="row">
+
+                        <!-- ===================== COLONNE 1 ===================== -->
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2 mb-3 text-primary">
+                                <i class="fas fa-user me-2"></i> Informations Client
+                            </h5>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nom client *</label>
+                                <input type="text" class="form-control" name="nom_client" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Adresse</label>
+                                    <textarea class="form-control" name="adresse"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Quartier</label>
+                                    <input type="text" class="form-control" name="quartier">
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">Téléphone</label>
+                                    <input type="text" class="form-control" name="telephone">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email">
+                                </div>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Type de contrat </label>
+                                    <select class="form-control" name="type_contrat_id" id="typeContrat">
+                                        <option value="">--- Sélectionner ---</option>
+                                        {% for type in type_contrats %}
+                                            <option value="{{ type.id }}">{{ type.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Statut *</label>
+                                    <select class="form-control" name="statut" required>
+                                        <option value="">--- Sélectionner ---</option>
+                                        <option value="non_actif">Non activé</option>
+                                        <option value="actif">Activé</option>
+                                        <option value="suspendu">Suspendu</option>
+                                        <option value="resilie">Résilié</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label fw-bold">Commercial</label>
+                                <select class="form-control" name="commercial_id">
+                                    <option value="">-- Sélectionner --</option>
+                                    {% for commercial in commerciaux %}
+                                        <option value="{{ commercial.id }}">{{ commercial.prenom }} {{ commercial.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- ===================== COLONNE 2 ===================== -->
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2 mb-3 text-primary">
+                                <i class="fas fa-network-wired me-2"></i> Informations Techniques
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Adresse IP</label>
+                                    <input type="text" class="form-control" name="adresse_ip">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">VLAN</label>
+                                    <input type="text" class="form-control" name="vlan">
+                                </div>
+                            </div>
+
+                            <!-- ✅ BASE STATION -->
+                            <div class="mt-3">
+                                <label class="form-label fw-bold">Base Station</label>
+                                <select class="form-control" name="base_station">
+                                    <option value="">--- Sélectionner ---</option>
+                                    {% for station in base_stations %}
+                                        <option value="{{ station.id }}">{{ station.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label fw-bold">Capacité *</label>
+                                <input type="number" class="form-control" name="capacite" id="capacite" required>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label>Download</label>
+                                    <input type="number" class="form-control" name="download" id="download">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Upload</label>
+                                    <input type="number" class="form-control" name="upload" id="upload">
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label>Contrat PDF</label>
+                                <input type="file" class="form-control" name="contrat_pdf">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===================== BOUTONS ===================== -->
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'clients:list_client' %}" class="btn btn-secondary">Retour</a>
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

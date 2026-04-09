@@ -1,0 +1,151 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-2">
+                    <h6 class="mb-0">Modifier mon profil</h6>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- PHOTO -->
+                        <div class="text-center mb-4">
+                            {% if form.instance.photo %}
+                                <img id="preview"
+                                     src="{{ form.instance.photo.url }}"
+                                     class="rounded-circle shadow mb-2"
+                                     width="100" height="100"
+                                     style="object-fit:cover;">
+                            {% else %}
+                                <img id="preview"
+                                     src="{% static 'img/default_user.png' %}"
+                                     class="rounded-circle shadow mb-2"
+                                     width="100" height="100"
+                                     style="object-fit:cover;">
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Photo</label>
+                            {{ form.photo }}
+                        </div>
+
+                        <!-- ROW 1 -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nom d'utilisateur</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    {{ form.username }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROW 2 -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Prénom</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-badge"></i>
+                                    </span>
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nom</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                    </span>
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ROW 3 -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Téléphone</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-telephone"></i>
+                                    </span>
+                                    {{ form.telephone }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nouveau mot de passe</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+                                    {{ form.password }}
+                                </div>
+                                <small class="text-muted">
+                                    Laisser vide pour garder l'ancien
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- BUTTONS -->
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <a href="{% url 'users:profile' %}"
+                               class="btn btn-secondary btn-sm rounded-pill">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Annuler
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-sm rounded-pill">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Enregistrer
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("id_photo").addEventListener("change", function(){
+    const reader = new FileReader();
+    reader.onload = function(e){
+        document.getElementById("preview").src = e.target.result;
+    }
+    reader.readAsDataURL(this.files[0]);
+});
+</script>
+
+
+{% endblock %}

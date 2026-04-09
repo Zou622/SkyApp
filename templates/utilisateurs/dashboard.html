@@ -1,0 +1,170 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <!-- ============================= -->
+        <!-- BIENVENUE -->
+        <!-- ============================= -->
+        <div class="card shadow border-0 mb-4">
+            <div class="card-body">
+                <h3 class="font-weight-bold">
+                    👋 Bonjour {{ user.first_name|default:user.username }}
+                </h3>
+                <p class="text-muted mb-2">
+                    Bienvenue sur votre tableau de bord SkyApp.
+                </p>
+                <span class="badge badge-primary">
+                    <i class="far fa-calendar-alt mr-1"></i>
+                    {% now "l d F Y" %}
+                </span>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- STATISTIQUES -->
+        <!-- ============================= -->
+        <div class="row">
+
+            <!-- ADMIN / SUPERVISEUR -->
+            {% if user.user_type == "admin" or user.user_type == "superviseur" %}
+            
+            <div class="col-md-3">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>{{ stats.users|default:0 }}</h3>
+                        <p>Utilisateurs</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ stats.activites|default:0 }}</h3>
+                        <p>Activités</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ stats.clients|default:0 }}</h3>
+                        <p>Clients</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+
+
+            <!-- TECHNICIEN -->
+            {% if user.user_type|lower == "technicien" %}
+            <div class="col-md-3">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>{{ stats.activites|default:0 }}</h3>
+                        <p>Mes activités</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+
+            <!-- COMMERCIAL -->
+            {% if user.user_type == "commercial" %}
+            <div class="col-md-3">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ stats.clients|default:0 }}</h3>
+                        <p>Mes Clients</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-address-book"></i>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- ACTIONS RAPIDES -->
+        <!-- ============================= -->
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt mr-2"></i> Actions rapides
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row text-center">
+
+                    <!-- ADMIN -->
+                    {% if user.user_type == "admin" %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'users:liste_utilisateurs' %}"
+                           class="btn btn-outline-primary w-100">
+                            <i class="fas fa-user-cog mr-1"></i>
+                            Gérer utilisateurs
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- COMMERCIAL -->
+                    {% if user.user_type == "commercial" %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'clients:list_client' %}"
+                           class="btn btn-outline-success w-100">
+                            <i class="fas fa-address-book mr-1"></i>
+                            Mes Clients
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- TECHNICIEN -->
+                    {% if user.user_type == "technicien" %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'clients:mes_activites' %}"
+                           class="btn btn-outline-warning w-100">
+                            <i class="fas fa-clipboard-list mr-1"></i>
+                            Mes Activités
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <!-- PROFIL -->
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'users:profile' %}"
+                           class="btn btn-outline-dark w-100">
+                            <i class="fas fa-user mr-1"></i>
+                            Mon profil
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

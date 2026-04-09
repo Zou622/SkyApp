@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="#"><b>Sky</b>Connect <b>S.A</b></a>
+        </div>
+
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Connectez-vous pour commencer</p>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {{ message.tags }} alert-dismissible">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="input-group mb-3">
+                        {{ form.username }}
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        {{ form.password }}
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                Connexion
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <p class="mb-1 mt-3">
+                    <button id="resetPasswordBtn">Mot de passe oublié ?</button>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.login-page {
+    background: #f4f6f9;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-box {
+    width: 360px;
+}
+.login-logo {
+    font-size: 35px;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 300;
+}
+.icheck-primary {
+    margin-top: 8px;
+}
+</style>
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('resetPasswordBtn').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Réinitialiser le mot de passe',
+            html: `<input type="email" id="swal-email" class="swal2-input" placeholder="Votre email">`,
+            showCancelButton: true,
+            confirmButtonText: 'Envoyer',
+            preConfirm: () => {
+                const email = Swal.getPopup().querySelector('#swal-email').value
+                if (!email) Swal.showValidationMessage(`Veuillez entrer votre email`)
+                return email
+            }
+        }).then((result) => {
+            if(result.isConfirmed){
+                fetch("{% url 'users:password_reset_request' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: new URLSearchParams({'email': result.value})
+                })
+                .then(resp => resp.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        Swal.fire('Succès', data.message, 'success')
+                    } else {
+                        Swal.fire('Erreur', data.message, 'error')
+                    }
+                })
+            }
+        })
+    });
+});
+</script>
+{% endblock %}

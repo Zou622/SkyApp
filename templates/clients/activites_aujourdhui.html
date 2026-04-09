@@ -1,0 +1,190 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container-fluid mt-3">
+        <div class="card">
+            <div class="container-fluid mt-4">
+                <h4 class="mb-3">
+                    <i class="fas fa-sun me-2"></i> Activités du jour ({{ date|date:"d/m/Y" }})
+                </h4>
+
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i> Les activités d'aujourd'hui</h5>
+                        <span class="badge bg-light text-dark">{{ activites|length }} activité(s)</span>
+                    </div>
+
+                    <div class="card-body p-3">
+                        {% if activites %}
+                            <div class="row g-3">
+                                {% for activite in activites %}
+                                    <div class="col-md-3">
+                                        <div class="card h-100 shadow-sm border-primary">
+
+                                            <!-- Header -->
+                                            <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white py-1">
+                                                <small>
+                                                    <i class="far fa-calendar-alt me-1"></i>
+                                                    {{ activite.date_activite|date:"d/m/Y" }}
+                                                </small>
+
+                                                <span class="badge
+                                                    {% if activite.statut == 'en_cours' %}bg-warning text-dark
+                                                    {% elif activite.statut == 'termine' %}bg-success
+                                                    {% elif activite.statut == 'annule' %}bg-danger
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ activite.get_statut_display }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Type -->
+                                            <div class="text-center mt-2">
+                                                <span class="badge bg-info text-dark px-3 py-1">
+                                                    {{ activite.get_type_activite_display }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Body -->
+                                            <div class="card-body pt-1 pb-2">
+
+                                                <div class="mb-1">
+                                                    <small class="text-muted d-block">
+                                                        <i class="fas fa-user me-1"></i>Client
+                                                    </small>
+                                                    <strong class="ms-3 small">
+                                                        {{ activite.client.nom_client }}
+                                                    </strong>
+                                                </div>
+
+                                                <div>
+                                                    <small class="text-muted d-block">
+                                                        <i class="fas fa-users me-1"></i>Techniciens
+                                                    </small>
+                                                    <div class="ms-3 mt-1">
+                                                        {% for tech in activite.techniciens.all %}
+                                                            <span class="badge bg-secondary me-1 mb-1">
+                                                                {{ tech.prenom }} {{ tech.nom }}
+                                                            </span>
+                                                        {% empty %}
+                                                            <span class="text-muted fst-italic small">
+                                                                Non assigné
+                                                            </span>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Actions -->
+                                            <div class="card-footer bg-transparent border-0 pt-0 pb-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+
+                                                    <div class="btn-group btn-group-sm">
+
+                                                        <!-- Voir -->
+                                                        <a href="{% url 'clients:detail_activite' activite.id %}" 
+                                                           class="btn btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+
+                                                        <!-- Modifier activité -->
+                                                        <a href="{% url 'clients:modifier_activite' activite.id %}" 
+                                                           class="btn btn-outline-warning">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+
+                                                        <!-- Créer rapport -->
+                                                        {% if activite.statut != "termine" %}
+                                                            <a href="{% url 'rapportActivites:creer_rapport' activite.id %}" 
+                                                               class="btn btn-outline-success">
+                                                                <i class="fas fa-file-alt"></i>
+                                                            </a>
+                                                        {% endif %}
+
+                                                        <!-- Modifier rapport -->
+                                                        {% if activite.statut == "termine" and activite.rapport %}
+                                                            <a href="{% url 'clients:modifier_rapport' activite.rapport.id %}" 
+                                                               class="btn btn-outline-dark">
+                                                                <i class="fas fa-pen"></i>
+                                                            </a>
+                                                        {% endif %}
+
+                                                        <!-- Supprimer -->
+                                                        {% if activite.statut != "termine" %}
+                                                            <button type="button"
+                                                                    class="btn btn-outline-danger"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal{{ activite.id }}">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        {% endif %}
+
+                                                    </div>
+
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-user-cog me-1"></i>
+                                                        {{ activite.techniciens.count }}
+                                                    </small>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar-day fa-4x text-muted mb-3"></i>
+                                <h4 class="text-muted mb-2">Aucune activité aujourd'hui</h4>
+                                <p class="text-muted mb-3">
+                                    Vous n'avez aucune activité pour le moment.
+                                </p>
+                                <a href="{% url 'clients:ajouter_activite' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Nouvelle activité
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+{% for activite in activites %}
+    {% if activite.statut != "termine" %}
+    <div class="modal fade" id="deleteModal{{ activite.id }}" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white py-2">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmation
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Supprimer cette activité ?
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                        Annuler
+                    </button>
+                    <form method="post" action="{% url 'clients:supprimer_activite' activite.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}

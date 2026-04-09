@@ -1,0 +1,91 @@
+{% extends "main.html" %}
+
+{% block contenu %}
+
+<div class="container mt-4">
+
+<div class="card shadow">
+
+<div class="card-header bg-primary text-white">
+<h4>Rapport activité</h4>
+</div>
+
+<div class="card-body">
+
+<form method="POST" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<!-- INFOS -->
+
+<div class="row mb-3">
+
+<div class="col-md-6">
+<input class="form-control" value="{{ activite.client.nom }}" readonly>
+</div>
+
+<div class="col-md-6">
+<input class="form-control" value="{{ activite.technicien.nom }}" readonly>
+</div>
+
+</div>
+
+<hr>
+
+<!-- CHAMPS -->
+
+<div class="row">
+
+{% for champ in champs %}
+
+<div class="col-md-6 mb-3">
+
+<label>{{ champ.nom }}</label>
+
+{% if champ.type_champ == "text" %}
+<input type="text" name="{{ champ.nom }}" class="form-control">
+
+{% elif champ.type_champ == "number" %}
+<input type="number" name="{{ champ.nom }}" class="form-control">
+
+{% elif champ.type_champ == "textarea" %}
+<textarea name="{{ champ.nom }}" class="form-control"></textarea>
+
+{% elif champ.type_champ == "date" %}
+<input type="date" name="{{ champ.nom }}" class="form-control">
+
+{% elif champ.type_champ == "select" %}
+<select name="{{ champ.nom }}" class="form-control">
+{% for opt in champ.options.split(",") %}
+<option>{{ opt }}</option>
+{% endfor %}
+</select>
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<hr>
+
+<!-- PHOTOS -->
+
+<h5>Photos</h5>
+
+<input type="file" name="photos" multiple class="form-control">
+
+<div class="text-center mt-4">
+<button class="btn btn-success">Enregistrer</button>
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

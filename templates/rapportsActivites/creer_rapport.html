@@ -1,0 +1,114 @@
+{% extends "main.html" %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+<div class="container-fluid mt-4">
+
+<div class="card shadow-lg">
+
+<!-- Header dynamique -->
+<div class="card-header {% if form.instance.pk %}bg-warning{% else %}bg-primary{% endif %} text-white">
+<h4>
+<i class="fas fa-file-alt me-2"></i>
+
+{% if form.instance.pk %}
+    Modifier le rapport : {{ activite.get_type_activite_display }}
+{% else %}
+    Nouveau rapport : {{ activite.get_type_activite_display }}
+{% endif %}
+
+</h4>
+</div>
+
+<div class="card-body">
+
+<form method="POST" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+        <div class="mb-3">
+
+            <!-- Label -->
+            <label class="form-label fw-bold">
+                <i class="fas fa-edit me-1 text-primary"></i>
+                {{ field.label }}
+            </label>
+
+            <!-- Champ -->
+            {{ field }}
+
+            <!-- 🔥 Affichage ancien fichier (mode modification) -->
+            {% if form.instance.pk and field.value and field.field.widget.input_type == "file" %}
+                <div class="mt-2">
+                    <small class="text-muted">Fichier actuel :</small><br>
+                    <a href="{{ field.value.url }}" target="_blank" class="text-primary">
+                        <i class="fas fa-eye me-1"></i> Voir le fichier
+                    </a>
+                </div>
+            {% endif %}
+
+            <!-- Erreurs -->
+            {% if field.errors %}
+                <div class="text-danger small mt-1">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ field.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+    {% endfor %}
+
+    <!-- Boutons -->
+    <div class="d-flex justify-content-between mt-4">
+
+        <!-- Retour -->
+        <a href="{% url 'rapportActivites:liste_activites_technicien' %}" 
+           class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour
+        </a>
+
+        <!-- Submit -->
+        <button type="submit" class="btn {% if form.instance.pk %}btn-warning{% else %}btn-success{% endif %} px-4">
+            <i class="fas fa-save me-2"></i>
+
+            {% if form.instance.pk %}
+                Mettre à jour
+            {% else %}
+                Enregistrer
+            {% endif %}
+        </button>
+
+    </div>
+
+</form>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- Validation JS -->
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+    let inputs = document.querySelectorAll("input, textarea, select");
+    let valid = true;
+
+    inputs.forEach(input => {
+        if (input.hasAttribute("required") && !input.value) {
+            input.classList.add("is-invalid");
+            valid = false;
+        } else {
+            input.classList.remove("is-invalid");
+            input.classList.add("is-valid");
+        }
+    });
+
+    if (!valid) {
+        e.preventDefault();
+    }
+});
+</script>
+
+{% endblock %}

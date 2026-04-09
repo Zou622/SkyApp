@@ -1,0 +1,158 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>
+                <i class="fas fa-file-alt me-2 text-primary"></i>
+                Liste des Rapports
+            </h4>
+
+            <span class="badge bg-primary">
+                {{ rapports|length }} rapport(s)
+            </span>
+        </div>
+
+        <div class="card shadow">
+
+            <div class="card-body">
+
+                <!-- 🔍 Recherche + Filtres -->
+                <form method="get" class="row mb-3">
+
+                    <div class="col-md-4">
+                        <input type="text" name="search" class="form-control"
+                               placeholder="Rechercher client ou type..."
+                               value="{{ request.GET.search }}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <input type="date" name="date" class="form-control"
+                               value="{{ request.GET.date }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Filtrer
+                        </button>
+                    </div>
+
+                    <div class="col-md-3 text-end">
+                        <a href="#"
+                           class="btn btn-success w-100">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </a>
+                    </div>
+
+                </form>
+
+                {% if rapports %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Type</th>
+                                <th>Client</th>
+                                <th>Date</th>
+                                <th>Heure</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for rapport in rapports %}
+                            <tr>
+
+                                <td>{{ forloop.counter }}</td>
+
+                                <td>
+                                    <span class="badge bg-info text-dark">
+                                        {{ rapport.activite.get_type_activite_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ rapport.activite.client.nom_client }}
+                                </td>
+
+                                <td>
+                                    {{ rapport.date_intervention_reelle|date:"d/m/Y" }}
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-light text-dark">
+                                        {{ rapport.heure_debut_reelle|time:"H:i" }}
+                                        →
+                                        {{ rapport.heure_fin_reelle|time:"H:i" }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex gap-1">
+
+                                        <!-- Voir -->
+                                        <a href="{% url 'rapportActivites:detail_rapport' rapport.id %}"
+                                           class="btn btn-outline-primary btn-sm"
+                                           title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <!-- Modifier -->
+                                        <a href="{% url 'clients:modifier_rapport' rapport.id %}"
+                                           class="btn btn-outline-warning btn-sm"
+                                           title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">Aucun rapport disponible</h4>
+                        <p class="text-muted">Essayez de modifier les filtres.</p>
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f7ff;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+</style>
+
+{% endblock %}
