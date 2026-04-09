@@ -38,7 +38,11 @@ SECRET_KEY = 'django-insecure-r&s*^vvesg9!7h#w8jf2kcfab9v#@y+xkaf-5ae@0=r$p5mabl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'skyapp.skyconnect-sa.com',
+    'localhost',
+    '10.7.1.187',
+]
 
 
 # Application definition
@@ -231,3 +235,17 @@ EMAIL_HOST_PASSWORD = 'ybdb bnrg lxpe qcmq'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://skyapp.skyconnect-sa.com',
+    'http://skyapp.skyconnect-sa.com',
+]
+
+CSRF_COOKIE_DOMAIN = '.skyconnect-sa.com'  # Notez le point au début
+
+
+# Si vous êtes en développement avec HTTPS non configuré
+# Désactiver la vérification HTTPS pour CSRF (pas recommandé en production)
+CSRF_COOKIE_SECURE = False  # Mettre à True si vous avez un certificat SSL valide
+SESSION_COOKIE_SECURE = False  # Mettre à True si vous avez un certificat SSL valide

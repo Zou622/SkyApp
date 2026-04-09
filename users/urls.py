@@ -3,10 +3,19 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from . import views
 from django.urls import reverse_lazy
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from django.conf import settings
+from . import views
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
 
 app_name = 'users'
 
 urlpatterns = [
+    
+     # Redirection de la racine vers login
+    path('', lambda request: redirect('users:login'), name='root'),
     # Authentification
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
@@ -16,7 +25,7 @@ urlpatterns = [
 
     # Profil
     path('profile/', views.profile_view, name='profile'),
-    path('/', views.dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/modifier/', views.modifier_profile, name='modifier_profile'),
 
     # Admin

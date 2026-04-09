@@ -480,4 +480,8 @@ def dashboard(request):
         stats['clients'] = Client.objects.count()
 
     return render(request, 'utilisateurs/dashboard.html', {'stats': stats})
-    
+
+from django.shortcuts import redirect
+
+def redirect_to_login(request):
+    return redirect('users:login')
