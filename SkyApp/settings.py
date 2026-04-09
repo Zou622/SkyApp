@@ -52,8 +52,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #mes apps
-    'base_stations',
-    'type_contrats',
     'users',
     'clients',
     'techniciens',
@@ -61,6 +59,8 @@ INSTALLED_APPS = [
     'activites',
     'rapportActivites',
     'billing',
+    'base_stations',
+    'type_contrats',
     
 
 ]
