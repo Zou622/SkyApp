@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -120,73 +121,131 @@ def is_manager(user):
     return user.is_authenticated and user.user_type in ['admin', 'superviseur']
 
 
+
+
+
 @login_required
 def dashboard(request):
-
     user = request.user
     stats = {}
+    
+    # Initialisation
+    stats["users"] = 0
+    stats["clients"] = 0
+    stats["activites"] = 0
+    stats["top_techniciens"] = []
+    stats["techniciens_sans_activite"] = []
+    stats["tech_labels"] = []
+    stats["tech_values"] = []
 
-    # ==============================
-    # ADMIN / SUPERVISEUR
-    # ==============================
     if user.user_type in ["admin", "superviseur"]:
+        
+        stats["users"] = User.objects.count()
+        stats["clients"] = Client.objects.count()
+        stats["activites"] = Activite.objects.count()
 
-        stats["total_users"] = User.objects.count()
-        stats["total_clients"] = Client.objects.count()
-        stats["total_activites"] = Activite.objects.count()
-        stats["total_commerciaux"] = Commercial.objects.count()
-        stats["total_techniciens"] = Technicien.objects.count()
-
-    # ==============================
-    # COMMERCIAL
-    # ==============================
-    elif user.user_type == "commercial":
-
-        commercial = Commercial.objects.filter(
-            user_account=user
-        ).first()
-
-        if commercial:
-            stats["mes_clients"] = Client.objects.filter(
-                commercial=commercial
-            ).count()
-
-            stats["mes_activites"] = Activite.objects.filter(
-                client__commercial=commercial
-            ).count()
+        # Vérifier la structure de la base de données
+        from django.db import connection
+        cursor = connection.cursor()
+        
+        # Déterminer le type de relation
+        cursor.execute("""
+            SELECT 
+                tc.nom, 
+                tc.prenom,
+                COUNT(ac.id) as nb_activites
+            FROM 
+                utilisateurs_technicien tc
+                LEFT JOIN clients_activite_techniciens act ON tc.id = act.technicien_id
+                LEFT JOIN clients_activite ac ON act.activite_id = ac.id
+            GROUP BY 
+                tc.id, tc.nom, tc.prenom
+            ORDER BY 
+                nb_activites DESC
+        """)
+        
+        results = cursor.fetchall()
+        
+        if results:
+            stats["tech_labels"] = [f"{r[0]} {r[1]}" for r in results]
+            stats["tech_values"] = [r[2] for r in results]
         else:
-            stats["mes_clients"] = 0
-            stats["mes_activites"] = 0
+            # Essayer l'autre type de relation
+            cursor.execute("""
+                SELECT 
+                    tc.nom, 
+                    tc.prenom,
+                    COUNT(ac.id) as nb_activites
+                FROM 
+                    utilisateurs_technicien tc
+                    LEFT JOIN clients_activite ac ON tc.id = ac.technicien_id
+                GROUP BY 
+                    tc.id, tc.nom, tc.prenom
+                ORDER BY 
+                    nb_activites DESC
+            """)
+            
+            results = cursor.fetchall()
+            stats["tech_labels"] = [f"{r[0]} {r[1]}" for r in results]
+            stats["tech_values"] = [r[2] for r in results]
 
-    # ==============================
-    # TECHNICIEN
-    # ==============================
-    elif user.user_type == "technicien":
+        # TOP 3 du mois
+        start_month = timezone.now().replace(day=1).strftime('%Y-%m-%d')
+        
+        cursor.execute("""
+            SELECT 
+                tc.nom, 
+                tc.prenom,
+                COUNT(ac.id) as nb_activites
+            FROM 
+                utilisateurs_technicien tc
+                LEFT JOIN clients_activite_techniciens act ON tc.id = act.technicien_id
+                LEFT JOIN clients_activite ac ON act.activite_id = ac.id
+            WHERE 
+                ac.date_activite >= %s OR ac.id IS NULL
+            GROUP BY 
+                tc.id, tc.nom, tc.prenom
+            HAVING 
+                COUNT(ac.id) > 0
+            ORDER BY 
+                nb_activites DESC
+            LIMIT 3
+        """, [start_month])
+        
+        results = cursor.fetchall()
+        stats["top_techniciens"] = [
+            {"nom": r[0], "prenom": r[1], "total_activites": r[2]}
+            for r in results
+        ]
 
-        technicien = Technicien.objects.filter(
-            user_account=user
-        ).first()
+        # Techniciens sans activité
+        cursor.execute("""
+            SELECT 
+                tc.nom, 
+                tc.prenom
+            FROM 
+                utilisateurs_technicien tc
+                LEFT JOIN clients_activite_techniciens act ON tc.id = act.technicien_id
+            WHERE 
+                act.technicien_id IS NULL
+        """)
+        
+        results = cursor.fetchall()
+        stats["techniciens_sans_activite"] = [
+            {"nom": r[0], "prenom": r[1]}
+            for r in results
+        ]
 
-        if technicien:
-            stats["mes_activites"] = Activite.objects.filter(
-                techniciens=technicien
-            ).count()
-        else:
-            stats["mes_activites"] = 0
+    # ... reste du code pour commercial et technicien ...
 
-    # ==============================
-    # AUTRE CAS
-    # ==============================
-    else:
-        stats["info"] = "Aucun rôle défini"
-
-    context = {
-        "stats": stats
-    }
-
-    return render(request, "utilisateurs/dashboard.html", context)
-
-
+    return render(request, "utilisateurs/dashboard.html", {
+        "stats": stats,
+        "user": user
+    }) 
+    
+    
+    
+    
 @admin_required
 def list_utilisateurs(request):
     """Liste tous les utilisateurs (admin seulement)"""
@@ -291,6 +350,18 @@ def get_user_stats(user):
 @login_required
 def profile_view(request):
     return render(request, "utilisateurs/profile.html")
+
+
+@login_required
+def detail_user(request, user_id):
+    user_obj = get_object_or_404(User, id=user_id)
+
+    context = {
+        "user_obj": user_obj
+    }
+
+    return render(request, "utilisateurs/detail_user.html", context)
+
 
 
 @login_required

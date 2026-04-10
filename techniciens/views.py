@@ -79,18 +79,23 @@ def enregistrer_technicien(request):
         # Récupérer les données
         nom = request.POST.get('nom', '').strip()
         prenom = request.POST.get('prenom', '').strip()
-        email = request.POST.get('email', '').strip()
+        email = request.POST.get('email', '').strip() or None
         telephone = request.POST.get('telephone', '').strip()
         quartier = request.POST.get('quartier', '').strip()
         adresse = request.POST.get('adresse', '').strip()
         specialite = request.POST.get('specialite', '').strip()
         statut = request.POST.get('statut', 'actif').strip()
-        date_embauche = request.POST.get('date_embauche', '').strip()
         photo = request.FILES.get('photo')
+        # pour gérer le cas où la date d'embauche n'est pas fournie
+        date_embauche = request.POST.get('date_embauche') or None
+        if date_embauche:
+            date_embauche = date_embauche
+        else:
+            date_embauche = None
 
         # Validation
-        if not nom or not prenom or not email:
-            messages.error(request, 'Le nom, prénom et email sont obligatoires')
+        if not nom or not prenom:
+            messages.error(request, 'Le nom et le prénom sont obligatoires')
             return render(request, 'techniciens/ajouter_technicien.html')
 
         # Vérifier si l'email existe déjà
@@ -135,14 +140,20 @@ def modifier_technicien(request, technicien_id):
         # Mettre à jour les données
         technicien.nom = request.POST.get('nom', technicien.nom)
         technicien.prenom = request.POST.get('prenom', technicien.prenom)
-        technicien.email = request.POST.get('email', technicien.email)
+        technicien.email = request.POST.get('email', technicien.email) or None
         technicien.telephone = request.POST.get('telephone', technicien.telephone)
         technicien.quartier = request.POST.get('quartier', technicien.quartier)
         technicien.adresse = request.POST.get('adresse', technicien.adresse)
         technicien.specialite = request.POST.get('specialite', technicien.specialite)
         technicien.statut = request.POST.get('statut', technicien.statut)
-        technicien.date_embauche = request.POST.get('date_embauche', technicien.date_embauche)
+        # pour gérer le cas où la date d'embauche n'est pas fournie
+        technicien.date_embauche = request.POST.get('date_embauche', technicien.date_embauche) or None
+        if technicien.date_embauche:
+            technicien.date_embauche = technicien.date_embauche
+        else:
+            technicien.date_embauche = None
 
+        # Gérer la photo (si une nouvelle photo est téléchargée)
         if 'photo' in request.FILES:
             technicien.photo = request.FILES['photo']
 

@@ -1,0 +1,113 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container mt-4">
+
+        <div class="card shadow">
+
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-circle mr-2"></i>
+                    Détail utilisateur
+                </h4>
+
+                <a href="{% url 'users:liste_utilisateurs' %}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body">
+                <div class="row">
+
+                    <!-- PHOTO -->
+                    <div class="col-md-4 text-center">
+                        {% if user_obj.photo %}
+                            <img src="{{ user_obj.photo.url }}"
+                                 class="rounded-circle border"
+                                 style="width:160px;height:160px;object-fit:cover;">
+                        {% else %}
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width:160px;height:160px;font-size:40px;font-weight:bold;">
+                                {{ user_obj.first_name|first|upper }}{{ user_obj.last_name|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- INFOS -->
+                    <div class="col-md-8">
+                        <table class="table table-borderless">
+
+                            <tr>
+                                <th>Nom complet :</th>
+                                <td>{{ user_obj.get_full_name }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Username :</th>
+                                <td>{{ user_obj.username }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Email :</th>
+                                <td>{{ user_obj.email|default:"Non renseigné" }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Téléphone :</th>
+                                <td>{{ user_obj.telephone|default:"-" }}</td>
+                            </tr>
+
+                            <tr>
+                                <th>Rôle :</th>
+                                <td>
+                                    <span class="badge
+                                        {% if user_obj.user_type == 'admin' %}badge-danger
+                                        {% elif user_obj.user_type == 'superviseur' %}badge-warning
+                                        {% elif user_obj.user_type == 'commercial' %}badge-info
+                                        {% elif user_obj.user_type == 'technicien' %}badge-success
+                                        {% else %}badge-secondary{% endif %}">
+                                        {{ user_obj.get_user_type_display }}
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>Statut :</th>
+                                <td>
+                                    {% if user_obj.est_valide %}
+                                        <span class="badge badge-success">Actif</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Inactif</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>Date inscription :</th>
+                                <td>{{ user_obj.date_inscription|date:"d/m/Y" }}</td>
+                            </tr>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card-footer text-right">
+                <a href="{% url 'users:modifier_profile' %}" class="btn btn-warning">
+                    <i class="fas fa-edit mr-1"></i> Modifier
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

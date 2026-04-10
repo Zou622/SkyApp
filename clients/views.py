@@ -642,10 +642,13 @@ def activites_aujourdhui(request):
 
 @login_required
 @user_passes_test(is_manager)   
-def detail_activite(request, id):
-    """Détails d'une activité"""
-    activite = get_object_or_404(Activite, pk=id)
-    context = {'activite': activite}
+def detail_activite(request, pk):
+    activite = get_object_or_404(Activite, pk=pk)
+
+    context = {
+        'activite': activite
+    }
+
     return render(request, 'clients/detail_activite.html', context)
 
 @login_required
@@ -677,7 +680,7 @@ def modifier_activite(request, pk):
         # Validation
         if not client_id or not type_activite or not date_activite:
             messages.error(request, 'Tous les champs obligatoires doivent être remplis')
-            return redirect('modifier_activite', pk=activite.pk)
+            return redirect('clients:modifier_activite', pk=activite.pk)
 
         try:
             activite.client = Client.objects.get(id=client_id)
@@ -695,7 +698,7 @@ def modifier_activite(request, pk):
             activite.techniciens.set(techniciens_ids)
 
             messages.success(request, 'Activité modifiée avec succès!')
-            return redirect('detail_activite', pk=activite.pk)
+            return redirect('clients:detail_activite', pk=activite.pk)
 
         except Exception as e:
             messages.error(request, f'Erreur: {str(e)}')
@@ -782,18 +785,6 @@ def mes_activites(request):
     activites = Activite.objects.filter(techniciens=technicien)
     return render(request, 'clients/mes_activites.html', {'activites': activites})
 
-@login_required
-def detail_activite(request, id):
-    #technicien = request.user.technicien
-    activite = get_object_or_404(
-        Activite,
-        id=id,
-        #techniciens=technicien
-    )
-
-    return render(request, 'clients/detail_activite.html', {
-        'activite': activite
-    })
     
     
     

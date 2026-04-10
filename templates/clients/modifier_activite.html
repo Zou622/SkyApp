@@ -12,7 +12,7 @@
             </div>
 
             <div class="card-body">
-                <form method="post" action="{% url 'activities:detail_activite' activite.id %}" >
+                <form id="activiteForm" method="post" action="{% url 'clients:modifier_activite' activite.id %}">
                     {% csrf_token %}
 
                     <div class="row">
@@ -148,12 +148,20 @@
 
 <script>
 document.getElementById('activiteForm').addEventListener('submit', function(e) {
+
     const debut = document.querySelector('input[name="heure_debut"]').value;
     const fin = document.querySelector('input[name="heure_fin"]').value;
 
     if (debut && fin && debut >= fin) {
         e.preventDefault();
-        alert("L'heure de fin doit être après l'heure de début");
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: "L'heure de fin doit être après l'heure de début"
+        });
+
+        return false;
     }
 });
 </script>

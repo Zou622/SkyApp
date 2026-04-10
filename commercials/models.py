@@ -27,7 +27,7 @@ class Commercial(models.Model):
 
     quartier = models.CharField(max_length=100, blank=True, null=True)
     adresse = models.TextField(blank=True, null=True)
-    telephone = models.CharField(max_length=20)
+    telephone = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
 
     specialite = models.CharField(

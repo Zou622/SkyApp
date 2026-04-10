@@ -44,9 +44,9 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label for="adresse" class="form-label fw-bold">Adresse *</label>
+                                                <label for="adresse" class="form-label fw-bold">Adresse </label>
                                                 <textarea class="form-control" id="adresse" name="adresse"
-                                                          rows="2" required>{{ client.adresse }}</textarea>
+                                                          rows="2">{{ client.adresse }}</textarea>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -143,7 +143,7 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                <label for="type_contrat" class="form-label fw-bold">
-                                                    <i class="fas fa-file-contract me-1"></i> Type de contrat *
+                                                    <i class="fas fa-file-contract me-1"></i> Type de contrat
                                                 </label>
                                                 <select class="form-select-lg" name="type_contrat_id">
                                                     <option value="">--- Sélectionner ---</option>
@@ -161,7 +161,7 @@
                                             <div class="mb-3">
                                                 <label for="capacite" class="form-label fw-bold">Capacité (Mbps) *</label>
                                                 <input type="text" class="form-control" id="capacite"
-                                                       name="capacite" value="{{ client.capacite|default:'' }}" required>
+                                                       name="capacite" value="{{ client.capacite|default:'' }}">
                                             </div>
                                         </div>
                                         <div class="col-md-4">

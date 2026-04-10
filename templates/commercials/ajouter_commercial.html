@@ -44,8 +44,8 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Téléphone *</label>
-                                    <input type="text" name="telephone" class="form-control" required>
+                                    <label class="form-label fw-bold">Téléphone </label>
+                                    <input type="text" name="telephone" class="form-control">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Email</label>
@@ -73,7 +73,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Taux de commission (%)</label>
                                     <input type="number" name="taux_commission" class="form-control"
-                                           value="10.00" step="0.01" min="0" max="100">
+                                           value="0.00" step="0.01" min="0" max="100">
                                 </div>
                             </div>
 
@@ -129,11 +129,11 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(event){
         const nom = form.querySelector('input[name="nom"]').value.trim();
         const prenom = form.querySelector('input[name="prenom"]').value.trim();
-        const telephone = form.querySelector('input[name="telephone"]').value.trim();
+        
 
-        if(!nom || !prenom || !telephone){
+        if(!nom || !prenom) {
             event.preventDefault();
-            alert('Veuillez remplir les champs obligatoires : Nom, Prénom et Téléphone.');
+            alert('Veuillez remplir les champs obligatoires : Nom et Prénom.');
             return false;
         }
     });

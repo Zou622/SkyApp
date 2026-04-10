@@ -58,8 +58,8 @@ def ajouter_commercial(request):
         est_actif = request.POST.get('est_actif') == 'on'
 
         # Validation simple
-        if not nom or not prenom or not telephone:
-            messages.error(request, 'Nom, Prénom et Téléphone sont obligatoires')
+        if not nom or not prenom:
+            messages.error(request, 'Nom et Prénom sont obligatoires')
             return render(request, 'commercials/ajouter_commercial.html')
 
         # Créer le commercial
@@ -107,12 +107,20 @@ def modifier_commercial(request, pk):
         commercial.adresse = request.POST.get('adresse')
         commercial.specialite = request.POST.get('specialite')
         commercial.taux_commission = request.POST.get('taux_commission')
-        commercial.date_embauche = request.POST.get('date_embauche')
+        #commercial.date_embauche = request.POST.get('date_embauche')
         commercial.est_actif = request.POST.get('est_actif') == 'on'
+        
+        #même si la date d'embauche est facultative, on doit vérifier si elle est fournie avant de l'assigner
+        date_embauche = request.POST.get('date_embauche')
+        if date_embauche:
+            commercial.date_embauche = date_embauche
+        else:
+            commercial.date_embauche = None
+
 
         # Validation
-        if not commercial.nom or not commercial.prenom or not commercial.telephone:
-            messages.error(request, 'Nom, Prénom et Téléphone sont obligatoires')
+        if not commercial.nom or not commercial.prenom:
+            messages.error(request, 'Nom et Prénom sont obligatoires')
             context = {
                 'commercial': commercial,
                 'specialites': Commercial.SPECIALITES

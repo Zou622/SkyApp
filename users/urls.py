@@ -27,6 +27,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/modifier/', views.modifier_profile, name='modifier_profile'),
+    path('user/<int:user_id>/', views.detail_user, name='detail_user'),
 
     # Admin
     path('users/', views.list_utilisateurs, name='liste_utilisateurs'),

@@ -133,9 +133,9 @@ def creer_rapport(request, activite_id):
     
     
     
-def detail_rapport(request, rapport_id):
+def detail_rapport(request, pk):
 
-    rapport = get_object_or_404(RapportActivite, id=rapport_id)
+    rapport = get_object_or_404(RapportActivite, pk=pk)
 
     type_activite = rapport.activite.type_activite.lower().strip()
 
@@ -241,7 +241,7 @@ def detail_rapport(request, rapport_id):
 
     champs = champs_par_type.get(type_activite, [])
 
-    return render(request, "rapportActivites/detail_rapport.html", {
+    return render(request, "rapportsActivites/detail_rapport.html", {
         "rapport": rapport,
         "champs": champs
     })

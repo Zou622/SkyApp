@@ -7,12 +7,12 @@ from django.conf import settings
 class Technicien(models.Model):
     nom = models.CharField(max_length=100, verbose_name="Nom")
     prenom = models.CharField(max_length=100, verbose_name="Prénom")
-    email = models.EmailField(verbose_name="Email", unique=True)
-    telephone = models.CharField(max_length=20, verbose_name="Téléphone")
+    email = models.EmailField(verbose_name="Email", unique=True, blank=True, null=True)
+    telephone = models.CharField(max_length=20, verbose_name="Téléphone" , blank=True, null=True)
 
     # Adresse
-    quartier = models.CharField(max_length=100, verbose_name="Quartier")
-    adresse = models.TextField(verbose_name="Adresse complète")
+    quartier = models.CharField(max_length=100, verbose_name="Quartier", blank=True, null=True)
+    adresse = models.TextField(verbose_name="Adresse complète" , blank=True, null=True)
 
     # Photo
     photo = models.ImageField(
@@ -26,7 +26,8 @@ class Technicien(models.Model):
     specialite = models.CharField(
         max_length=100,
         verbose_name="Spécialité",
-        blank=True
+        blank=True,
+        null=True
     )
 
     # Relation vers User (optionnelle - si vous voulez aussi un lien depuis Technicien)
@@ -54,7 +55,7 @@ class Technicien(models.Model):
     est_actif = models.BooleanField(default=True)
 
     # Dates
-    date_embauche = models.DateField(verbose_name="Date d'embauche")
+    date_embauche = models.DateField(verbose_name="Date d'embauche" , blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
