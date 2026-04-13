@@ -9,6 +9,8 @@
 
         <!-- LEFT -->
         <div class="login-left">
+            <div class="overlay"></div>
+
             <div class="left-content">
                 <h2>SkyApp</h2>
                 <p>Plateforme de gestion des activités</p>
@@ -21,7 +23,7 @@
             <div class="login-box">
 
                 <h3>Connexion</h3>
-                <p class="subtitle">Accédez à votre espace</p>
+                <p class="subtitle">Accédez à votre espace sécurisé</p>
 
                 {% if messages %}
                     {% for message in messages %}
@@ -51,10 +53,9 @@
                     </button>
                 </form>
 
-                <!-- 🔥 ANDROID BUTTON -->
                 <div class="extra-links">
                     <button id="resetPasswordBtn" class="btn-reset">
-                        <span>🔒</span> Mot de passe oublié ?
+                        🔒 Mot de passe oublié ?
                     </button>
                 </div>
 
@@ -69,9 +70,11 @@
 <style>
 
 /* GLOBAL */
-body {
+html, body {
     margin: 0;
-    font-family: Arial;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: "Segoe UI", sans-serif;
     background: #eef2f7;
 }
 
@@ -79,48 +82,67 @@ body {
 .login-page {
     min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
 /* CONTAINER */
 .login-container {
     display: flex;
-    width: 1000px;
-    max-width: 100%;
-    height: 560px;
-    border-radius: 20px;
+    width: 100%;
+    max-width: 1050px;
+    min-height: 580px;
+    border-radius: 18px;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
 }
 
 /* LEFT */
 .login-left {
     width: 50%;
-    background: linear-gradient(135deg, #2563eb, #1e3a8a);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
 }
 
+/* IMAGE NON ZOOMÉE */
 .login-left::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("{% static 'dist/img/New_logo.jpg.jpeg' %}") center/contain no-repeat;
-    opacity: 0.2;
+    background: url("{% static 'dist/img/New_logo.jpg.jpeg' %}") center no-repeat;
+    background-size: contain; /* 🔥 correction zoom */
+    opacity: 0.25;
 }
 
+/* overlay */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.15);
+}
+
+/* TEXTE */
 .left-content {
+    position: relative;
     text-align: center;
     color: white;
+    margin-top: 50px;
     z-index: 2;
 }
 
-.logo {
-    width: 110px;
+.left-content h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.left-content p {
+    font-size: 14px;
 }
 
 /* RIGHT */
@@ -134,44 +156,50 @@ body {
 
 .login-box {
     width: 100%;
-    max-width: 360px;
+    max-width: 380px;
 }
 
 h3 {
-    font-size: 26px;
-    margin: 0;
+    font-size: 28px;
 }
 
 .subtitle {
     color: #64748b;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 /* INPUT */
 .form-group {
+    margin-bottom: 15px;
     position: relative;
 }
 
 .form-group input {
     width: 100%;
-    padding: 12px;
+    padding: 13px;
+    font-size: 16px;
     border-radius: 10px;
-    border: 1px solid #ddd;
-    margin-bottom: 15px;
+    border: 1px solid #e5e7eb;
+}
+
+.form-group input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
 }
 
 .password-group span {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 12px;
+    top: 12px;
     cursor: pointer;
 }
 
-/* BUTTON LOGIN */
+/* BUTTON */
 .btn-login {
     width: 100%;
-    padding: 12px;
-    background: #2563eb;
+    padding: 14px;
+    font-size: 16px;
+    background: #3b82f6;
     color: white;
     border: none;
     border-radius: 10px;
@@ -181,31 +209,17 @@ h3 {
     display: none;
 }
 
-/* 🔥 ANDROID RESET BUTTON */
-.btn-reset {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-radius: 30px;
-    border: none;
-    background: rgba(37,99,235,0.08);
-    color: #2563eb;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-reset:hover {
-    background: rgba(37,99,235,0.15);
-}
-
-.btn-reset:active {
-    transform: scale(0.96);
-}
-
+/* RESET */
 .extra-links {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 18px;
+}
+
+.btn-reset {
+    border: none;
+    background: transparent;
+    color: #3b82f6;
+    cursor: pointer;
 }
 
 /* MOBILE */
@@ -213,13 +227,12 @@ h3 {
 
     .login-container {
         flex-direction: column;
-        height: auto;
         box-shadow: none;
     }
 
     .login-left {
         width: 100%;
-        height: 150px;
+        min-height: 160px;
     }
 
     .login-right {
@@ -227,13 +240,8 @@ h3 {
         padding: 20px;
     }
 
-    .form-group input {
-        padding: 14px;
-        font-size: 16px;
-    }
-
-    .btn-login {
-        padding: 14px;
+    .login-box {
+        max-width: 100%;
     }
 }
 
@@ -246,7 +254,6 @@ h3 {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* LOGIN LOADING */
     const form = document.getElementById("loginForm");
     const btn = document.getElementById("loginBtn");
     const text = document.querySelector(".btn-text");
@@ -258,28 +265,18 @@ document.addEventListener("DOMContentLoaded", function () {
         loading.style.display = "inline-block";
     });
 
-    /* SHOW PASSWORD */
     document.getElementById("togglePassword").addEventListener("click", function () {
-        const input = document.querySelector("input[type='password']");
+        const input = document.querySelector("input[type='password'], input[type='text']");
         input.type = input.type === "password" ? "text" : "password";
     });
 
-    /* 🔥 RESET PASSWORD ANDROID STYLE */
     document.getElementById('resetPasswordBtn').addEventListener('click', function () {
 
         Swal.fire({
             title: 'Mot de passe oublié',
-            text: 'Entrez votre email',
             input: 'email',
-            inputPlaceholder: 'email@gmail.com',
             showCancelButton: true,
-            confirmButtonText: 'Envoyer',
-            cancelButtonText: 'Annuler',
-
-            inputValidator: (value) => {
-                if (!value) return 'Email requis';
-            }
-
+            confirmButtonText: 'Envoyer'
         }).then((result) => {
 
             if (result.isConfirmed) {
@@ -304,14 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status === 'success') {
-                        Swal.fire('Succès', data.message, 'success');
-                    } else {
-                        Swal.fire('Erreur', data.message, 'error');
-                    }
-                })
-                .catch(() => {
-                    Swal.fire('Erreur', 'Serveur indisponible', 'error');
+                    Swal.fire(data.status === 'success' ? 'Succès' : 'Erreur', data.message);
                 });
 
             }
