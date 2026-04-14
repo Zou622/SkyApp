@@ -10,6 +10,7 @@ from activites.models import Activite
 from base_stations.models import BaseStation
 from commercials.models import Commercial
 from django.urls import reverse
+from django.core.exceptions import ValidationError 
 from django.contrib import messages
 from django.db.models import Q
 from datetime import date, datetime

@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from .models import Commercial
 from datetime import date
