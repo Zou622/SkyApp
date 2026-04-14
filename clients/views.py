@@ -14,7 +14,8 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db.models import Q
 from datetime import date, datetime
-
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_ipv46_address
 from rapportActivites.forms import RapportActiviteForm
 from rapportActivites.models import RapportActivite
 from techniciens.models import Technicien
@@ -254,13 +255,13 @@ def modifier_client(request, client_id):
         if adresse_ip:
             try:
                 validate_ipv46_address(adresse_ip) # pyright: ignore[reportUndefinedVariable]
-            except ValidationError: # pyright: ignore[reportUndefinedVariable]
+            except ValidationError: 
                 messages.error(request, "❌ Adresse IP invalide")
                 return redirect('clients:modifier_client', client.id)
 
         client.adresse_ip = adresse_ip
 
-        client.type_contrat = request.POST.get('type_contrat', client.type_contrat)
+        #client.type_contrat = request.POST.get('type_contrat', client.type_contrat)
         client.base_station = clean_value(request.POST.get('base_station'))
         client.capacite = clean_value(request.POST.get('capacite'))
         client.download = clean_value(request.POST.get('download'))
