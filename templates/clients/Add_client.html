@@ -96,6 +96,18 @@
                                 <i class="fas fa-network-wired me-2"></i> Informations Techniques
                             </h5>
 
+                            <!-- 🔥 NOUVEAU CHAMP FORFAIT -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Forfait
+                                </label>
+                                <select class="form-control" name="forfait" id="forfaitSelect">
+                                    <option value="">--- Sélectionner un forfait ---</option>
+                                    <option value="dedié">Dedié</option>
+                                    <option value="partagé">Partagé</option>
+                                </select>
+                                <small class="text-muted">Sélectionnez le forfait souscrit par le client</small>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <label class="form-label">Adresse IP</label>
@@ -107,7 +119,7 @@
                                 </div>
                             </div>
 
-                            <!-- ✅ BASE STATION -->
+                            <!-- BASE STATION -->
                             <div class="mt-3">
                                 <label class="form-label fw-bold">Base Station</label>
                                 <select class="form-control" name="base_station">
@@ -119,18 +131,18 @@
                             </div>
 
                             <div class="mt-3">
-                                <label class="form-label fw-bold">Capacité </label>
-                                <input type="number" class="form-control" name="capacite" id="capacite">
+                                <label class="form-label fw-bold">Capacité (Mbps)</label>
+                                <input type="number" class="form-control" name="capacite" id="capacite" placeholder="Ex: 100">
                             </div>
 
                             <div class="row mt-2">
                                 <div class="col-md-6">
-                                    <label>Download</label>
-                                    <input type="number" class="form-control" name="download" id="download">
+                                    <label>Download (Mbps)</label>
+                                    <input type="number" class="form-control" name="download" id="download" placeholder="Ex: 100">
                                 </div>
                                 <div class="col-md-6">
-                                    <label>Upload</label>
-                                    <input type="number" class="form-control" name="upload" id="upload">
+                                    <label>Upload (Mbps)</label>
+                                    <input type="number" class="form-control" name="upload" id="upload" placeholder="Ex: 50">
                                 </div>
                             </div>
 
@@ -152,6 +164,90 @@
     </div>
 </div>
 
+<!-- JavaScript pour pré-remplir capacité/download/upload selon le forfait -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forfaitSelect = document.getElementById('forfaitSelect');
+    const capaciteInput = document.getElementById('capacite');
+    const downloadInput = document.getElementById('download');
+    const uploadInput = document.getElementById('upload');
+    const typeContrat = document.getElementById('typeContrat');
+    const dedieMessage = document.getElementById('dedieMessage');
 
+    // Mapping des forfaits
+    const forfaitMapping = {
+        '10 Mbps': 10,
+        '20 Mbps': 20,
+        '30 Mbps': 30,
+        '50 Mbps': 50,
+        '100 Mbps': 100,
+        '200 Mbps': 200,
+        '500 Mbps': 500,
+        '1 Gbps': 1000
+    };
+
+    // Fonction pour mettre à jour les champs
+    function updateForfaitFields() {
+        const selectedForfait = forfaitSelect.value;
+        
+        if (selectedForfait && forfaitMapping[selectedForfait]) {
+            const valeur = forfaitMapping[selectedForfait];
+            capaciteInput.value = valeur;
+            
+            // Vérifier le type de contrat
+            const contratValue = typeContrat.value;
+            const contratText = typeContrat.options[typeContrat.selectedIndex]?.text;
+            
+            if (contratText && contratText.toLowerCase().includes('symétrique')) {
+                // Pour un contrat symétrique
+                downloadInput.value = valeur;
+                uploadInput.value = valeur;
+                dedieMessage.style.display = 'block';
+            } else {
+                // Pour un contrat asymétrique ou non spécifié
+                downloadInput.value = valeur;
+                uploadInput.value = Math.floor(valeur / 2); // Upload = moitié de la capacité
+                dedieMessage.style.display = 'none';
+            }
+        }
+    }
+
+    // Écouter les changements sur le forfait
+    forfaitSelect.addEventListener('change', updateForfaitFields);
+    
+    // Écouter les changements sur le type de contrat
+    typeContrat.addEventListener('change', function() {
+        if (forfaitSelect.value) {
+            updateForfaitFields();
+        }
+        
+        // Afficher/masquer le message pour contrat dédié
+        const selectedText = typeContrat.options[typeContrat.selectedIndex]?.text;
+        if (selectedText && selectedText.toLowerCase().includes('symétrique')) {
+            dedieMessage.style.display = 'block';
+        } else {
+            dedieMessage.style.display = 'none';
+        }
+    });
+});
+</script>
+
+<!-- Style optionnel -->
+<style>
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    
+    select.form-control {
+        cursor: pointer;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+</style>
 
 {% endblock %}

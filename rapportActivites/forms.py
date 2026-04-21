@@ -29,6 +29,8 @@ class RapportActiviteForm(forms.ModelForm):
             'date_prochaine_intervention',
             'photo_avant',
             'photo_apres',
+            'photo_arriver_site_tmp',
+            'photo_chemin_cable',
             'document_joint',
             'description',
             'point_de_depart',
@@ -39,7 +41,19 @@ class RapportActiviteForm(forms.ModelForm):
             'quel_brain',
             'photo_appareils_connecte',
             'plainte_client',
-            'photo_ping'
+            'photo_ping',
+            
+            'nom_prospect',
+            'telephone_prospect',
+            'email_prospect',
+            'adresse_prospect',
+            'canal_prospection',
+            'besoin_client',
+            'offre_proposee',
+            'statut_prospection',
+            'probabilite_conversion',
+            'date_relance',
+            'commentaire_prospection',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -64,7 +78,8 @@ class RapportActiviteForm(forms.ModelForm):
                     'equipements_utilises',
                     'parametres_configures',
                     'photo_avant',
-                    'photo_apres'
+                    'photo_apres',
+                    'photo_arriver_site_tmp'
                 ],
 
                 "maintenance": [
@@ -76,6 +91,7 @@ class RapportActiviteForm(forms.ModelForm):
                     'solutions_apportees',
                     'photo_avant',
                     'photo_apres',
+                    'photo_arriver_site_tmp',
                     'description'
                 ],
 
@@ -83,10 +99,9 @@ class RapportActiviteForm(forms.ModelForm):
                     'date_intervention_reelle',
                     'heure_debut_reelle',
                     'heure_fin_reelle',
-                    'travaux_realises',
-                    'etat_avant',
+                    'photo_arriver_site_tmp',
                     'difficultes_rencontrees',
-                    'photo_avant',
+                    'photo_chemin_cable',
                     'description'
                 ],
 
@@ -94,9 +109,10 @@ class RapportActiviteForm(forms.ModelForm):
                     'date_intervention_reelle',
                     'heure_debut_reelle',
                     'heure_fin_reelle',
-                    'travaux_realises',
-                    'difficultes_rencontrees',
-                    'solutions_apportees'
+                    'description',
+                    'solutions_apportees',
+                    'photo_ping',
+                    'photo_appareils_connecte',
                 ],
                 
                 "tirage_fo":[
@@ -107,6 +123,9 @@ class RapportActiviteForm(forms.ModelForm):
                     'nombre_de_joinbox_poser',
                     'type_de_brain',
                     'photo_apres',
+                    'photo_chemin_cable',
+                    'description',
+                    'difficultes_rencontrees',
                 ],
                 
                 "raccordement":[
@@ -125,8 +144,8 @@ class RapportActiviteForm(forms.ModelForm):
                     'date_intervention_reelle',
                     'heure_debut_reelle',
                     'heure_fin_reelle',
-                    'description',
                     'photo_avant',
+                    'description',
                     'photo_apres'
                 ],
                 
@@ -140,12 +159,37 @@ class RapportActiviteForm(forms.ModelForm):
                     'photo_appareils_connecte'
                 ],
                 
+                "prospection": [
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+
+                    # Prospect
+                    'nom_prospect',
+                    'telephone_prospect',
+                    'email_prospect',
+                    'adresse_prospect',
+
+                    # Infos prospection
+                    'canal_prospection',
+                    'besoin_client',
+                    'offre_proposee',
+
+                    # Résultat
+                    'statut_prospection',
+                    'probabilite_conversion',
+                    'date_relance',
+
+                    # Notes
+                    'commentaire_prospection',
+                    'description'
+                ],
+                
                 'autre':[
                     'date_intervention_reelle',
                     'heure_debut_reelle',
                     'heure_fin_reelle',
                     'description',
-                    'photo_avant',
                     'photo_apres',
                     'travaux_realises',
                     'difficultes_rencontrees',

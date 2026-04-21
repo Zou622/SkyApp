@@ -1,0 +1,63 @@
+{% extends 'main.html' %}
+{% block contenu %}
+
+<div class="container mt-4">
+    <div class="card shadow">
+
+        <div class="card-header bg-warning text-white">
+            <h4>✏️ Modifier Prospection</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+                Client : <strong>{{ prospection.client.nom_client }}</strong>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>Date</label>
+                    <input type="date" name="date_activite"
+                           value="{{ prospection.date_activite }}"
+                           class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Lieu</label>
+                    <input type="text" name="lieu"
+                           value="{{ prospection.lieu }}"
+                           class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Statut</label>
+                    <select name="statut" class="form-control">
+                        {% for code, label in statuts %}
+                            <option value="{{ code }}"
+                                {% if prospection.statut == code %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Description</label>
+                    <textarea name="description"
+                              class="form-control"
+                              rows="4">{{ prospection.description }}</textarea>
+                </div>
+
+                <button class="btn btn-warning">
+                    💾 Modifier
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

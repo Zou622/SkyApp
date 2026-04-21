@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from datetime import datetime
 
@@ -20,6 +20,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .forms import RapportActiviteForm
 from activites.models import Activite
 
+
+
+def is_allowed_roles(roles):
+    def check(user):
+        return user.is_authenticated and user.user_type in roles
+    return user_passes_test(check)
 
 #La liste des activté par technicien
 @login_required
@@ -53,7 +59,7 @@ from django.utils import timezone
 
 
 #La vue pour demarrer une activité
-@login_required
+@is_allowed_roles(['admin', 'superviseur','technicien'])
 def demarrer_activite(request, activite_id):
     """Permet au technicien de démarrer une activité"""
 
@@ -63,15 +69,15 @@ def demarrer_activite(request, activite_id):
         technicien = Technicien.objects.get(user=request.user)
     except Technicien.DoesNotExist:
         messages.error(request, "Vous n'êtes pas enregistré comme technicien")
-        return redirect('rapportActivites:liste_activites_technicien')
+        return redirect('clients:mes_activites')
 
     if technicien not in activite.techniciens.all():
         messages.error(request, "Vous n'êtes pas affecté à cette activité")
-        return redirect('rapportActivites:liste_activites_technicien')
+        return redirect('clients:mes_activites')
 
     if activite.statut != 'planifie':
         messages.warning(request, "Cette activité a déjà démarré ou est terminée")
-        return redirect('rapportActivites:liste_activites_technicien')
+        return redirect('clients:mes_activites')
 
     activite.statut = 'en_cours'
     activite.heure_debut = timezone.now().time()
@@ -79,7 +85,7 @@ def demarrer_activite(request, activite_id):
 
     messages.success(request,
                      f"✅ Activité démarrée : {activite.get_type_activite_display()} chez {activite.client.nom_client}")
-    return redirect('liste_activites_technicien')
+    return redirect('clients:mes_activites')
 
 
 
@@ -116,11 +122,11 @@ def creer_rapport(request, activite_id):
 
             rapport.save()
 
-            # ✅ mettre activité en terminé
-            activite.statut = "termine"
+            # ✅ mettre activité en encours si pas déjà fait
+            activite.statut = "en_attente"
             activite.save()
 
-            return redirect('rapportActivites:liste_activites_technicien')
+            return redirect('clients:mes_activites')
 
     else:
         form = RapportActiviteForm(activite=activite)
@@ -130,9 +136,36 @@ def creer_rapport(request, activite_id):
         "activite": activite
     })
     
+
+@login_required
+@is_allowed_roles(['admin', 'supervisseur','technicien'])
+def commencer_activite(request, activite_id):
+
+    activite = get_object_or_404(Activite, id=activite_id)
+
+    # 🔒 déjà commencée ou terminée
+    if activite.statut != 'planifie':
+        messages.warning(request, "⚠️ Cette activité est déjà en cours ou terminée.")
+        return redirect('rapportActivites:mes_activites')
+
+    # ✅ mise à jour statut
+    activite.statut = 'en_cours'
+    activite.heure_debut = timezone.now().time()
+    activite.save()
+
+    messages.success(
+        request,
+        f"🚀 Activité démarrée : {activite.get_type_activite_display()} chez {activite.client.nom_client}"
+    )
+
+    return redirect('rapportActivites:mes_activites')   
+
     
     
     
+    
+    
+@login_required 
 def detail_rapport(request, pk):
 
     rapport = get_object_or_404(RapportActivite, pk=pk)
@@ -142,101 +175,131 @@ def detail_rapport(request, pk):
     champs_par_type = {
 
         "installation": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'description',
-            'travaux_realises',
-            'equipements_utilises',
-            'parametres_configures',
-            'photo_avant',
-            'photo_apres'
-        ],
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'description',
+                    'travaux_realises',
+                    'equipements_utilises',
+                    'parametres_configures',
+                    'photo_avant',
+                    'photo_apres',
+                    'photo_arriver_site_tmp'
+                ],
 
-        "maintenance": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'travaux_realises',
-            'materiel_remplace',
-            'solutions_apportees',
-            'photo_avant',
-            'photo_apres',
-            'description'
-        ],
+                "maintenance": [
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'travaux_realises',
+                    'materiel_remplace',
+                    'solutions_apportees',
+                    'photo_avant',
+                    'photo_apres',
+                    'photo_arriver_site_tmp',
+                    'description'
+                ],
 
-        "survey": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'travaux_realises',
-            'etat_avant',
-            'difficultes_rencontrees',
-            'photo_avant',
-            'description'
-        ],
+                "survey": [
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'photo_arriver_site_tmp',
+                    'difficultes_rencontrees',
+                    'photo_chemin_cable',
+                    'description'
+                ],
 
-        "investigation": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'travaux_realises',
-            'difficultes_rencontrees',
-            'solutions_apportees'
-        ],
+                "investigation": [
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'description',
+                    'solutions_apportees',
+                    'photo_ping',
+                    'photo_appareils_connecte',
+                ],
+                
+                "tirage_fo":[
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'point_de_depart',
+                    'nombre_de_joinbox_poser',
+                    'type_de_brain',
+                    'photo_apres',
+                    'photo_chemin_cable',
+                    'description',
+                    'difficultes_rencontrees',
+                ],
+                
+                "raccordement":[
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'quel_joinbox',
+                    'tube',
+                    'quel_brain',
+                    'photo_avant',
+                    'photo_apres',
+                    'description'
+                ],
+                
+                'remplacement':[
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'photo_avant',
+                    'description',
+                    'photo_apres'
+                ],
+                
+                'noc support':[
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'description',
+                    'plainte_client',
+                    'photo_ping'
+                    'photo_appareils_connecte'
+                ],
+                
+                "prospection": [
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
 
-        "tirage_fo": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'point_de_depart',
-            'nombre_de_joinbox_poser',
-            'type_de_brain',
-            'photo_apres',
-        ],
+                    # Prospect
+                    'nom_prospect',
+                    'telephone_prospect',
+                    'email_prospect',
+                    'adresse_prospect',
 
-        "raccordement": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'quel_joinbox',
-            'tube',
-            'quel_brain',
-            'photo_avant',
-            'photo_apres',
-            'description'
-        ],
+                    # Infos prospection
+                    'canal_prospection',
+                    'besoin_client',
+                    'offre_proposee',
 
-        "remplacement": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'description',
-            'photo_avant',
-            'photo_apres'
-        ],
+                    # Résultat
+                    'statut_prospection',
+                    'probabilite_conversion',
+                    'date_relance',
 
-        "noc support": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'description',
-            'plainte_client',
-            'photo_ping',
-            'photo_appareils_connecte'
-        ],
-
-        "autre": [
-            'date_intervention_reelle',
-            'heure_debut_reelle',
-            'heure_fin_reelle',
-            'description',
-            'travaux_realises',
-            'difficultes_rencontrees',
-            'solutions_apportees',
-            'photo_avant',
-            'photo_apres'
-        ]
+                    # Notes
+                    'commentaire_prospection',
+                    'description'
+                ],
+                
+                'autre':[
+                    'date_intervention_reelle',
+                    'heure_debut_reelle',
+                    'heure_fin_reelle',
+                    'description',
+                    'photo_apres',
+                    'travaux_realises',
+                    'difficultes_rencontrees',
+                    'solutions_apportees'
+                ]
     }
 
     champs = champs_par_type.get(type_activite, [])
@@ -270,3 +333,23 @@ def liste_rapports(request):
     return render(request, 'rapportsActivites/liste_rapports.html', {
         'rapports': rapports
     })
+
+
+@login_required
+@is_allowed_roles(['admin', 'superadmin'])
+def valider_rapport(request, rapport_id):
+
+    rapport = get_object_or_404(RapportActivite, id=rapport_id)
+
+    # ✅ valider le rapport
+    rapport.statut_validation = 'valide'
+    rapport.save()
+
+    # ✅ passer activité en terminé
+    activite = rapport.activite
+    activite.statut = "termine"
+    activite.save()
+
+    messages.success(request, "✅ Rapport validé, activité terminée.")
+
+    return redirect('rapportActivites:liste_rapports')

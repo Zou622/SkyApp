@@ -20,6 +20,7 @@ urlpatterns = [
     path('', include('rapportActivites.urls')),
     path('', include('base_stations.urls')),
     path('', include('type_contrats.urls')),
+    path('', include('prospects.urls')),
 
 ]
 

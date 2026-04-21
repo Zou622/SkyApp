@@ -110,6 +110,13 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
 
+                                        {% if rapport.statut_validation == "en_attente" %}
+                                            <a href="{% url 'rapportActivites:valider_rapport' rapport.id %}" 
+                                            class="btn btn-outline-success btn-sm" title="Valider">
+                                                <i class="fas fa-check"></i >
+                                            </a>
+                                        {% endif %}
+
                                     </div>
                                 </td>
 

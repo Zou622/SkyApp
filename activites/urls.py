@@ -19,4 +19,9 @@ urlpatterns = [
     path('activites-par-technicien/', views.activites_par_technicien, name='activites_par_technicien'),
 
 
+    path('prospection/ajouter/<int:client_id>/', views.ajouter_prospection, name='ajouter_prospection'),
+    path('prospection/', views.liste_prospection, name='liste_prospection'),
+    path('prospection/modifier/<int:id>/', views.modifier_prospection, name='modifier_prospection'),
+    #path('prospects/', views.list_prospects, name='list_prospects'),
+    
 ]

@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from collections import defaultdict
 from django.contrib.auth.decorators import login_required, user_passes_test
-from activites.models import Activite
+from activites.models import Activite  # ✅ OK - import depuis l'app activites
 from base_stations.models import BaseStation
 from commercials.models import Commercial
 from django.urls import reverse
@@ -14,40 +14,32 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db.models import Q
 from datetime import date, datetime
-from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from rapportActivites.forms import RapportActiviteForm
 from rapportActivites.models import RapportActivite
 from techniciens.models import Technicien
 from type_contrats.models import TypeContrat
-#from rapportActivites.models import RapportActivite
-from .models import Client
+from .models import Client  # ✅ OK - import depuis le même app
 from users.models import User
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, get_object_or_404, redirect
-from activites.models import Activite
 from .decorators import technicien_required, role_required, admin_required
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 
-
-
-def is_manager(user):
-    return user.is_authenticated and user.user_type in ['admin', 'superviseur']
+def is_allowed_roles(roles):
+    def check(user):
+        return user.is_authenticated and user.user_type in roles
+    return user_passes_test(check)
 
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur'])
 def afficher_formulaire_ajout(request):
     # Récupérer tous les commerciaux
     commerciaux = Commercial.objects.all()
     base_stations = BaseStation.objects.all()
     type_contrats = TypeContrat.objects.all()
-    client = None  # Aucun client existant lors de l'ajoutbas
+    client = None  # Aucun client existant lors de l'ajoutbase
 
     return render(request, 'clients/Add_client.html', {
         'commerciaux': commerciaux,
@@ -57,7 +49,7 @@ def afficher_formulaire_ajout(request):
     })
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur'])
 def enregistrer_client(request):
     if request.method == 'POST':
 
@@ -66,14 +58,20 @@ def enregistrer_client(request):
         quartier = request.POST.get('quartier', '').strip()
         telephone = request.POST.get('telephone', '').strip()
         email = request.POST.get('email', '').strip()
+
         vlan = request.POST.get('vlan', '').strip()
         adresse_ip = request.POST.get('adresse_ip', '').strip()
+
         statut = request.POST.get('statut', 'non_actif').strip()
 
         capacite = request.POST.get('capacite', '').strip()
         download = request.POST.get('download', '').strip()
         upload = request.POST.get('upload', '').strip()
+
         contrat_pdf = request.FILES.get('contrat_pdf')
+        
+        # ================= NOUVEAU CHAMP FORFAIT =================
+        forfait = request.POST.get('forfait', '').strip()
 
         # ================= COMMERCIAL =================
         commercial = None
@@ -112,18 +110,26 @@ def enregistrer_client(request):
             quartier=quartier,
             telephone=telephone,
             email=email,
-            vlan=vlan,
-            adresse_ip=adresse_ip,
+
+            vlan=vlan or None,
+            adresse_ip=adresse_ip or None,
+
             statut=statut,
+
             type_contrat=type_contrat,
             base_station=base_station,
+
             capacite=capacite or None,
             download=download or None,
             upload=upload or None,
+            
+            forfait=forfait or None,  
+
             contrat_pdf=contrat_pdf,
             commercial=commercial
         )
 
+        # 🔥 MESSAGE DIFFÉRENT
         messages.success(request, f'✅ Client "{nom_client}" ajouté avec succès!')
         return redirect('clients:list_client')
 
@@ -131,93 +137,79 @@ def enregistrer_client(request):
 
 
 @login_required
-#@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur','commercial'])
 def list_client(request):
-    """
-    Vue pour afficher la liste des clients avec statistiques
-    """
-    # Votre logique de filtrage existante
-    #clients = Client.objects.all()
-    clients = Client.objects.select_related('commercial').order_by('-id')
+    user = request.user
 
-    # Filtrage par statut
-    statut_filter = request.GET.get('statut')
-    if statut_filter:
-        clients = clients.filter(statut=statut_filter)
+    # 🔐 Détection du commercial (CORRECT)
+    commercial = Commercial.objects.filter(user_account=user).first()
+    is_commercial = commercial is not None
 
-    # Recherche par texte
+    # ================= BASE QUERY =================
+    # 🔥 FILTRER UNIQUEMENT LES CLIENTS NON SUPPRIMÉS (est_supprime=False)
+    if is_commercial:
+        clients_list = Client.objects.filter(commercial=commercial, est_supprime=False)
+    else:
+        clients_list = Client.objects.filter(est_supprime=False)
+
+    # ================= FILTRES =================
     search_query = request.GET.get('search', '')
+    statut_filter = request.GET.get('statut', '')
+
     if search_query:
-        clients = clients.filter(
+        clients_list = clients_list.filter(
             Q(nom_client__icontains=search_query) |
-            Q(email__icontains=search_query) |
-            Q(telephone__icontains=search_query)
+            Q(telephone__icontains=search_query) |
+            Q(email__icontains=search_query)
         )
 
-    # Calcul des statistiques (sur tous les clients)
-    total_clients = Client.objects.all().count()
-    actif_count = Client.objects.filter(statut='actif').count()
-    suspendu_count = Client.objects.filter(statut='suspendu').count()
-    resilie_count = Client.objects.filter(statut='resilie').count()
-    non_actif_count = Client.objects.filter(statut='non_actif').count()
+    if statut_filter:
+        clients_list = clients_list.filter(statut=statut_filter)
 
-    # Calcul des pourcentages
-    if total_clients > 0:
-        actif_pourcentage = round((actif_count / total_clients) * 100, 1)
-        suspendu_pourcentage = round((suspendu_count / total_clients) * 100, 1)
-        resilie_pourcentage = round((resilie_count / total_clients) * 100, 1)
-        non_actif_pourcentage = round((non_actif_count / total_clients) * 100, 1)
-    else:
-        actif_pourcentage = suspendu_pourcentage = resilie_pourcentage = non_actif_pourcentage = 0
+    # ================= STATS =================
+    total_clients = clients_list.count()
+    actif_count = clients_list.filter(statut='actif').count()
+    suspendu_count = clients_list.filter(statut='suspendu').count()
+    resilie_count = clients_list.filter(statut='resilie').count()
+    non_actif_count = clients_list.filter(statut='non_actif').count()
 
-    # Pagination
-    page = request.GET.get('page', 1)
-    paginator = Paginator(clients, 5)
+    def percentage(part, total):
+        return round((part / total) * 100, 1) if total > 0 else 0
 
-    try:
-        clients_paginated = paginator.page(page)
-    except PageNotAnInteger:
-        clients_paginated = paginator.page(1)
-    except EmptyPage:
-        clients_paginated = paginator.page(paginator.num_pages)
+    actif_pourcentage = percentage(actif_count, total_clients)
+    suspendu_pourcentage = percentage(suspendu_count, total_clients)
+    resilie_pourcentage = percentage(resilie_count, total_clients)
+    non_actif_pourcentage = percentage(non_actif_count, total_clients)
 
-    # Déterminer la plage de pages à afficher
-    page_num = clients_paginated.number
-    if paginator.num_pages <= 7:
-        page_range = range(1, paginator.num_pages + 1)
-    else:
-        if page_num <= 4:
-            page_range = range(1, 8)
-        elif page_num >= paginator.num_pages - 3:
-            page_range = range(paginator.num_pages - 6, paginator.num_pages + 1)
-        else:
-            page_range = range(page_num - 3, page_num + 4)
+    # ================= PAGINATION =================
+    paginator = Paginator(clients_list.order_by('-id'), 10)
+    page = request.GET.get('page')
+    clients = paginator.get_page(page)
 
-    context = {
-        'clients': clients_paginated,
+    # ================= CONTEXT =================
+    return render(request, 'clients/list_client.html', {
+        'clients': clients,
+        'search_query': search_query,
+        'statut_filter': statut_filter,
+
         'total_clients': total_clients,
         'actif_count': actif_count,
         'suspendu_count': suspendu_count,
         'resilie_count': resilie_count,
         'non_actif_count': non_actif_count,
+
         'actif_pourcentage': actif_pourcentage,
         'suspendu_pourcentage': suspendu_pourcentage,
         'resilie_pourcentage': resilie_pourcentage,
         'non_actif_pourcentage': non_actif_pourcentage,
-        'search_query': search_query,
-        'statut_filter': statut_filter,
-        'page_range': page_range,
-    }
-    return render(request, 'clients/list_client.html', context)
 
-# Pour que les statistiques s'affichent correctement, modifiez aussi le template HTML :
-# Remplacez {{ stats.actif|default:0 }} par {{ stats.actif|default:"0" }}
-# Remplacez {{ stats.suspendu|default:0 }} par {{ stats.suspendu|default:"0" }}
-# Remplacez {{ stats.resilie|default:0 }} par {{ stats.resilie|default:"0" }}
+        'is_commercial': is_commercial,
+    })
+
 
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur','commercial'])
 #fonction pour afficher le formulaire detail.
 def detail_client(request, client_id):
     client = get_object_or_404(Client, id=client_id)
@@ -226,19 +218,18 @@ def detail_client(request, client_id):
 
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur'])
 #Fonction pour la modification d'un client
 def modifier_client(request, client_id):
     client = get_object_or_404(Client, id=client_id)
 
     if request.method == 'POST':
 
-        # 🔹 Fonction utilitaire pour éviter "None"
         def clean_value(value):
             value = value.strip() if value else ''
             return value if value else None
 
-        # ================= INFOS CLIENT =================
+        # ================= CLIENT =================
         client.nom_client = request.POST.get('nom_client', client.nom_client)
         client.adresse = request.POST.get('adresse', client.adresse)
         client.quartier = clean_value(request.POST.get('quartier'))
@@ -246,61 +237,39 @@ def modifier_client(request, client_id):
         client.email = clean_value(request.POST.get('email'))
         client.statut = request.POST.get('statut', client.statut)
 
-        # ================= INFOS TECHNIQUES =================
+        # ================= TECHNIQUE =================
         client.vlan = clean_value(request.POST.get('vlan'))
-
-        # 🔥 CORRECTION IMPORTANTE IP
-        adresse_ip = clean_value(request.POST.get('adresse_ip'))
-
-        if adresse_ip:
-            try:
-                validate_ipv46_address(adresse_ip) # pyright: ignore[reportUndefinedVariable]
-            except ValidationError: 
-                messages.error(request, "❌ Adresse IP invalide")
-                return redirect('clients:modifier_client', client.id)
-
-        client.adresse_ip = adresse_ip
-
-        #client.type_contrat = request.POST.get('type_contrat', client.type_contrat)
-        client.base_station = clean_value(request.POST.get('base_station'))
         client.capacite = clean_value(request.POST.get('capacite'))
         client.download = clean_value(request.POST.get('download'))
         client.upload = clean_value(request.POST.get('upload'))
+        client.forfait = clean_value(request.POST.get('forfait'))  
+        client.adresse_ip = clean_value(request.POST.get('adresse_ip'))
+
+        if client.adresse_ip:
+            try:
+                validate_ipv46_address(client.adresse_ip)
+            except ValidationError:
+                messages.error(request, "❌ Adresse IP invalide")
+                return redirect('clients:modifier_client', client.id)
 
         # ================= COMMERCIAL =================
         commercial_id = request.POST.get('commercial_id')
-
         if commercial_id and commercial_id.isdigit():
-            try:
-                client.commercial = Commercial.objects.get(id=commercial_id)
-            except Commercial.DoesNotExist:
-                client.commercial = None
-                messages.warning(request, "⚠️ Commercial introuvable")
+            client.commercial = Commercial.objects.filter(id=commercial_id).first()
         else:
             client.commercial = None
 
-        
         # ================= TYPE CONTRAT =================
         type_contrat_id = request.POST.get('type_contrat')
-
         if type_contrat_id and type_contrat_id.isdigit():
-            try:
-                client.type_contrat = TypeContrat.objects.get(id=type_contrat_id)
-            except TypeContrat.DoesNotExist:
-                client.type_contrat = None
-                messages.warning(request, "⚠️ Type de contrat introuvable")
+            client.type_contrat = TypeContrat.objects.filter(id=type_contrat_id).first()
         else:
             client.type_contrat = None
 
         # ================= BASE STATION =================
         base_station_id = request.POST.get('base_station')
-
         if base_station_id and base_station_id.isdigit():
-            try:
-                client.base_station = BaseStation.objects.get(id=base_station_id)
-            except BaseStation.DoesNotExist:
-                client.base_station = None
-                messages.warning(request, "⚠️ Base station introuvable")
+            client.base_station = BaseStation.objects.filter(id=base_station_id).first()
         else:
             client.base_station = None
 
@@ -310,48 +279,61 @@ def modifier_client(request, client_id):
                 client.contrat_pdf.delete(save=False)
             client.contrat_pdf = request.FILES['contrat_pdf']
 
-        # ================= SAVE =================
         client.save()
 
         messages.success(request, f'✅ Client "{client.nom_client}" modifié avec succès!')
         return redirect('clients:list_client')
 
+    # ================= DATA POUR FORM =================
     commerciaux = Commercial.objects.all().order_by('nom', 'prenom')
-    
-    base_stations = BaseStation.objects.all()
-    
-    type_contrat = TypeContrat.objects.all()
+    base_stations = BaseStation.objects.all().order_by('nom')
+    types_contrat = TypeContrat.objects.all().order_by('nom')
 
-    return render(
-        request,
-        'clients/modifier_client.html',
-        {
-            'client': client,
-            'commerciaux': commerciaux,
-            'base_stations': base_stations,
-            'types_contrat': type_contrat,
-        }
-    )
+    context = {
+        'client': client,
+        'commerciaux': commerciaux,
+        'base_stations': base_stations,
+        'types_contrat': types_contrat,
+    }
+
+    return render(request, 'clients/modifier_client.html', context)
+
 
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur'])
 #Fonction pour la suppression d'un client
+@login_required
 def supprimer_client(request, client_id):
-    """Supprimer un client"""
     client = get_object_or_404(Client, id=client_id)
-
-    if request.method == 'POST':
-        nom_client = client.nom_client
-        client.delete()
-        messages.success(request, f'❌ Client "{nom_client}" supprimé avec succès!')
-        return redirect('list_client')
-
-    return render(request, 'clients/supprimer_client.html', {'client': client})
-
+    client_name = client.nom_client
+    
+    # Vérifier si l'utilisateur a le droit de supprimer ce client
+    user = request.user
+    commercial = Commercial.objects.filter(user_account=user).first()
+    
+    # Si c'est un commercial, vérifier que le client lui appartient
+    if commercial and client.commercial != commercial:
+        messages.error(request, "Vous n'avez pas le droit de supprimer ce client.")
+        return redirect('clients:list_client')
+    
+    # 🔥 SOFT DELETE : Marquer comme supprimé sans effacer les données
+    client.est_supprime = True
+    client.date_suppression = timezone.now()
+    client.statut = 'resilie'  # Changer le statut en résilié
+    client.save()
+    
+    # Message de confirmation
+    messages.warning(
+        request, 
+        f'⚠️ Le client "{client_name}" a été désactivé/supprimé.\n'
+        f'Ses activités et son contrat sont conservés dans l\'historique.'
+    )
+    
+    return redirect('clients:list_client')
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur','commercial'])
 #Fonction pour afficher le pdf
 def voir_pdf(request, client_id):
         """Afficher le PDF d'un client"""
@@ -374,36 +356,8 @@ def voir_pdf(request, client_id):
 
 
 @login_required
-@user_passes_test(is_manager)
-#//fonction pour l'activation du client'
-@csrf_exempt
-def activate_client(request, client_id):
-    if request.method == 'POST':
-        try:
-            client = Client.objects.get(id=client_id)
-            # Logique d'activation
-            client.is_active = True
-            client.save()
-
-            return JsonResponse({
-                'success': True,
-                'message': f'Client {client.nom_client} activé avec succès'
-            })
-        except Client.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'message': 'Client non trouvé'
-            }, status=404)
-
-    return JsonResponse({
-        'success': False,
-        'message': 'Méthode non autorisée'
-    }, status=405)
-
-
-
-@login_required
-@user_passes_test(is_manager)   
+@is_allowed_roles(['admin', 'superviseur']) 
+#@user_passes_test(is_commercial)
 #Le module des cativités
 def ajouter_activite_avec_client(request, client_id):
 
@@ -412,6 +366,7 @@ def ajouter_activite_avec_client(request, client_id):
 
     if request.method == "POST":
 
+        # ================= INFOS PRINCIPALES =================
         type_activite = request.POST.get("type_activite")
         date_activite = request.POST.get("date_activite")
         lieu = request.POST.get("lieu")
@@ -422,6 +377,12 @@ def ajouter_activite_avec_client(request, client_id):
 
         technicien_ids = request.POST.getlist("techniciens")
 
+        # ================= VALIDATION =================
+        if not type_activite or not date_activite or not statut:
+            messages.error(request, "❌ Veuillez remplir les champs obligatoires")
+            return redirect('clients:ajouter_activite_avec_client', client_id=client_id)
+
+        # ================= CREATION ACTIVITE =================
         activite = Activite.objects.create(
             client=client,
             type_activite=type_activite,
@@ -433,11 +394,42 @@ def ajouter_activite_avec_client(request, client_id):
             heure_fin=heure_fin,
         )
 
-        # IMPORTANT pour ManyToMany
-        activite.techniciens.set(technicien_ids)
+        # ================= TECHNICIENS =================
+        if technicien_ids:
+            activite.techniciens.set(technicien_ids)
+
+        # ================= 🔥 GESTION PROSPECTION =================
+        if type_activite == "prospection":
+
+            zone = request.POST.get("zone")
+            potentiel = request.POST.get("potentiel")
+            observation = request.POST.get("observation")
+
+            # 👉 OPTION SIMPLE (rapide)
+            activite.description += f"""
+
+            --- PROSPECTION ---
+            Zone: {zone}
+            Potentiel: {potentiel}
+            Observation: {observation}
+            """
+
+            activite.save()
+
+            # 👉 OPTION PRO (commentée pour plus tard)
+            # Prospection.objects.create(
+            #     activite=activite,
+            #     zone=zone,
+            #     potentiel=potentiel,
+            #     observation=observation
+            # )
+
+        # ================= SUCCESS =================
+        messages.success(request, "✅ Activité ajoutée avec succès")
 
         return redirect('clients:detail_client', client_id=client_id)
 
+    # ================= GET =================
     context = {
         "client": client,
         "techniciens": techniciens,
@@ -448,11 +440,11 @@ def ajouter_activite_avec_client(request, client_id):
 
     return render(request, "clients/ajouter_activite_avec_client.html", context)
 
-
 # clients/views.py
 
 @login_required
-@user_passes_test(is_manager)   
+@is_allowed_roles(['admin', 'superviseur']) 
+#@user_passes_test(is_commercial)
 def ajouter_activite(request):
     if request.method == 'POST':
         client_id = request.POST.get('client_id')
@@ -507,7 +499,8 @@ def ajouter_activite(request):
     })
 
 @login_required
-@user_passes_test(is_manager)   
+@is_allowed_roles(['admin', 'superviseur','commercial'])  
+#@user_passes_test(is_commercial)
 def list_activite(request):
     # 🔐 Si technicien → il ne voit que ses activités
     if request.user.user_type.lower() == "technicien":
@@ -565,7 +558,7 @@ def list_activite(request):
     activites_list = activites_list.order_by('-date_activite', 'heure_debut')
 
     # Pagination
-    paginator = Paginator(activites_list, 5)
+    paginator = Paginator(activites_list, 10)
     page_number = request.GET.get('page')
     activites = paginator.get_page(page_number)
 
@@ -593,7 +586,8 @@ def list_activite(request):
 
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur','commercial'])
+#@user_passes_test(is_commercial)
 def calendrier_activites(request):
     """Vue calendrier des activités"""
     mois = request.GET.get('mois', date.today().month)
@@ -629,7 +623,8 @@ def calendrier_activites(request):
 
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur','commercial'])
+#@user_passes_test(is_commercial)
 def activites_aujourdhui(request):
     """Liste des activités du jour"""
     aujourdhui = date.today()
@@ -643,7 +638,8 @@ def activites_aujourdhui(request):
 
 
 @login_required
-@user_passes_test(is_manager)   
+@is_allowed_roles(['admin', 'superviseur','commercial','technicien']) 
+#@user_passes_test(is_commercial)
 def detail_activite(request, pk):
     activite = get_object_or_404(Activite, pk=pk)
 
@@ -654,7 +650,8 @@ def detail_activite(request, pk):
     return render(request, 'clients/detail_activite.html', context)
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur'])
+#@user_passes_test(is_commercial)
 def modifier_activite(request, pk):
     """Modifier une activité"""
     activite = get_object_or_404(
@@ -720,28 +717,31 @@ def modifier_activite(request, pk):
     return render(request, 'clients/modifier_activite.html', context)
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur'])
+#@user_passes_test(is_commercial)
+@login_required
 def supprimer_activite(request, pk):
-    """Supprimer une activité"""
     activite = get_object_or_404(Activite, pk=pk)
 
-    if hasattr(request.user, 'technicien'):
-        raise PermissionDenied
+    if request.user.user_type == "technicien":
+        messages.error(request, "❌ Action non autorisée")
+        return redirect('clients:list_activite')
 
     if request.method == 'POST':
         client_nom = activite.client.nom_client
         activite.delete()
-        messages.success(request, f'Activité pour {client_nom} supprimée avec succès!')
-        return redirect('list_activite')
 
-    context = {'activite': activite}
-    return render(request, 'activites/supprimer_activite.html', context)
+        messages.success(request, f'✅ Activité pour {client_nom} supprimée avec succès!')
+        return redirect('clients:list_activite')
+
+    return redirect('clients:list_activite')
 
 #la liste des activités par client
 
 
 @login_required
-@user_passes_test(is_manager)
+@is_allowed_roles(['admin', 'superviseur'])
+#@user_passes_test(is_commercial)
 def liste_activites_client(request, client_id):
     client = get_object_or_404(Client, id=client_id)
 
@@ -755,6 +755,8 @@ def liste_activites_client(request, client_id):
     return render(request, 'clients/liste_activites_client.html', context)
 
 @login_required
+#@user_passes_test(is_commercial)
+@is_allowed_roles(['admin', 'superviseur','commercial','technicien'])
 def activites_par_technicien(request):
     date = timezone.now().date()
     activites = Activite.objects.filter(date_activite=date).prefetch_related('techniciens', 'client')
@@ -777,20 +779,45 @@ def activites_par_technicien(request):
 
 
 @login_required
+@is_allowed_roles(['admin', 'technicien'])
 def mes_activites(request):
-    # Utiliser getattr pour éviter l'exception AttributeError
-    technicien = getattr(request.user, 'technicien', None)
-    
-    if not technicien:
-        return HttpResponseForbidden("Vous n'êtes pas associé à un profil technicien")
-    
-    activites = Activite.objects.filter(techniciens=technicien)
-    return render(request, 'clients/mes_activites.html', {'activites': activites})
 
+    user = request.user
+
+    # 🔒 sécurité supplémentaire (au cas où le décorateur change)
+    if user.user_type not in ['admin', 'technicien']:
+        return HttpResponseForbidden("Accès refusé")
+
+    # =========================
+    # 🔧 TECHNICIEN
+    # =========================
+    if user.user_type == "technicien":
+
+        technicien = getattr(user, 'technicien', None)
+
+        if not technicien:
+            return HttpResponseForbidden(
+                "Aucun profil technicien associé à votre compte"
+            )
+
+        activites = Activite.objects.filter(
+            techniciens=technicien
+        ).order_by('-date_activite')
+
+    # =========================
+    # 👑 ADMIN
+    # =========================
+    else:  # admin
+
+        activites = Activite.objects.all().order_by('-date_activite')
+
+    return render(request, 'clients/mes_activites.html', {
+        'activites': activites
+    })
     
     
-    
-@login_required
+@login_required    
+@is_allowed_roles(['technicien'])
 def modifier_rapport(request, rapport_id):
 
     rapport = get_object_or_404(RapportActivite, id=rapport_id)
@@ -828,3 +855,25 @@ def modifier_rapport(request, rapport_id):
         "form": form,
         "activite": activite
     })
+    
+
+def statut_badge_class(self):
+    return {
+        "en_attente": "bg-info",
+        "planifie": "bg-primary",
+        "en_cours": "bg-warning text-dark",
+        "termine": "bg-success",
+        "annule": "bg-danger",
+    }.get(self.statut, "bg-secondary")
+
+
+def type_badge_class(self):
+    return {
+        "noc support": "bg-dark",
+        "installation": "bg-info",
+        "maintenance": "bg-primary",
+    }.get(self.type_activite, "bg-secondary")
+    
+
+
+   

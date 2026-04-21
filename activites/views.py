@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Q
 from datetime import date, datetime
-
+from .models import Activite
 from techniciens.models import Technicien
 from .models import Client
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -22,28 +22,30 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 @csrf_exempt
 @login_required
 def activate_client(request, client_id):
+
     if request.method == 'POST':
         try:
-            client = Client.objects.get(id=client_id)
-            # Logique d'activation
-            client.is_active = True
+            client = get_object_or_404(Client, id=client_id)
+
+            # logique activation
+            client.statut = "actif"   # 🔥 IMPORTANT: ton modèle utilise "statut", pas is_active
             client.save()
 
             return JsonResponse({
                 'success': True,
                 'message': f'Client {client.nom_client} activé avec succès'
             })
-        except Client.DoesNotExist:
+
+        except Exception as e:
             return JsonResponse({
                 'success': False,
-                'message': 'Client non trouvé'
-            }, status=404)
+                'message': str(e)
+            }, status=500)
 
     return JsonResponse({
         'success': False,
         'message': 'Méthode non autorisée'
     }, status=405)
-
 
 
 #Le module des cativités
@@ -330,3 +332,178 @@ def mes_activites(request):
     }
 
     return render(request, "activites/mes_activites.html", context)
+
+
+
+# les fonctions de prospection
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from datetime import date
+
+from clients.models import Client
+from activites.models import Activite
+
+def ajouter_prospection(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+
+    if request.method == "POST":
+        try:
+            activite = Activite.objects.create(
+                client=client,
+                type_activite='prospection',  # 🔥 FORCÉ
+                date_activite=request.POST.get("date_activite"),
+                lieu=request.POST.get("lieu"),
+                description=request.POST.get("description"),
+                statut=request.POST.get("statut"),
+            )
+
+            messages.success(request, "✅ Prospection enregistrée avec succès")
+            return redirect('clients:detail_client', client.id)
+
+        except Exception as e:
+            messages.error(request, f"Erreur : {str(e)}")
+
+    return render(request, "clients/ajouter_prospection.html", {
+        "client": client,
+        "statuts": Activite.STATUT_CHOICES,
+        "aujourdhui": date.today().isoformat(),
+    })
+
+
+from django.db.models import Count
+from activites.models import Activite
+
+
+def liste_prospection(request):
+
+    prospections = Activite.objects.filter(type_activite='prospection') \
+        .select_related('client') \
+        .order_by('-date_activite')
+
+    # 🔥 STATISTIQUES
+    stats = prospections.values('statut').annotate(total=Count('id'))
+
+    stat_dict = {item['statut']: item['total'] for item in stats}
+
+    context = {
+        "prospections": prospections,
+        "total": prospections.count(),
+        "planifie": stat_dict.get('planifie', 0),
+        "en_cours": stat_dict.get('en_cours', 0),
+        "termine": stat_dict.get('termine', 0),
+        "annule": stat_dict.get('annule', 0),
+    }
+
+    return render(request, "clients/liste_prospection.html", context)
+    
+    
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from activites.models import Activite
+
+
+def modifier_prospection(request, id):
+    prospection = get_object_or_404(
+        Activite,
+        id=id,
+        type_activite='prospection'
+    )
+
+    if request.method == "POST":
+        try:
+            prospection.date_activite = request.POST.get("date_activite")
+            prospection.lieu = request.POST.get("lieu")
+            prospection.description = request.POST.get("description")
+            prospection.statut = request.POST.get("statut")
+
+            prospection.save()
+
+            messages.success(request, "✅ Prospection modifiée avec succès")
+            return redirect('activities:liste_prospection')
+
+        except Exception as e:
+            messages.error(request, f"Erreur : {str(e)}")
+
+    return render(request, "clients/modifier_prospection.html", {
+        "prospection": prospection,
+        "statuts": Activite.STATUT_CHOICES
+    })
+    
+    
+    
+    
+    
+    
+    user = request.user
+
+    # 🔐 rôle commercial
+    is_commercial = hasattr(user, 'commercial_profile')
+
+    # ================= BASE QUERY =================
+    if is_commercial:
+        prospects_list = Client.objects.filter(
+            commercial=user.commercial_profile,
+            type_client='prospect'
+        )
+    else:
+        prospects_list = Client.objects.filter(
+            type_client='prospect'
+        )
+
+    # ================= FILTRES =================
+    search_query = request.GET.get('search')
+    statut_filter = request.GET.get('statut')
+
+    if search_query:
+        prospects_list = prospects_list.filter(
+            Q(nom_client__icontains=search_query) |
+            Q(telephone__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+
+    if statut_filter:
+        prospects_list = prospects_list.filter(statut=statut_filter)
+
+    # ================= STATS GENERALES =================
+    total_prospects = prospects_list.count()
+
+    statut_stats = {
+        'actif': prospects_list.filter(statut='actif').count(),
+        'suspendu': prospects_list.filter(statut='suspendu').count(),
+        'resilie': prospects_list.filter(statut='resilie').count(),
+        'non_actif': prospects_list.filter(statut='non_actif').count(),
+    }
+
+    def percent(part, total):
+        return round((part / total) * 100, 1) if total else 0
+
+    # ================= STATS ADMIN PAR COMMERCIAL =================
+    commercial_stats = None
+    if not is_commercial:
+        commercial_stats = (
+            prospects_list
+            .values('commercial__id', 'commercial__nom', 'commercial__prenom')
+            .annotate(total=Count('id'))
+            .order_by('-total')
+        )
+
+    # ================= PAGINATION =================
+    paginator = Paginator(prospects_list.order_by('-id'), 10)
+    page = request.GET.get('page')
+    prospects = paginator.get_page(page)
+
+    return render(request, 'clients/liste_prospection.html', {
+        'prospects': prospects,
+        'search_query': search_query,
+        'statut_filter': statut_filter,
+
+        'total_prospects': total_prospects,
+        'statut_stats': statut_stats,
+
+        'actif_percent': percent(statut_stats['actif'], total_prospects),
+        'suspendu_percent': percent(statut_stats['suspendu'], total_prospects),
+        'resilie_percent': percent(statut_stats['resilie'], total_prospects),
+
+        'commercial_stats': commercial_stats,
+        'is_commercial': is_commercial,
+    })

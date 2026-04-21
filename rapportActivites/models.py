@@ -17,16 +17,24 @@ class RapportActivite(models.Model):
         ('maintenance', 'Maintenance'),
         ('tirage_FO', 'Tirage_FO'),
         ('raccordement', 'Raccordement'),
+        ('prospection', 'Prospection'),
         ('remplacement', 'Remplacement'),
         ('autre', 'Autre'),
     ]
 
-    STATUT_RAPPORT_CHOICES = [
-        ('brouillon', 'Brouillon'),
-        ('soumis', 'Soumis'),
+    STATUT_CHOICES = [
+        ('en_attente', 'En attente'),
+        ('en_cours', 'En cours'),
         ('valide', 'Validé'),
-        ('rejete', 'Rejeté'),
+        ('refuse', 'Refusé'),
+        ('brouillon', 'Brouillon'),
     ]
+    
+    statut_validation = models.CharField(
+        max_length=20,
+        choices=STATUT_CHOICES,
+        default='en_attente'
+    )
 
     # Lien avec l'activité (One-to-One car une activité n'a qu'un rapport)
     activite = models.OneToOneField(
@@ -96,6 +104,10 @@ class RapportActivite(models.Model):
     # Photos et documents
     photo_avant = models.ImageField(upload_to='rapports/photos/avant/', null=True, blank=True,
                                     verbose_name="Photo avant")
+    photo_arriver_site_tmp = models.ImageField(upload_to='rapports/photos/arrivee_site/',null=True,
+                                                    blank=True,verbose_name="Photo arrivée sur site")
+    photo_chemin_cable = models.ImageField(upload_to='rapports/photos/chemin_cable/', null=True, blank=True,
+                                    verbose_name="Photo chemin du cable")
     photo_apres = models.ImageField(upload_to='rapports/photos/apres/', null=True, blank=True,
                                     verbose_name="Photo après")
     photo_appareils_connecte = models.ImageField(upload_to='rapports/photos/appareilsconnecte/', null=True, blank=True,
@@ -106,7 +118,7 @@ class RapportActivite(models.Model):
                                       verbose_name="Document joint")
 
     # Validation
-    statut = models.CharField(max_length=20, choices=STATUT_RAPPORT_CHOICES, default='brouillon', verbose_name="Statut")
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='brouillon', verbose_name="Statut")
     valide_par = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -115,6 +127,23 @@ class RapportActivite(models.Model):
         related_name='rapports_valides',
         verbose_name="Validé par"
     )
+    
+    # PROSPECTION
+    nom_prospect = models.CharField(max_length=255, blank=True, null=True)
+    telephone_prospect = models.CharField(max_length=20, blank=True, null=True)
+    email_prospect = models.EmailField(blank=True, null=True)
+    adresse_prospect = models.TextField(blank=True, null=True)
+
+    canal_prospection = models.CharField(max_length=50, blank=True, null=True)
+    besoin_client = models.TextField(blank=True, null=True)
+    offre_proposee = models.CharField(max_length=255, blank=True, null=True)
+
+    statut_prospection = models.CharField(max_length=50, blank=True, null=True)
+    probabilite_conversion = models.IntegerField(blank=True, null=True)
+    date_relance = models.DateField(blank=True, null=True)
+
+    commentaire_prospection = models.TextField(blank=True, null=True)
+    
     date_validation = models.DateTimeField(null=True, blank=True, verbose_name="Date de validation")
     commentaire_validation = models.TextField(verbose_name="Commentaire de validation", blank=True)
 

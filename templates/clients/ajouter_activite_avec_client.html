@@ -5,6 +5,8 @@
 <div class="content-wrapper">
     <div class="container mt-4">
         <div class="card shadow">
+
+            <!-- HEADER -->
             <div class="card-header bg-primary text-white">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">
@@ -17,6 +19,7 @@
                 </div>
             </div>
 
+            <!-- BODY -->
             <div class="card-body">
 
                 <div class="alert alert-info">
@@ -36,9 +39,13 @@
                         <!-- COLONNE GAUCHE -->
                         <div class="col-md-6">
 
+                            <!-- TYPE ACTIVITE -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Type d'activité *</label>
-                                <select name="type_activite" class="form-control" required>
+                                <select name="type_activite"
+                                        id="typeActivite"
+                                        class="form-control"
+                                        required>
                                     <option value="">--- Sélectionner ---</option>
                                     {% for code, label in types_activite %}
                                         <option value="{{ code }}">{{ label }}</option>
@@ -46,7 +53,7 @@
                                 </select>
                             </div>
 
-                            <!-- Techniciens -->
+                            <!-- TECHNICIENS -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">
                                     Techniciens assignés
@@ -57,7 +64,6 @@
                                             class="form-control"
                                             multiple
                                             size="6">
-
                                         {% for tech in techniciens %}
                                             <option value="{{ tech.id }}">
                                                 {{ tech.prenom }} {{ tech.nom }}
@@ -72,12 +78,9 @@
                                         Aucun technicien disponible
                                     </div>
                                 {% endif %}
-
-                                <small class="text-muted">
-                                    Maintenez CTRL (ou Cmd sur Mac) pour sélectionner plusieurs
-                                </small>
                             </div>
 
+                            <!-- LIEU -->
                             <div class="mb-3">
                                 <label class="form-label">Lieu</label>
                                 <input type="text"
@@ -91,6 +94,7 @@
                         <!-- COLONNE DROITE -->
                         <div class="col-md-6">
 
+                            <!-- DATE -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Date *</label>
                                 <input type="date"
@@ -100,6 +104,7 @@
                                        required>
                             </div>
 
+                            <!-- HEURES -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -120,6 +125,7 @@
                                 </div>
                             </div>
 
+                            <!-- STATUT -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Statut *</label>
                                 <select name="statut" class="form-control" required>
@@ -144,6 +150,41 @@
                                   required></textarea>
                     </div>
 
+                    <!-- 🔥 SECTION PROSPECTION -->
+                    <div id="prospectionSection"
+                         class="mt-4 p-3 border rounded bg-light"
+                         style="display:none;">
+
+                        <h5 class="text-primary">
+                            <i class="fas fa-search-location me-2"></i>
+                            Informations de prospection
+                        </h5>
+
+                        <div class="row mt-3">
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Zone ciblée</label>
+                                <input type="text" name="zone" class="form-control">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Potentiel</label>
+                                <select name="potentiel" class="form-control">
+                                    <option value="">-- Choisir --</option>
+                                    <option value="faible">Faible</option>
+                                    <option value="moyen">Moyen</option>
+                                    <option value="eleve">Élevé</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold">Observations terrain</label>
+                                <textarea name="observation" class="form-control"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
                     <!-- BOUTONS -->
                     <div class="mt-4 border-top pt-3 d-flex justify-content-between">
                         <a href="{% url 'clients:detail_client' client.id %}"
@@ -163,4 +204,24 @@
         </div>
     </div>
 </div>
+
+<!-- SCRIPT -->
+<script>
+    const typeSelect = document.getElementById("typeActivite");
+    const prospectionSection = document.getElementById("prospectionSection");
+
+    function toggleProspection() {
+        if (typeSelect.value === "prospection") {
+            prospectionSection.style.display = "block";
+        } else {
+            prospectionSection.style.display = "none";
+        }
+    }
+
+    typeSelect.addEventListener("change", toggleProspection);
+
+    // initialisation au chargement
+    toggleProspection();
+</script>
+
 {% endblock %}

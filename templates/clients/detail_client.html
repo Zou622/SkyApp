@@ -49,6 +49,28 @@
                             </div>
                         </div>
 
+                        <!-- 🔥 NOUVEAU : FORFAIT -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title text-muted">
+                                    <i class="fas fa-tag me-1"></i> Forfait
+                                </h6>
+                                <h4>
+                                    {% if client.forfait %}
+                                        <span class="badge bg-success fs-6">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            {{ client.forfait }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary fs-6">
+                                            <i class="fas fa-minus-circle me-1"></i>
+                                            Non spécifié
+                                        </span>
+                                    {% endif %}
+                                </h4>
+                            </div>
+                        </div>
+
                         <!-- Type de contrat -->
                         <div class="card mb-3">
                             <div class="card-body">
@@ -134,12 +156,34 @@
                                         <p class="mb-2">
                                             <i class="fas fa-home me-2 text-muted"></i>
                                             <strong>Adresse:</strong><br>
-                                            {{ client.adresse|linebreaks }}
+                                            {{ client.adresse|linebreaks|default:"-" }}
                                         </p>
                                         <p class="mb-0">
                                             <i class="fas fa-map-pin me-2 text-muted"></i>
                                             <strong>Quartier:</strong><br>
                                             {{ client.quartier|default:"Non spécifié" }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- 🔥 NOUVEAU : Informations Commerciales -->
+                                <div class="card mb-4">
+                                    <div class="card-header bg-dark text-white py-2">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-chart-line me-2"></i> Commercial
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-0">
+                                            <i class="fas fa-user-tie text-info me-2"></i>
+                                            <strong>Commercial assigné:</strong><br>
+                                            {% if client.commercial %}
+                                            <span class="badge bg-info mt-1">
+                                                {{ client.commercial.prenom }} {{ client.commercial.nom }}
+                                            </span>
+                                            {% else %}
+                                            <span class="text-muted">Aucun commercial assigné</span>
+                                            {% endif %}
                                         </p>
                                     </div>
                                 </div>
@@ -173,6 +217,19 @@
                                             </code>
                                             {% else %}
                                             <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </p>
+
+                                        <!-- 🔥 NOUVEAU : Base Station -->
+                                        <p class="mb-0">
+                                            <i class="fas fa-tower-broadcast text-primary me-2"></i>
+                                            <strong>Base Station:</strong><br>
+                                            {% if client.base_station %}
+                                            <span class="badge bg-primary mt-1">
+                                                {{ client.base_station.nom }}
+                                            </span>
+                                            {% else %}
+                                            <span class="text-muted">Non assignée</span>
                                             {% endif %}
                                         </p>
                                     </div>
@@ -324,6 +381,7 @@
     border-radius: 10px;
     border: none;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
 
 .card-header {
@@ -353,36 +411,29 @@ code {
 .text-muted {
     color: #6c757d !important;
 }
+
+/* Animation pour les cartes */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Animation pour les cartes
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.transition = 'transform 0.3s ease';
-            this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
-        });
-
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-        });
-    });
-
     // Confirmation avant suppression
     const deleteModal = document.getElementById('deleteModal');
     if (deleteModal) {
         const deleteButton = deleteModal.querySelector('.btn-danger');
-        deleteButton.addEventListener('click', function(e) {
-            const confirmation = confirm('ÊTES-VOUS ABSOLUMENT SÛR DE VOULOIR SUPPRIMER CE CLIENT ?\n\nCette action est définitive et ne peut pas être annulée.');
-            if (!confirmation) {
-                e.preventDefault();
-                return false;
-            }
-        });
+        if (deleteButton) {
+            deleteButton.addEventListener('click', function(e) {
+                const confirmation = confirm('ÊTES-VOUS ABSOLUMENT SÛR DE VOULOIR SUPPRIMER CE CLIENT ?\n\nCette action est définitive et ne peut pas être annulée.');
+                if (!confirmation) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
     }
 });
 </script>

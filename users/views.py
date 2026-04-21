@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models
+from django.db import connection, models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -42,8 +42,7 @@ from django.utils import timezone
 from .models import PasswordResetToken
 from .forms import PasswordResetRequestForm, SetNewPasswordForm
 from django.contrib.auth import get_user_model
-
-
+from prospects.models import Prospect
 
 
 
@@ -123,129 +122,7 @@ def is_manager(user):
 
 
 
-
-@login_required
-def dashboard(request):
-    user = request.user
-    stats = {}
-    
-    # Initialisation
-    stats["users"] = 0
-    stats["clients"] = 0
-    stats["activites"] = 0
-    stats["top_techniciens"] = []
-    stats["techniciens_sans_activite"] = []
-    stats["tech_labels"] = []
-    stats["tech_values"] = []
-
-    if user.user_type in ["admin", "superviseur"]:
-        
-        stats["users"] = User.objects.count()
-        stats["clients"] = Client.objects.count()
-        stats["activites"] = Activite.objects.count()
-
-        # Vérifier la structure de la base de données
-        from django.db import connection
-        cursor = connection.cursor()
-        
-        # Déterminer le type de relation
-        cursor.execute("""
-            SELECT 
-                tc.nom, 
-                tc.prenom,
-                COUNT(ac.id) as nb_activites
-            FROM 
-                utilisateurs_technicien tc
-                LEFT JOIN clients_activite_techniciens act ON tc.id = act.technicien_id
-                LEFT JOIN clients_activite ac ON act.activite_id = ac.id
-            GROUP BY 
-                tc.id, tc.nom, tc.prenom
-            ORDER BY 
-                nb_activites DESC
-        """)
-        
-        results = cursor.fetchall()
-        
-        if results:
-            stats["tech_labels"] = [f"{r[0]} {r[1]}" for r in results]
-            stats["tech_values"] = [r[2] for r in results]
-        else:
-            # Essayer l'autre type de relation
-            cursor.execute("""
-                SELECT 
-                    tc.nom, 
-                    tc.prenom,
-                    COUNT(ac.id) as nb_activites
-                FROM 
-                    utilisateurs_technicien tc
-                    LEFT JOIN clients_activite ac ON tc.id = ac.technicien_id
-                GROUP BY 
-                    tc.id, tc.nom, tc.prenom
-                ORDER BY 
-                    nb_activites DESC
-            """)
-            
-            results = cursor.fetchall()
-            stats["tech_labels"] = [f"{r[0]} {r[1]}" for r in results]
-            stats["tech_values"] = [r[2] for r in results]
-
-        # TOP 3 du mois
-        start_month = timezone.now().replace(day=1).strftime('%Y-%m-%d')
-        
-        cursor.execute("""
-            SELECT 
-                tc.nom, 
-                tc.prenom,
-                COUNT(ac.id) as nb_activites
-            FROM 
-                utilisateurs_technicien tc
-                LEFT JOIN clients_activite_techniciens act ON tc.id = act.technicien_id
-                LEFT JOIN clients_activite ac ON act.activite_id = ac.id
-            WHERE 
-                ac.date_activite >= %s OR ac.id IS NULL
-            GROUP BY 
-                tc.id, tc.nom, tc.prenom
-            HAVING 
-                COUNT(ac.id) > 0
-            ORDER BY 
-                nb_activites DESC
-            LIMIT 3
-        """, [start_month])
-        
-        results = cursor.fetchall()
-        stats["top_techniciens"] = [
-            {"nom": r[0], "prenom": r[1], "total_activites": r[2]}
-            for r in results
-        ]
-
-        # Techniciens sans activité
-        cursor.execute("""
-            SELECT 
-                tc.nom, 
-                tc.prenom
-            FROM 
-                utilisateurs_technicien tc
-                LEFT JOIN clients_activite_techniciens act ON tc.id = act.technicien_id
-            WHERE 
-                act.technicien_id IS NULL
-        """)
-        
-        results = cursor.fetchall()
-        stats["techniciens_sans_activite"] = [
-            {"nom": r[0], "prenom": r[1]}
-            for r in results
-        ]
-
-    # ... reste du code pour commercial et technicien ...
-
-    return render(request, "utilisateurs/dashboard.html", {
-        "stats": stats,
-        "user": user
-    }) 
-    
-    
-    
-    
+ 
 @admin_required
 def list_utilisateurs(request):
     """Liste tous les utilisateurs (admin seulement)"""
@@ -265,6 +142,8 @@ def list_utilisateurs(request):
         'user_type_actuel': user_type,
         'types_utilisateurs': User.TYPE_USER,
     })
+
+
 
 
 @login_required
@@ -507,7 +386,6 @@ def supprimer_utilisateur(request, user_id):
     return JsonResponse({"success": False, "message": "Méthode non autorisée"}, status=405)
 
 
-
 @login_required
 def dashboard(request):
     user = request.user
@@ -516,21 +394,57 @@ def dashboard(request):
         'users': 0,
         'clients': 0,
         'activites': 0,
+        'prospects': 0,
+        'mes_prospects': 0,
+        'mes_conversions': 0,
+        'total_converti': 0,
+        'conversion_stats': [],
+        'taux_conversion': 0,
+        'top_techniciens': []
     }
 
     # =========================
     # ADMIN / SUPERVISEUR
     # =========================
     if user.user_type in ['admin', 'superviseur']:
+
         stats['users'] = User.objects.count()
         stats['clients'] = Client.objects.count()
         stats['activites'] = Activite.objects.count()
+        stats['prospects'] = Prospect.objects.count()
+
+        # 🔥 TOTAL CONVERTI
+        stats['total_converti'] = Prospect.objects.filter(
+            statut="converti"
+        ).count()
+
+        # 🔥 TAUX DE CONVERSION
+        total = stats['prospects']
+        converti = stats['total_converti']
+        stats['taux_conversion'] = round((converti / total) * 100, 1) if total else 0
+
+        # 🔥 PAR COMMERCIAL
+        stats['conversion_stats'] = (
+            Prospect.objects.filter(statut="converti")
+            .values('commercial__nom', 'commercial__prenom')
+            .annotate(total=Count('id'))
+            .order_by('-total')
+        )
+
+        # 🔥 TOP TECHNICIENS
+        stats['top_techniciens'] = (
+            Technicien.objects.annotate(
+                total_activites=Count('activites')
+            )
+            .order_by('-total_activites')[:3]
+        )
 
     # =========================
     # TECHNICIEN
     # =========================
     elif user.user_type == 'technicien':
-        if user.technicien:
+
+        if hasattr(user, 'technicien') and user.technicien:
             stats['activites'] = Activite.objects.filter(
                 techniciens=user.technicien
             ).count()
@@ -539,19 +453,30 @@ def dashboard(request):
     # COMMERCIAL
     # =========================
     elif user.user_type == 'commercial':
-        if user.commercial:
+
+        if hasattr(user, 'commercial') and user.commercial:
+
             stats['clients'] = Client.objects.filter(
                 commercial=user.commercial
             ).count()
 
-    # =========================
-    # COMPTABLE (optionnel)
-    # =========================
-    elif user.user_type == 'comptable':
-        stats['clients'] = Client.objects.count()
+            stats['mes_prospects'] = Prospect.objects.filter(
+                commercial=user.commercial
+            ).count()
 
-    return render(request, 'utilisateurs/dashboard.html', {'stats': stats})
+            stats['mes_conversions'] = Prospect.objects.filter(
+                commercial=user.commercial,
+                statut="converti"
+            ).count()
 
+    return render(request, 'utilisateurs/dashboard.html', {
+        'stats': stats,
+        'user': user
+    })
+    
+    
+    
+    
 from django.shortcuts import redirect
 
 def redirect_to_login(request):

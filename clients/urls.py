@@ -15,7 +15,7 @@ urlpatterns = [
     path('modifier_client/<int:client_id>/', views.modifier_client, name='modifier_client'),
     path('supprimer_client/<int:client_id>/', views.supprimer_client, name='supprimer_client'),
     path('client/<int:client_id>/pdf/', views.voir_pdf, name='voir_pdf'),
-    path('client/<int:client_id>/activate/', views.activate_client, name='activate_client'),
+    #path('client/<int:client_id>/activate/', views.activate_client, name='activate_client'),
 
    # URLS du module activité
     path('activites/', views.list_activite, name='list_activite'),
