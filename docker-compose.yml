@@ -8,19 +8,44 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skyuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   web:
     build: .
-    command: gunicorn SkyApp.wsgi:application --workers 3 --bind 0.0.0.0:80
+    command: gunicorn SkyApp.wsgi:application --workers 3 --bind 0.0.0.0:8000
     volumes:
-      - .:/app 
-    ports:
-      - "80:80"
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    expose:
+      - "8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
     environment:
       - DATABASE_URL=postgresql://skyuser:skypass@db:5432/skyapp
+      - DEBUG=False
+      - ALLOWED_HOSTS=skyapp.skyconnect-sa.com,localhost
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/static:ro
+      - media_volume:/media:ro
+    depends_on:
+      - web
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
