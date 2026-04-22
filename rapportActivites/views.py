@@ -311,7 +311,7 @@ def detail_rapport(request, pk):
     
     
 
-
+@login_required
 def liste_rapports(request):
     rapports = RapportActivite.objects.select_related(
         'activite', 'activite__client'
@@ -329,6 +329,9 @@ def liste_rapports(request):
     date = request.GET.get('date')
     if date:
         rapports = rapports.filter(date_intervention_reelle=date)
+
+    # 🔥 IMPORTANT : sécuriser les données
+    rapports = rapports.exclude(id__isnull=True)
 
     return render(request, 'rapportsActivites/liste_rapports.html', {
         'rapports': rapports

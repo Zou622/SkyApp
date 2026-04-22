@@ -16,130 +16,122 @@
             </div>
         </div>
 
-        <!-- ================= ADMIN ================= -->
+        <!-- ============================= -->
+        <!-- ADMIN / SUPERVISEUR -->
+        <!-- ============================= -->
         {% if user.user_type == "admin" or user.user_type == "superviseur" %}
 
         <div class="row">
 
             <div class="col-md-3">
                 <div class="card bg-primary text-white mb-4">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h3>{{ stats.users }}</h3>
-                            <p>Utilisateurs</p>
-                        </div>
-                        <i class="fas fa-users"></i>
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h3>{{ stats.users }}</h3>
+                        <p>Total Utilisateurs</p>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-2">
                 <div class="card bg-info text-white mb-4">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h3>{{ stats.clients }}</h3>
-                            <p>Clients</p>
-                        </div>
-                        <i class="fas fa-user-check"></i>
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-check fa-2x mb-2"></i>
+                        <h3>{{ stats.clients }}</h3>
+                        <p>Total Clients</p>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-2">
                 <div class="card bg-success text-white mb-4">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h3>{{ stats.activites }}</h3>
-                            <p>Activités</p>
-                        </div>
-                        <i class="fas fa-chart-line"></i>
+                    <div class="card-body text-center">
+                        <i class="fas fa-tasks fa-2x mb-2"></i>
+                        <h3>{{ stats.activites }}</h3>
+                        <p>Total Activités</p>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-2">
                 <div class="card bg-dark text-white mb-4">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h3>{{ stats.prospects }}</h3>
-                            <p>Prospects</p>
-                        </div>
-                        <i class="fas fa-user-plus"></i>
+                    <div class="card-body text-center">
+                        <i class="fas fa-bullseye fa-2x mb-2"></i>
+                        <h3>{{ stats.prospects }}</h3>
+                        <p>Total Prospects</p>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-3">
                 <div class="card bg-warning text-white mb-4">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h3>{{ stats.total_converti }}</h3>
-                            <p>Conversions</p>
-                        </div>
-                        <i class="fas fa-exchange-alt"></i>
+                    <div class="card-body text-center">
+                        <i class="fas fa-file-alt fa-2x mb-2"></i>
+                        <h3>{{ stats.total_converti }}</h3>
+                        <p>Total prospect convertis en client</p>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        {% comment %} <!-- ================= GRAPH CONVERSIONS ================= -->
-        <div class="card mb-4">
-            <div class="card-header bg-dark text-white">
-                📈 Évolution des conversions
-            </div>
-            <div class="card-body">
-                {% if stats.conversion_labels %}
-                <canvas id="conversionChart"></canvas>
-                {% else %}
-                <p class="text-muted text-center">Aucune donnée</p>
-                {% endif %}
-            </div>
-        </div> {% endcomment %}
-
-        <!-- ================= CONVERSION PAR COMMERCIAL ================= -->
+        <!-- CONVERSION PAR COMMERCIAL -->
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                📊 Conversions par commercial
+                <i class="fas fa-chart-bar me-2"></i> Conversions par commercial
             </div>
             <div class="card-body">
+
                 {% for c in stats.conversion_stats %}
                 <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>{{ c.commercial__nom }} {{ c.commercial__prenom }}</span>
+                    <span>
+                        <i class="fas fa-user me-2"></i>
+                        {{ c.commercial__nom }} {{ c.commercial__prenom }}
+                    </span>
                     <span class="badge bg-success">{{ c.total }}</span>
                 </div>
                 {% empty %}
                 <p>Aucune donnée</p>
                 {% endfor %}
+
             </div>
         </div>
 
-        <!-- ================= TOP TECHNICIENS ================= -->
+        <!-- TOP TECHNICIENS -->
         <div class="card mb-4">
             <div class="card-header bg-success text-white">
-                🏆 Top 3 techniciens
+                <i class="fas fa-trophy me-2"></i> Top techniciens
             </div>
             <div class="card-body">
+
                 {% for t in stats.top_techniciens %}
                 <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>{{ t.nom }} {{ t.prenom }}</span>
+                    <span>
+                        <i class="fas fa-user-cog me-2"></i>
+                        {{ t.nom }} {{ t.prenom }}
+                    </span>
                     <span class="badge bg-success">{{ t.total_activites }}</span>
                 </div>
                 {% empty %}
                 <p>Aucune donnée</p>
                 {% endfor %}
+
             </div>
         </div>
 
         {% endif %}
 
-        <!-- ================= COMMERCIAL ================= -->
+        <!-- ============================= -->
+        <!-- COMMERCIAL -->
+        <!-- ============================= -->
         {% if user.user_type == "commercial" %}
+
         <div class="row">
 
             <div class="col-md-4">
                 <div class="card bg-success text-white mb-4">
-                    <div class="card-body">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
                         <h3>{{ stats.clients }}</h3>
                         <p>Mes Clients</p>
                     </div>
@@ -148,7 +140,8 @@
 
             <div class="col-md-4">
                 <div class="card bg-dark text-white mb-4">
-                    <div class="card-body">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-plus fa-2x mb-2"></i>
                         <h3>{{ stats.mes_prospects }}</h3>
                         <p>Mes Prospects</p>
                     </div>
@@ -157,48 +150,110 @@
 
             <div class="col-md-4">
                 <div class="card bg-warning text-white mb-4">
-                    <div class="card-body">
+                    <div class="card-body text-center">
+                        <i class="fas fa-exchange-alt fa-2x mb-2"></i>
                         <h3>{{ stats.mes_conversions }}</h3>
-                        <p>Mes Conversions</p>
+                        <p>Conversions</p>
                     </div>
                 </div>
             </div>
 
         </div>
+
         {% endif %}
 
-        <!-- ================= ACTIONS RAPIDES ================= -->
+        <!-- ============================= -->
+        <!-- TECHNICIEN -->
+        <!-- ============================= -->
+        {% if user.user_type == "technicien" %}
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-list fa-2x mb-2"></i>
+                        <h3>{{ stats.activites }}</h3>
+                        <p>Total activités</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_terminees }}</h3>
+                        <p>Activités Terminées</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-spinner fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_en_cours }}</h3>
+                        <p>Activités En cours</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-info text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_planifiees }}</h3>
+                        <p>Activités Planifiées</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_en_attente }}</h3>
+                        <p>Activités En attente</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PROGRESSION -->
+        <div class="card mb-4 shadow">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-chart-line me-2"></i> Progression des activités
+            </div>
+            <div class="card-body">
+
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar bg-success"
+                         style="width: {{ stats.taux_realisation }}%">
+                        {{ stats.taux_realisation }}%
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {% endif %}
+
+        <!-- ============================= -->
+        <!-- ACTIONS RAPIDES -->
+        <!-- ============================= -->
         <div class="card shadow border-0 mt-4">
             <div class="card-header bg-primary text-white">
-                <h5><i class="fas fa-bolt"></i> Actions rapides</h5>
+                <i class="fas fa-bolt me-2"></i> Actions rapides
             </div>
 
             <div class="card-body">
                 <div class="row text-center">
 
-                    {% if user.user_type == "admin" or user.user_type == "superviseur" %}
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'users:liste_utilisateurs' %}" class="btn btn-outline-primary w-100">
-                            Gérer utilisateurs
-                        </a>
-                    </div>
-                    {% endif %}
-
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'clients:list_client' %}" class="btn btn-outline-success w-100">
-                            Clients
-                        </a>
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <a href="{% url 'prospects:list_prospects' %}" class="btn btn-outline-dark w-100">
-                            Prospects
-                        </a>
-                    </div>
-
-                    <div class="col-md-3 mb-3">
+                    <div class="col-md-3 mb-2">
                         <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary w-100">
-                            Profil
+                            <i class="fas fa-user me-2"></i> Profil
                         </a>
                     </div>
 
@@ -208,49 +263,5 @@
 
     </div>
 </div>
-
-<!-- ============================= -->
-<!-- CHART JS -->
-<!-- ============================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-{% if stats.conversion_labels and stats.conversion_values %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('conversionChart');
-
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ stats.conversion_labels|safe }},
-                datasets: [{
-                    label: 'Conversions',
-                    data: {{ stats.conversion_values|safe }},
-                    borderColor: '#ffc107',
-                    backgroundColor: 'rgba(255,193,7,0.2)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
-    }
-});
-</script>
-{% endif %}
 
 {% endblock %}

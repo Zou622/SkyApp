@@ -19,51 +19,64 @@
     </ul>
 
     <!-- RIGHT -->
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ml-auto align-items-center">
+
+        <!-- PARAMÉTRAGE -->
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                <i class="fas fa-cog me-1"></i> Paramétrage
+
+            <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+                <i class="fas fa-cog me-2"></i>
+                <span>Paramétrage</span>
             </a>
 
-            <ul class="dropdown-menu dropdown-menu-right">
+            <ul class="dropdown-menu dropdown-menu-end shadow">
 
                 {% if user.user_type == "admin" %}
 
                     <li>
                         <a class="dropdown-item" href="{% url 'users:register' %}">
-                            <i class="fas fa-user-plus me-2 text-primary"></i> Nouvel utilisateur
+                            <i class="fas fa-user-plus me-2 text-primary"></i>
+                            Nouvel utilisateur
                         </a>
                     </li>
 
                     <li>
                         <a class="dropdown-item" href="{% url 'users:liste_utilisateurs' %}">
-                            <i class="fas fa-users me-2 text-info"></i> Liste des utilisateurs
+                            <i class="fas fa-users me-2 text-info"></i>
+                            Liste des utilisateurs
                         </a>
                     </li>
 
                     <li>
                         <a class="dropdown-item" href="{% url 'base_stations:liste_base_stations' %}">
-                            <i class="fas fa-broadcast-tower me-2 text-success"></i> Base stations
+                            <i class="fas fa-broadcast-tower me-2 text-success"></i>
+                            Base stations
                         </a>
                     </li>
 
                     <li>
                         <a class="dropdown-item" href="{% url 'type_contrat:liste_type' %}">
-                            <i class="fas fa-file-contract me-2 text-warning"></i> Types de contrats
+                            <i class="fas fa-file-contract me-2 text-warning"></i>
+                            Types de contrats
                         </a>
                     </li>
 
                 {% endif %}
 
+                <li><hr class="dropdown-divider"></li>
+
                 <li>
                     <a class="dropdown-item text-danger" href="{% url 'users:logout' %}">
-                        <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Déconnexion
                     </a>
                 </li>
 
             </ul>
         </li>
+
     </ul>
+
 </nav>
 
 

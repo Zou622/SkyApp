@@ -386,6 +386,7 @@ def supprimer_utilisateur(request, user_id):
     return JsonResponse({"success": False, "message": "Méthode non autorisée"}, status=405)
 
 
+
 @login_required
 def dashboard(request):
     user = request.user
@@ -400,7 +401,14 @@ def dashboard(request):
         'total_converti': 0,
         'conversion_stats': [],
         'taux_conversion': 0,
-        'top_techniciens': []
+        'top_techniciens': [],
+
+        # TECHNICIEN
+        'activites_terminees': 0,
+        'activites_en_cours': 0,
+        'activites_planifiees': 0,
+        'activites_en_attente': 0,
+        'taux_realisation': 0,
     }
 
     # =========================
@@ -413,17 +421,12 @@ def dashboard(request):
         stats['activites'] = Activite.objects.count()
         stats['prospects'] = Prospect.objects.count()
 
-        # 🔥 TOTAL CONVERTI
-        stats['total_converti'] = Prospect.objects.filter(
-            statut="converti"
-        ).count()
+        stats['total_converti'] = Prospect.objects.filter(statut="converti").count()
 
-        # 🔥 TAUX DE CONVERSION
         total = stats['prospects']
         converti = stats['total_converti']
         stats['taux_conversion'] = round((converti / total) * 100, 1) if total else 0
 
-        # 🔥 PAR COMMERCIAL
         stats['conversion_stats'] = (
             Prospect.objects.filter(statut="converti")
             .values('commercial__nom', 'commercial__prenom')
@@ -431,12 +434,10 @@ def dashboard(request):
             .order_by('-total')
         )
 
-        # 🔥 TOP TECHNICIENS
         stats['top_techniciens'] = (
             Technicien.objects.annotate(
                 total_activites=Count('activites')
-            )
-            .order_by('-total_activites')[:3]
+            ).order_by('-total_activites')[:3]
         )
 
     # =========================
@@ -445,9 +446,20 @@ def dashboard(request):
     elif user.user_type == 'technicien':
 
         if hasattr(user, 'technicien') and user.technicien:
-            stats['activites'] = Activite.objects.filter(
+
+            qs = Activite.objects.filter(
                 techniciens=user.technicien
-            ).count()
+            )
+
+            stats['activites'] = qs.count()
+            stats['activites_terminees'] = qs.filter(statut="termine").count()
+            stats['activites_en_cours'] = qs.filter(statut="en_cours").count()
+            stats['activites_planifiees'] = qs.filter(statut="planifie").count()
+            stats['activites_en_attente'] = qs.filter(statut="en_attente").count()
+
+            total = stats['activites']
+            termine = stats['activites_terminees']
+            stats['taux_realisation'] = round((termine / total) * 100, 1) if total else 0
 
     # =========================
     # COMMERCIAL
@@ -472,8 +484,7 @@ def dashboard(request):
     return render(request, 'utilisateurs/dashboard.html', {
         'stats': stats,
         'user': user
-    })
-    
+    }) 
     
     
     

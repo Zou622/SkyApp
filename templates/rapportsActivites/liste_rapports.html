@@ -111,9 +111,10 @@
                                         </a>
 
                                         {% if rapport.statut_validation == "en_attente" %}
-                                            <a href="{% url 'rapportActivites:valider_rapport' rapport.id %}" 
-                                            class="btn btn-outline-success btn-sm" title="Valider">
-                                                <i class="fas fa-check"></i >
+                                            <a href="#"
+                                            class="btn btn-outline-success btn-sm btn-valider"
+                                            data-url="{% url 'rapportActivites:valider_rapport' rapport.id %}">
+                                                <i class="fas fa-check"></i>
                                             </a>
                                         {% endif %}
 
@@ -161,5 +162,63 @@
     font-size: 0.75rem;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ===============================
+    // COMMENCER ACTIVITÉ
+    // ===============================
+    document.querySelectorAll('.btn-commencer').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let url = this.dataset.url;
+
+            Swal.fire({
+                title: 'Commencer cette activité ?',
+                text: "Le statut passera à EN COURS",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, commencer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        });
+    });
+
+    // ===============================
+    // VALIDER RAPPORT
+    // ===============================
+    document.querySelectorAll('.btn-valider').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let url = this.dataset.url;
+
+            Swal.fire({
+                title: 'Valider ce rapport ?',
+                text: "Cette action est définitive",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, valider',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        });
+    });
+
+});
+</script>
 
 {% endblock %}
