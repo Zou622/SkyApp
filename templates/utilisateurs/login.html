@@ -264,10 +264,18 @@ document.addEventListener("DOMContentLoaded", function () {
         loading.style.display = "inline-block";
     });
 
-    document.getElementById("togglePassword").addEventListener("click", function () {
-        const input = document.querySelector("input[type='password'], input[type='text']");
-        input.type = input.type === "password" ? "text" : "password";
-    });
+    // Version Django avec id généré dynamiquement
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordInput = document.querySelector("#{{ form.password.id_for_label }}"); // ou "#id_password"
+
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener("click", function () {
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            this.textContent = isPassword ? "🙈" : "👁️";
+            passwordInput.focus();
+        });
+    }
 
     document.getElementById('resetPasswordBtn').addEventListener('click', function () {
 
@@ -302,13 +310,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     Swal.fire(data.status === 'success' ? 'Succès' : 'Erreur', data.message);
                 });
-
             }
-
         });
-
     });
-
 });
 </script>
 
