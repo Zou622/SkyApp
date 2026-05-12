@@ -178,24 +178,15 @@ def modifier_profile(request):
     user = request.user
 
     if request.method == "POST":
-        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user.employe, user=user)
 
         if form.is_valid():
-            user = form.save(commit=False)
-
-            password = form.cleaned_data.get("password")
-
-            if password:
-                user.set_password(password)
-
-            user.save()
-
+            form.save()
             messages.success(request, "Profil modifié avec succès")
-
             return redirect('users:profile')
 
     else:
-        form = UserProfileForm(instance=user)
+        form = UserProfileForm(instance=user.employe, user=user)
 
     return render(request, "utilisateurs/modifier_profile.html", {"form": form})
 
@@ -346,24 +337,22 @@ def modifier_utilisateur(request, user_id):
 
     user = get_object_or_404(User, id=user_id)
 
+@login_required
+@admin_required
+def modifier_utilisateur(request, user_id):
+
+    user = get_object_or_404(User, id=user_id)
+
     if request.method == "POST":
-        form = UserProfileForm(request.POST, request.FILES, instance=user)
+        form = UserProfileForm(request.POST, request.FILES, instance=user.employe, user=user)
 
         if form.is_valid():
-            user = form.save(commit=False)
-
-            password = form.cleaned_data.get("password")
-
-            if password:
-                user.set_password(password)
-
-            user.save()
-
+            form.save()
             messages.success(request, "Utilisateur modifié avec succès")
             return redirect('users:liste_utilisateurs')
 
     else:
-        form = UserProfileForm(instance=user)
+        form = UserProfileForm(instance=user.employe, user=user)
 
     return render(request, "utilisateurs/modifier_utilisateur.html", {
         "form": form,
@@ -429,7 +418,7 @@ def dashboard(request):
 
         stats['conversion_stats'] = (
             Prospect.objects.filter(statut="converti")
-            .values('commercial__nom', 'commercial__prenom')
+            .values('commercial__employe__nom', 'commercial__employe__prenom')
             .annotate(total=Count('id'))
             .order_by('-total')
         )
@@ -441,14 +430,34 @@ def dashboard(request):
         )
 
     # =========================
+    # RESSOURCES HUMAINES
+    # =========================
+    if user.user_type in ['admin', 'rh']:
+
+        from employes.models import Employe
+
+        stats['total_employes'] = Employe.objects.count()
+        stats['employes_actifs'] = Employe.objects.filter(statut='Actif').count()
+        stats['techniciens'] = Technicien.objects.count()
+        stats['commerciaux'] = Commercial.objects.count()
+
+        # Employés nouveaux ce mois (approximation)
+        from django.utils import timezone
+        import datetime
+        debut_mois = timezone.now().replace(day=1)
+        stats['nouveaux_employes'] = Employe.objects.filter(date_embauche__gte=debut_mois).count()
+
+        stats['employes_inactifs'] = Employe.objects.filter(statut='Inactif').count()
+
+    # =========================
     # TECHNICIEN
     # =========================
     elif user.user_type == 'technicien':
 
-        if hasattr(user, 'technicien') and user.technicien:
+        if user.employe and hasattr(user.employe, 'technicien_profile') and user.employe.technicien_profile:
 
             qs = Activite.objects.filter(
-                techniciens=user.technicien
+                techniciens=user.employe.technicien_profile
             )
 
             stats['activites'] = qs.count()
@@ -466,18 +475,18 @@ def dashboard(request):
     # =========================
     elif user.user_type == 'commercial':
 
-        if hasattr(user, 'commercial') and user.commercial:
+        if user.employe and hasattr(user.employe, 'commercial_profile') and user.employe.commercial_profile:
 
             stats['clients'] = Client.objects.filter(
-                commercial=user.commercial
+                commercial=user.employe.commercial_profile
             ).count()
 
             stats['mes_prospects'] = Prospect.objects.filter(
-                commercial=user.commercial
+                commercial=user.employe.commercial_profile
             ).count()
 
             stats['mes_conversions'] = Prospect.objects.filter(
-                commercial=user.commercial,
+                commercial=user.employe.commercial_profile,
                 statut="converti"
             ).count()
 

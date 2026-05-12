@@ -37,7 +37,7 @@
                                 <input type="text" 
                                        name="nom" 
                                        class="form-control" 
-                                       value="{{ commercial.nom }}"
+                                       value="{{ commercial.employe.nom }}"
                                        required>
                             </div>
                             
@@ -47,7 +47,7 @@
                                 <input type="text" 
                                        name="prenom" 
                                        class="form-control" 
-                                       value="{{ commercial.prenom }}"
+                                       value="{{ commercial.employe.prenom }}"
                                        required>
                             </div>
                             
@@ -57,7 +57,7 @@
                                 <input type="text" 
                                        name="telephone" 
                                        class="form-control" 
-                                       value="{{ commercial.telephone }}">
+                                       value="{{ commercial.employe.telephone }}">
                             </div>
                             
                             <!-- Email -->
@@ -66,7 +66,7 @@
                                 <input type="email" 
                                        name="email" 
                                        class="form-control" 
-                                       value="{{ commercial.email|default:'' }}">
+                                       value="{{ commercial.employe.email|default:'' }}">
                             </div>
                         </div>
                         
@@ -107,7 +107,7 @@
                                 <input type="date" 
                                        name="date_embauche" 
                                        class="form-control" 
-                                       value="{{ commercial.date_embauche|date:'Y-m-d' }}">
+                                       value="{{ commercial.employe.date_embauche|date:'Y-m-d' }}">
                             </div>
                             
                             <!-- Statut actif -->
@@ -139,7 +139,7 @@
                                 <input type="text" 
                                        name="quartier" 
                                        class="form-control" 
-                                       value="{{ commercial.quartier|default:'' }}">
+                                       value="{{ commercial.employe.quartier|default:'' }}">
                             </div>
                         </div>
                         
@@ -153,7 +153,7 @@
                                 <label class="form-label fw-bold">Adresse</label>
                                 <textarea name="adresse" 
                                           class="form-control" 
-                                          rows="3">{{ commercial.adresse|default:'' }}</textarea>
+                                          rows="3">{{ commercial.employe.adresse|default:'' }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -161,17 +161,13 @@
                     <!-- Informations complémentaires -->
                     <div class="alert alert-light border mt-4">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <small class="text-muted">Date de création</small>
                                 <div class="fw-bold">{{ commercial.date_creation|date:"d/m/Y H:i" }}</div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <small class="text-muted">Dernière modification</small>
                                 <div class="fw-bold">{{ commercial.date_modification|date:"d/m/Y H:i" }}</div>
-                            </div>
-                            <div class="col-md-4">
-                                <small class="text-muted">Ancienneté</small>
-                                <div class="fw-bold">{{ commercial.anciennete }} an{{ commercial.anciennete|pluralize:"s" }}</div>
                             </div>
                         </div>
                     </div>

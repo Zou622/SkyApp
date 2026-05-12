@@ -11,7 +11,7 @@ from commercials.models import Commercial
 def list_prospects(request):
     user = request.user
 
-    commercial = Commercial.objects.filter(user_account=user).first()
+    commercial = Commercial.objects.filter(employe__user_account=user).first()
     is_commercial = commercial is not None
 
     # ================= BASE QUERY =================
@@ -57,7 +57,7 @@ def list_prospects(request):
     if not is_commercial:
         commercial_stats = (
             prospects_list
-            .values('commercial__id', 'commercial__nom', 'commercial__prenom')
+            .values('commercial__id', 'commercial__employe__nom', 'commercial__employe__prenom')
             .annotate(total=Count('id'))
             .order_by('-total')
         )
@@ -88,7 +88,7 @@ def add_prospect(request):
     # 🔥 récupérer le commercial connecté
     commercial_connecte = None
     if is_commercial:
-        commercial_connecte = Commercial.objects.filter(user_account=request.user).first()
+        commercial_connecte = Commercial.objects.filter(employe__user_account=request.user).first()
 
     if request.method == "POST":
 

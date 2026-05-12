@@ -1,0 +1,140 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user-plus me-2"></i> Créer un Compte Utilisateur
+                        </h4>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Afficher les informations de l'employé -->
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex align-items-center">
+                                {% if employe.photo %}
+                                    <img src="{{ employe.photo.url }}" alt="Photo" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-primary me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h5 class="mb-0">{{ employe.nom }} {{ employe.prenom }}</h5>
+                                    <small class="text-muted">Matricule: {{ employe.matricule }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulaire de création de compte -->
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+
+                            <!-- Messages d'erreur/succès -->
+                            {% if messages %}
+                                {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                                    <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %} me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <!-- Nom d'utilisateur -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-user me-1"></i> Nom d'utilisateur *
+                                </label>
+                                <input type="text" name="username" class="form-control" placeholder="ex: jdupont" required>
+                                <small class="text-muted">Ce sera utilisé pour la connexion</small>
+                            </div>
+
+                            <!-- Email (lecture seule) -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-envelope me-1"></i> Email
+                                </label>
+                                <input type="email" class="form-control" value="{{ employe.email|default:'' }}" disabled>
+                                <small class="text-muted">Récupéré depuis le profil employé</small>
+                            </div>
+
+                            <!-- Mot de passe -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-1"></i> Mot de passe *
+                                </label>
+                                <input type="password" name="password" class="form-control" placeholder="Entrez un mot de passe" required>
+                                <small class="text-muted">Min. 8 caractères recommandé</small>
+                            </div>
+
+                            <!-- Confirmation de mot de passe -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-1"></i> Confirmer le mot de passe *
+                                </label>
+                                <input type="password" name="confirm_password" class="form-control" id="confirm_password" placeholder="Confirmez le mot de passe" required>
+                                <small class="text-muted">Doit être identique au mot de passe ci-dessus</small>
+                            </div>
+
+                            <!-- Type d'utilisateur -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-shield-alt me-1"></i> Rôle/Type d'utilisateur *
+                                </label>
+                                <select name="user_type" class="form-select" required>
+                                    <option value="">-- Sélectionner un rôle --</option>
+                                    {% for code, label in user_types %}
+                                    <option value="{{ code }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted">Détermine les permissions et accès</small>
+                            </div>
+
+                            <!-- Information de sécurité -->
+                            <div class="alert alert-warning">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                <strong>Recommandations de sécurité :</strong>
+                                <ul class="mb-0 mt-2 small">
+                                    <li>Utilisez un mot de passe fort (majuscules, minuscules, chiffres, caractères spéciaux)</li>
+                                    <li>Conservez le mot de passe dans un endroit sûr</li>
+                                    <li>Changez le mot de passe régulièrement</li>
+                                </ul>
+                            </div>
+
+                            <!-- Boutons d'action -->
+                            <div class="d-flex justify-content-between gap-2 mt-4">
+                                <a href="{% url 'employes:detail_employe' employe.id %}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i> Annuler
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-user-plus me-1"></i> Créer le compte
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.querySelector('input[name="password"]').value;
+        const confirmPassword = document.querySelector('#confirm_password').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Les mots de passe ne correspondent pas !');
+            document.querySelector('#confirm_password').classList.add('is-invalid');
+        }
+    });
+</script>
+
+{% endblock %}

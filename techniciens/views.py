@@ -22,15 +22,15 @@ def list_technicien(request):
 
     if search_query:
         techniciens_list = techniciens_list.filter(
-            Q(nom__icontains=search_query) |
-            Q(prenom__icontains=search_query) |
-            Q(email__icontains=search_query) |
-            Q(telephone__icontains=search_query) |
-            Q(quartier__icontains=search_query) |
+            Q(employe__nom__icontains=search_query) |
+            Q(employe__prenom__icontains=search_query) |
+            Q(employe__email__icontains=search_query) |
+            Q(employe__telephone__icontains=search_query) |
+            Q(employe__quartier__icontains=search_query) |
             Q(specialite__icontains=search_query)
         )
 
-    techniciens_list = techniciens_list.order_by('nom', 'prenom')
+    techniciens_list = techniciens_list.order_by('employe__nom', 'employe__prenom')
 
     # Pagination
     page = request.GET.get('page', 1)

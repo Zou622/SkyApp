@@ -1,0 +1,354 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-white py-3">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit me-2"></i> Modifier un Employé
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <!-- Messages d'erreur/succès -->
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                        <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% else %}check-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Résumé des erreurs -->
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Erreurs du formulaire :</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <!-- Colonne 1 : Infos personnelles -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-warning mb-3">
+                                <i class="fas fa-user me-2"></i> Informations Personnelles
+                            </h5>
+
+                            <!-- Nom -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.nom.label }} *</label>
+                                {{ form.nom }}
+                                {% if form.nom.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.nom.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Prénom -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.prenom.label }} *</label>
+                                {{ form.prenom }}
+                                {% if form.prenom.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.prenom.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Sexe -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.sexe.label }}</label>
+                                {{ form.sexe }}
+                                {% if form.sexe.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.sexe.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Date de naissance -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.date_naissance.label }}</label>
+                                {{ form.date_naissance }}
+                                {% if form.date_naissance.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.date_naissance.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Téléphone -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.telephone.label }}</label>
+                                {{ form.telephone }}
+                                {% if form.telephone.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.telephone.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.email.label }}</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Adresse -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.adresse.label }}</label>
+                                {{ form.adresse }}
+                                {% if form.adresse.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.adresse.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Quartier -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.quartier.label }}</label>
+                                {{ form.quartier }}
+                                {% if form.quartier.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.quartier.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Colonne 2 : Infos professionnelles -->
+                        <div class="col-md-6">
+                            <h5 class="text-warning mb-3">
+                                <i class="fas fa-briefcase me-2"></i> Informations Professionnelles
+                            </h5>
+
+                            <!-- Département -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.departement.label }}</label>
+                                <div class="input-group">
+                                    {{ form.departement }}
+                                    <a href="{% url 'employes:liste_departements' %}" class="btn btn-sm btn-outline-secondary" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalAjouterDepartement" title="Ajouter">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                {% if form.departement.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.departement.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Poste -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.poste.label }}</label>
+                                <div class="input-group">
+                                    {{ form.poste }}
+                                    <a href="{% url 'employes:liste_postes' %}" class="btn btn-sm btn-outline-secondary" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalAjouterPoste" title="Ajouter">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                {% if form.poste.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.poste.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Statut -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.statut.label }}</label>
+                                {{ form.statut }}
+                                {% if form.statut.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.statut.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Date d'embauche -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.date_embauche.label }}</label>
+                                {{ form.date_embauche }}
+                                {% if form.date_embauche.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.date_embauche.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Photo -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">{{ form.photo.label }}</label>
+                                {% if employe.photo %}
+                                <div class="mb-2">
+                                    <img src="{{ employe.photo.url }}" alt="Photo actuelle" style="max-width: 150px; height: auto;" class="rounded">
+                                </div>
+                                {% endif %}
+                                {{ form.photo }}
+                                {% if form.photo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.photo.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="row mt-4 pt-3 border-top">
+                        <div class="col-12 d-flex justify-content-between">
+                            <a href="{% url 'employes:detail_employe' employe.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-1"></i> Mettre à jour
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals d'ajout rapide -->
+<div class="modal fade" id="modalAjouterDepartement" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Ajouter un département</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAjouterDepartement" action="{% url 'employes:ajouter_departement' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="departement_nom">Nom du département</label>
+                        <input type="text" class="form-control" id="departement_nom" name="nom" required>
+                        <div id="departementFeedback" class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAjouterPoste" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Ajouter un poste</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formAjouterPoste" action="{% url 'employes:ajouter_poste' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="poste_nom">Nom du poste</label>
+                        <input type="text" class="form-control" id="poste_nom" name="nom" required>
+                        <div id="posteFeedback" class="invalid-feedback"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-success">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleAjaxForm(formId, selectName, feedbackId, modalId) {
+        const form = document.getElementById(formId);
+        const feedback = document.getElementById(feedbackId);
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            feedback.textContent = '';
+            feedback.classList.remove('d-block');
+            const url = form.action;
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData,
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    const select = document.querySelector(`select[name="${selectName}"]`);
+                    if (select) {
+                        const option = document.createElement('option');
+                        option.value = data.id;
+                        option.textContent = data.nom;
+                        option.selected = true;
+                        select.appendChild(option);
+                    }
+                    form.reset();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+                    modal.hide();
+                } else {
+                    feedback.textContent = data.errors ? data.errors.nom?.[0] || 'Une erreur est survenue.' : 'Une erreur est survenue.';
+                    feedback.classList.add('d-block');
+                }
+            } catch (error) {
+                feedback.textContent = 'Impossible de contacter le serveur.';
+                feedback.classList.add('d-block');
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        handleAjaxForm('formAjouterDepartement', 'departement', 'departementFeedback', 'modalAjouterDepartement');
+        handleAjaxForm('formAjouterPoste', 'poste', 'posteFeedback', 'modalAjouterPoste');
+    });
+</script>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+</style>
+
+{% endblock %}

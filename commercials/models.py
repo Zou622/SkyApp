@@ -6,12 +6,12 @@ User = get_user_model()
 
 class Commercial(models.Model):
 
-    user_account = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
+    employe = models.OneToOneField(
+        'employes.Employe',
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="commercial_profile"
+        related_name='commercial_profile'
     )
 
     SPECIALITES = [
@@ -21,14 +21,6 @@ class Commercial(models.Model):
         ('gestion', 'Gestion Clientèle'),
         ('autre', 'Autre'),
     ]
-
-    nom = models.CharField(max_length=100)
-    prenom = models.CharField(max_length=100)
-
-    quartier = models.CharField(max_length=100, blank=True, null=True)
-    adresse = models.TextField(blank=True, null=True)
-    telephone = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
 
     specialite = models.CharField(
         max_length=50,
@@ -43,15 +35,13 @@ class Commercial(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
 
-    date_embauche = models.DateField(blank=True, null=True)
-
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
     est_actif = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ['nom', 'prenom']
+        ordering = ['employe__nom', 'employe__prenom']
 
     def __str__(self):
-        return f"{self.prenom} {self.nom}"
+        return f"{self.employe.prenom} {self.employe.nom}"

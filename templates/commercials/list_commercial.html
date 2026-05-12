@@ -67,11 +67,11 @@
                                             </div>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <h6 class="mb-0">{{ commercial.prenom }} {{ commercial.nom }}</h6>
+                                            <h6 class="mb-0">{{ commercial.employe.prenom }} {{ commercial.employe.nom }}</h6>
                                             <small class="text-muted">
-                                                {% if commercial.date_embauche %}
+                                                {% if commercial.employe.date_embauche %}
                                                 <i class="fas fa-calendar-alt me-1"></i>
-                                                {{ commercial.date_embauche|date:"d/m/Y" }}
+                                                {{ commercial.employe.date_embauche|date:"d/m/Y" }}
                                                 {% endif %}
                                             </small>
                                         </div>
@@ -81,9 +81,9 @@
                                 <!-- Contact -->
                                 <td>
                                     <div class="small">
-                                        <div><i class="fas fa-phone me-1 text-muted"></i> {{ commercial.telephone }}</div>
-                                        {% if commercial.email %}
-                                        <div><i class="fas fa-envelope me-1 text-muted"></i> {{ commercial.email|truncatechars:20 }}</div>
+                                        <div><i class="fas fa-phone me-1 text-muted"></i> {{ commercial.employe.telephone }}</div>
+                                        {% if commercial.employe.email %}
+                                        <div><i class="fas fa-envelope me-1 text-muted"></i> {{ commercial.employe.email|truncatechars:20 }}</div>
                                         {% endif %}
                                     </div>
                                 </td>
@@ -152,7 +152,7 @@
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <p>Supprimer le commercial <strong>"{{ commercial.prenom }} {{ commercial.nom }}"</strong> ?</p>
+                                            <p>Supprimer le commercial <strong>"{{ commercial.employe.prenom }} {{ commercial.employe.nom }}"</strong> ?</p>
                                             <p class="text-danger"><small>Cette action est irréversible !</small></p>
                                         </div>
                                         <div class="modal-footer">

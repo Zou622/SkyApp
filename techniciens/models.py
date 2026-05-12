@@ -5,21 +5,12 @@ from django.conf import settings
 # from users.models import User
 
 class Technicien(models.Model):
-    nom = models.CharField(max_length=100, verbose_name="Nom")
-    prenom = models.CharField(max_length=100, verbose_name="Prénom")
-    email = models.EmailField(verbose_name="Email", unique=True, blank=True, null=True)
-    telephone = models.CharField(max_length=20, verbose_name="Téléphone" , blank=True, null=True)
-
-    # Adresse
-    quartier = models.CharField(max_length=100, verbose_name="Quartier", blank=True, null=True)
-    adresse = models.TextField(verbose_name="Adresse complète" , blank=True, null=True)
-
-    # Photo
-    photo = models.ImageField(
-        upload_to='techniciens/photos/',
-        verbose_name="Photo",
+    employe = models.OneToOneField(
+        'employes.Employe',
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
-        null=True
+        related_name='technicien_profile'
     )
 
     # Informations professionnelles
@@ -28,15 +19,6 @@ class Technicien(models.Model):
         verbose_name="Spécialité",
         blank=True,
         null=True
-    )
-
-    # Relation vers User (optionnelle - si vous voulez aussi un lien depuis Technicien)
-    user = models.OneToOneField(
-        'users.User',  # Utilisez une chaîne de caractères
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='technicien_profile'
     )
 
     # Statut
@@ -55,22 +37,21 @@ class Technicien(models.Model):
     est_actif = models.BooleanField(default=True)
 
     # Dates
-    date_embauche = models.DateField(verbose_name="Date d'embauche" , blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.nom} {self.prenom}"
+        return f"{self.employe.nom} {self.employe.prenom}"
 
     def nom_complet(self):
-        return f"{self.nom} {self.prenom}"
+        return f"{self.employe.nom} {self.employe.prenom}"
 
     def get_photo_url(self):
-        if self.photo and hasattr(self.photo, 'url'):
-            return self.photo.url
+        if self.employe.photo and hasattr(self.employe.photo, 'url'):
+            return self.employe.photo.url
         return '/static/images/default-avatar.png'
 
     class Meta:
         verbose_name = "Technicien"
         verbose_name_plural = "Techniciens"
-        ordering = ['nom', 'prenom']
+        ordering = ['employe__nom', 'employe__prenom']

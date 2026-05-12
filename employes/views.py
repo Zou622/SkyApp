@@ -1,14 +1,20 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 
-from .models import Employe
-from .forms import EmployeForm
+from .models import Departement, Employe, Poste
+from .forms import DepartementForm, EmployeForm, PosteForm
+from users.decorators import user_type_required
+
+User = get_user_model()
 
 
 @login_required
+@user_type_required(['admin', 'rh'])
 def liste_employes(request):
 
     #  RECHERCHE
@@ -44,6 +50,7 @@ def liste_employes(request):
 
 
 @login_required
+@user_type_required(['admin', 'rh'])
 def ajouter_employe(request):
 
     if request.method == "POST":
@@ -59,7 +66,7 @@ def ajouter_employe(request):
                 f"L'employé {employe.nom} {employe.prenom} a été ajouté avec succès.",
             )
 
-            return redirect("liste_employes")
+            return redirect("employes:liste_employes")
 
         else:
 
@@ -72,3 +79,160 @@ def ajouter_employe(request):
     context = {"form": form, "titre": "Ajouter un employé"}
 
     return render(request, "employes/ajout_employes.html", context)
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def liste_departements(request):
+    departements = Departement.objects.all().order_by('nom')
+    return render(request, 'employes/liste_departements.html', {
+        'departements': departements,
+    })
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def ajouter_departement(request):
+    form = DepartementForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        departement = form.save()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'id': departement.id, 'nom': departement.nom})
+        messages.success(request, 'Département ajouté avec succès.')
+        return redirect('employes:liste_departements')
+
+    return render(request, 'employes/ajout_departement.html', {
+        'form': form,
+        'titre': 'Ajouter un département',
+    })
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def supprimer_departement(request, departement_id):
+    departement = get_object_or_404(Departement, id=departement_id)
+    if request.method == 'POST':
+        departement.delete()
+        messages.success(request, 'Département supprimé avec succès.')
+        return redirect('employes:liste_departements')
+    return render(request, 'employes/confirmer_suppression.html', {
+        'objet': departement,
+        'type': 'département',
+        'retour_url': 'employes:liste_departements',
+    })
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def liste_postes(request):
+    postes = Poste.objects.all().order_by('nom')
+    return render(request, 'employes/liste_postes.html', {
+        'postes': postes,
+    })
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def ajouter_poste(request):
+    form = PosteForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        poste = form.save()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'id': poste.id, 'nom': poste.nom})
+        messages.success(request, 'Poste ajouté avec succès.')
+        return redirect('employes:liste_postes')
+
+    return render(request, 'employes/ajout_poste.html', {
+        'form': form,
+        'titre': 'Ajouter un poste',
+    })
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def supprimer_poste(request, poste_id):
+    poste = get_object_or_404(Poste, id=poste_id)
+    if request.method == 'POST':
+        poste.delete()
+        messages.success(request, 'Poste supprimé avec succès.')
+        return redirect('employes:liste_postes')
+    return render(request, 'employes/confirmer_suppression.html', {
+        'objet': poste,
+        'type': 'poste',
+        'retour_url': 'employes:liste_postes',
+    })
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def detail_employe(request, employe_id):
+    employe = get_object_or_404(Employe, id=employe_id)
+    context = {
+        'employe': employe,
+    }
+    return render(request, 'employes/detail_employes.html', context)
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def modifier_employe(request, employe_id):
+    employe = get_object_or_404(Employe, id=employe_id)
+    
+    if request.method == 'POST':
+        form = EmployeForm(request.POST, request.FILES, instance=employe)
+        if form.is_valid():
+            employe = form.save()
+            messages.success(request, f"L'employé {employe.nom} {employe.prenom} a été modifié avec succès.")
+            return redirect('employes:detail_employe', employe_id=employe.id)
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+    else:
+        form = EmployeForm(instance=employe)
+    
+    context = {
+        'form': form,
+        'titre': 'Modifier un employé',
+        'employe': employe,
+    }
+    return render(request, 'employes/modifier_employes.html', context)
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def creer_compte_utilisateur(request, employe_id):
+    employe = get_object_or_404(Employe, id=employe_id)
+    
+    if employe.has_user_account:
+        messages.warning(request, "Cet employé a déjà un compte utilisateur.")
+        return redirect('employes:liste_employes')
+    
+    if request.method == "POST":
+        username = request.POST.get('username')
+        user_type = request.POST.get('user_type')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if not username or not password or not confirm_password or not user_type:
+            messages.error(request, "Tous les champs obligatoires doivent être remplis.")
+        elif password != confirm_password:
+            messages.error(request, "Les mots de passe ne correspondent pas.")
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, "Ce nom d'utilisateur existe déjà.")
+        else:
+            user = User.objects.create_user(
+                username=username,
+                first_name=employe.prenom,
+                last_name=employe.nom,
+                email=employe.email or '',
+                user_type=user_type,
+                password=password,
+                employe=employe
+            )
+            messages.success(request, f"Compte utilisateur créé pour {employe.nom} {employe.prenom}.")
+            return redirect('employes:liste_employes')
+    
+    context = {
+        'employe': employe,
+        'user_types': User.TYPE_USER
+    }
+    return render(request, "employes/creer_compte.html", context)

@@ -437,12 +437,12 @@ def modifier_prospection(request, id):
     user = request.user
 
     # 🔐 rôle commercial
-    is_commercial = hasattr(user, 'commercial_profile')
+    is_commercial = user.employe and hasattr(user.employe, 'commercial_profile')
 
     # ================= BASE QUERY =================
     if is_commercial:
         prospects_list = Client.objects.filter(
-            commercial=user.commercial_profile,
+            commercial=user.employe.commercial_profile,
             type_client='prospect'
         )
     else:
@@ -482,7 +482,7 @@ def modifier_prospection(request, id):
     if not is_commercial:
         commercial_stats = (
             prospects_list
-            .values('commercial__id', 'commercial__nom', 'commercial__prenom')
+            .values('commercial__id', 'commercial__employe__nom', 'commercial__employe__prenom')
             .annotate(total=Count('id'))
             .order_by('-total')
         )

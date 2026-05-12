@@ -142,7 +142,7 @@ def list_client(request):
     user = request.user
 
     # 🔐 Détection du commercial (CORRECT)
-    commercial = Commercial.objects.filter(user_account=user).first()
+    commercial = Commercial.objects.filter(employe__user_account=user).first()
     is_commercial = commercial is not None
 
     # ================= BASE QUERY =================
@@ -310,7 +310,7 @@ def supprimer_client(request, client_id):
     
     # Vérifier si l'utilisateur a le droit de supprimer ce client
     user = request.user
-    commercial = Commercial.objects.filter(user_account=user).first()
+    commercial = Commercial.objects.filter(employe__user_account=user).first()
     
     # Si c'est un commercial, vérifier que le client lui appartient
     if commercial and client.commercial != commercial:
@@ -824,7 +824,7 @@ def modifier_rapport(request, rapport_id):
     activite = rapport.activite
 
     # 🔒 sécurité : seul le technicien peut modifier
-    technicien = Technicien.objects.filter(user=request.user).first()
+    technicien = Technicien.objects.filter(employe__user_account=request.user).first()
     if not technicien:
         return redirect('rapportActivites:liste_activites_technicien')
 

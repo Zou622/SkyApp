@@ -29,20 +29,13 @@ class CustomUserAdmin(UserAdmin):
         'last_name'
     )
 
+    readonly_fields = ('date_inscription', 'derniere_connexion')
+
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Informations personnelles', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Informations supplémentaires', {
-            'fields': (
-                'user_type',
-                'telephone',
-                'adresse',
-                'photo',
-                'est_valide',
-                'technicien',
-                'commercial'
-            )
-        }),
+        ('Liens', {'fields': ('user_type', 'employe')}),
+        ('Statut', {'fields': ('est_valide', 'est_actif')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Dates importantes', {'fields': ('last_login', 'date_joined')}),
+        ('Dates importantes', {'fields': ('last_login', 'date_joined', 'date_inscription', 'derniere_connexion')}),
     )

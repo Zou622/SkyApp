@@ -60,16 +60,11 @@ class UserRegistrationForm(UserCreationForm):
         max_length=30,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    telephone = forms.CharField(
-        max_length=20,
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
 
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email',
-                  'user_type', 'telephone', 'password1', 'password2')
+                  'user_type', 'password1', 'password2')
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -80,6 +75,8 @@ class UserRegistrationForm(UserCreationForm):
 
 
 User = get_user_model()
+from employes.models import Employe
+
 class UserProfileForm(forms.ModelForm):
     password = forms.CharField(
         required=False,
@@ -88,16 +85,25 @@ class UserProfileForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email', 'telephone', 'photo', 'password']
+        model = Employe
+        fields = ['nom', 'prenom', 'email', 'telephone', 'adresse', 'quartier', 'photo']
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
-        user = super().save(commit=False)
+        employe = super().save(commit=False)
         password = self.cleaned_data.get("password")
 
         # 🔹 Ne changer le mot de passe que si un mot de passe est saisi
-        if password:
-            user.set_password(password)
+        if password and self.user:
+            self.user.set_password(password)
+            self.user.save()
+
+        if commit:
+            employe.save()
+        return employe
         # Sinon on conserve l'ancien mot de passe
 
         if commit:
@@ -121,9 +127,7 @@ class UserProfileForm1(forms.ModelForm):
             "first_name",
             "last_name",
             "email",
-            "telephone",
             "user_type",
-            "photo",
             "password"
         ]
 
@@ -161,8 +165,6 @@ class UserProfileForm(forms.ModelForm):
             'first_name',
             'last_name',
             'email',
-            'telephone',
-            'photo'
         ]
 
         labels = {
@@ -170,8 +172,6 @@ class UserProfileForm(forms.ModelForm):
             'first_name': "Prénom",
             'last_name': "Nom",
             'email': "Email",
-            'telephone': "Téléphone",
-            'photo': "Photo de profil",
         }
 
         widgets = {
@@ -179,8 +179,6 @@ class UserProfileForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'email': forms.EmailInput(attrs={'class': 'form-control form-control-sm'}),
-            'telephone': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
-            'photo': forms.FileInput(attrs={'class': 'form-control form-control-sm'}),
         }
 
 

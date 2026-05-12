@@ -29,11 +29,11 @@ class Employe(models.Model):
         ("Inactif", "Inactif"),
     )
 
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
-    )
+    matricule = models.CharField(max_length=50, unique=True, blank=True)
 
-    matricule = models.CharField(max_length=50, unique=True)
+    @property
+    def has_user_account(self):
+        return hasattr(self, 'user_account')
 
     photo = models.ImageField(upload_to="employes/photos/", null=True, blank=True)
 
@@ -48,6 +48,7 @@ class Employe(models.Model):
     email = models.EmailField(blank=True)
 
     adresse = models.TextField(blank=True)
+    quartier = models.CharField(max_length=100, blank=True, null=True)
 
     departement = models.ForeignKey(Departement, on_delete=models.SET_NULL, null=True)
 
@@ -58,6 +59,15 @@ class Employe(models.Model):
     statut = models.CharField(max_length=20, choices=STATUT, default="Actif")
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.matricule:
+            # Générer automatiquement le matricule basé sur l'ID
+            super().save(*args, **kwargs)  # Sauvegarder d'abord pour avoir un ID
+            self.matricule = f"EMP{self.id:04d}"
+            super().save(update_fields=['matricule'])  # Sauvegarder seulement le matricule
+        else:
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"

@@ -19,15 +19,20 @@ class User(AbstractUser):
         ('commercial', 'Commercial'),
         ('technicien', 'Technicien'),
         ('comptable', 'Comptable'),
+        ('rh', 'Ressources Humaines'),
     ]
 
     # Champs supplémentaires
     user_type = models.CharField(max_length=20, choices=TYPE_USER)
-    nom = models.CharField(max_length=25, blank=True)
-    prenom = models.CharField(max_length=30, blank=True)
-    telephone = models.CharField(max_length=20, blank=True, null=True)
-    adresse = models.TextField(blank=True)
-    photo = models.ImageField(upload_to='users/photos/', null=True, blank=True)
+
+    # Lien vers le profil employé
+    employe = models.OneToOneField(
+        'employes.Employe',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='user_account'
+    )
 
     # Dates
     date_inscription = models.DateTimeField(auto_now_add=True)
@@ -37,32 +42,19 @@ class User(AbstractUser):
     est_actif = models.BooleanField(default=True)
     est_valide = models.BooleanField(default=False, help_text="Compte validé par un admin")
 
-    # Utilisez des chaînes de caractères au lieu d'importer les classes
-    technicien = models.OneToOneField(
-        'techniciens.Technicien',  # Changé ici
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='user_account'
-    )
-
-    commercial = models.OneToOneField(
-        'commercials.Commercial',  # Changé ici aussi si nécessaire
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='commercial_profile'
-    )
-
     class Meta:
         verbose_name = "Utilisateur"
         verbose_name_plural = "Utilisateurs"
 
     def __str__(self):
-        return f"{self.username} - {self.get_full_name()} ({self.get_user_type_display()})"
+        if self.employe:
+            return f"{self.username} - {self.employe.nom} {self.employe.prenom} ({self.get_user_type_display()})"
+        return f"{self.username} ({self.get_user_type_display()})"
 
     def get_full_name(self):
-        return f"{self.first_name} {self.last_name}".strip() or self.username
+        if self.employe:
+            return f"{self.employe.prenom} {self.employe.nom}"
+        return self.username
     
 
 class PasswordResetToken(models.Model):

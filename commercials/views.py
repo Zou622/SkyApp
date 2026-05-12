@@ -20,14 +20,14 @@ def list_commercial(request):
 
     if search_query:
         commerciaux_list = Commercial.objects.filter(
-            Q(nom__icontains=search_query) |
-            Q(prenom__icontains=search_query) |
-            Q(telephone__icontains=search_query) |
-            Q(email__icontains=search_query) |
-            Q(quartier__icontains=search_query)
-        ).order_by('nom', 'prenom')
+            Q(employe__nom__icontains=search_query) |
+            Q(employe__prenom__icontains=search_query) |
+            Q(employe__telephone__icontains=search_query) |
+            Q(employe__email__icontains=search_query) |
+            Q(employe__quartier__icontains=search_query)
+        ).order_by('employe__nom', 'employe__prenom')
     else:
-        commerciaux_list = Commercial.objects.all().order_by('nom', 'prenom')
+        commerciaux_list = Commercial.objects.all().order_by('employe__nom', 'employe__prenom')
 
     paginator = Paginator(commerciaux_list, 10)
     page_number = request.GET.get('page')
@@ -45,6 +45,9 @@ def list_commercial(request):
 # Ajouter un commercial
 @login_required
 def ajouter_commercial(request):
+    from employes.models import Employe
+    from django.utils import timezone
+
     if request.method == 'POST':
         # Récupérer les données du formulaire
         nom = request.POST.get('nom')
@@ -63,18 +66,24 @@ def ajouter_commercial(request):
             messages.error(request, 'Nom et Prénom sont obligatoires')
             return render(request, 'commercials/ajouter_commercial.html')
 
-        # Créer le commercial
         try:
-            commercial = Commercial.objects.create(
+            # Créer d'abord l'employé
+            employe = Employe.objects.create(
                 nom=nom,
                 prenom=prenom,
                 telephone=telephone,
                 email=email if email else None,
                 quartier=quartier if quartier else None,
                 adresse=adresse if adresse else None,
+                date_embauche=date_embauche if date_embauche else date.today(),
+                statut='Actif'
+            )
+
+            # Créer le commercial lié à l'employé
+            commercial = Commercial.objects.create(
+                employe=employe,
                 specialite=specialite if specialite else 'vente',
                 taux_commission=taux_commission if taux_commission else 10.00,
-                date_embauche=date_embauche if date_embauche else None,
                 est_actif=est_actif
             )
 
@@ -100,27 +109,19 @@ def modifier_commercial(request, pk):
 
     if request.method == 'POST':
         # Récupérer les données du formulaire
-        commercial.nom = request.POST.get('nom')
-        commercial.prenom = request.POST.get('prenom')
-        commercial.telephone = request.POST.get('telephone')
-        commercial.email = request.POST.get('email')
-        commercial.quartier = request.POST.get('quartier')
-        commercial.adresse = request.POST.get('adresse')
-        commercial.specialite = request.POST.get('specialite')
-        commercial.taux_commission = request.POST.get('taux_commission')
-        #commercial.date_embauche = request.POST.get('date_embauche')
-        commercial.est_actif = request.POST.get('est_actif') == 'on'
-        
-        #même si la date d'embauche est facultative, on doit vérifier si elle est fournie avant de l'assigner
+        nom = request.POST.get('nom')
+        prenom = request.POST.get('prenom')
+        telephone = request.POST.get('telephone')
+        email = request.POST.get('email')
+        quartier = request.POST.get('quartier')
+        adresse = request.POST.get('adresse')
+        specialite = request.POST.get('specialite')
+        taux_commission = request.POST.get('taux_commission')
         date_embauche = request.POST.get('date_embauche')
-        if date_embauche:
-            commercial.date_embauche = date_embauche
-        else:
-            commercial.date_embauche = None
-
+        est_actif = request.POST.get('est_actif') == 'on'
 
         # Validation
-        if not commercial.nom or not commercial.prenom:
+        if not nom or not prenom:
             messages.error(request, 'Nom et Prénom sont obligatoires')
             context = {
                 'commercial': commercial,
@@ -129,8 +130,24 @@ def modifier_commercial(request, pk):
             return render(request, 'commercials/modifier_commercial.html', context)
 
         try:
+            # Modifier l'employé lié
+            commercial.employe.nom = nom
+            commercial.employe.prenom = prenom
+            commercial.employe.telephone = telephone
+            commercial.employe.email = email if email else None
+            commercial.employe.quartier = quartier if quartier else None
+            commercial.employe.adresse = adresse if adresse else None
+            if date_embauche:
+                commercial.employe.date_embauche = date_embauche
+            commercial.employe.save()
+
+            # Modifier le commercial
+            commercial.specialite = specialite if specialite else 'vente'
+            commercial.taux_commission = taux_commission if taux_commission else 10.00
+            commercial.est_actif = est_actif
             commercial.save()
-            messages.success(request, f'Commercial {commercial.nom} {commercial.prenom} modifié avec succès!')
+
+            messages.success(request, f'Commercial {nom} {prenom} modifié avec succès!')
             return redirect('detail_commercial', pk=commercial.pk)
 
         except Exception as e:
@@ -170,9 +187,9 @@ def supprimer_commercial(request, pk):
     commercial = get_object_or_404(Commercial, pk=pk)
 
     if request.method == 'POST':
-        #nom_complet = commercial.nom_complet()
+        nom_complet = f"{commercial.employe.nom} {commercial.employe.prenom}"
         commercial.delete()
-        messages.success(request, f'Commercial {commercial.nom}  {commercial.prenom}  supprimé avec succès!')
+        messages.success(request, f'Commercial {nom_complet} supprimé avec succès!')
         return redirect('list_commercial')
 
     context = {'commercial': commercial}

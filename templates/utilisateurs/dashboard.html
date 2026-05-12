@@ -86,7 +86,7 @@
                 <div class="d-flex justify-content-between border-bottom py-2">
                     <span>
                         <i class="fas fa-user me-2"></i>
-                        {{ c.commercial__nom }} {{ c.commercial__prenom }}
+                        {{ c.commercial__employe__nom }} {{ c.commercial__employe__prenom }}
                     </span>
                     <span class="badge bg-success">{{ c.total }}</span>
                 </div>
@@ -116,6 +116,98 @@
                 <p>Aucune donnée</p>
                 {% endfor %}
 
+            </div>
+        </div>
+
+        {% endif %}
+
+        <!-- ============================= -->
+        <!-- RESSOURCES HUMAINES -->
+        <!-- ============================= -->
+        {% if user.user_type == "admin" or user.user_type == "rh" %}
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="card bg-info text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-friends fa-2x mb-2"></i>
+                        <h3>{{ stats.total_employes|default:0 }}</h3>
+                        <p>Total Employés</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-check fa-2x mb-2"></i>
+                        <h3>{{ stats.employes_actifs|default:0 }}</h3>
+                        <p>Employés Actifs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tools fa-2x mb-2"></i>
+                        <h3>{{ stats.techniciens|default:0 }}</h3>
+                        <p>Techniciens</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-briefcase fa-2x mb-2"></i>
+                        <h3>{{ stats.commerciaux|default:0 }}</h3>
+                        <p>Commerciaux</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACTIONS RAPIDES RH -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <i class="fas fa-plus-circle me-2"></i> Actions Rapides
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'employes:ajouter_employe' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-plus me-2"></i> Ajouter un employé
+                            </a>
+                            <a href="{% url 'employes:liste_employes' %}" class="btn btn-outline-info">
+                                <i class="fas fa-list me-2"></i> Voir tous les employés
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-chart-bar me-2"></i> Statistiques RH
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h5 class="text-success">{{ stats.nouveaux_employes|default:0 }}</h5>
+                                <small class="text-muted">Nouveaux ce mois</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="text-warning">{{ stats.employes_inactifs|default:0 }}</h5>
+                                <small class="text-muted">Inactifs</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
