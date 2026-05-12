@@ -285,7 +285,7 @@ def modifier_client(request, client_id):
         return redirect('clients:list_client')
 
     # ================= DATA POUR FORM =================
-    commerciaux = Commercial.objects.all().order_by('nom', 'prenom')
+    commerciaux = Commercial.objects.all().order_by('employe__nom', 'employe__prenom')
     base_stations = BaseStation.objects.all().order_by('nom')
     types_contrat = TypeContrat.objects.all().order_by('nom')
 
@@ -362,7 +362,7 @@ def voir_pdf(request, client_id):
 def ajouter_activite_avec_client(request, client_id):
 
     client = get_object_or_404(Client, id=client_id)
-    techniciens = Technicien.objects.all().order_by('nom', 'prenom')
+    techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
 
     if request.method == "POST":
 
@@ -488,7 +488,7 @@ def ajouter_activite(request):
             messages.error(request, f'Erreur: {str(e)}')
 
     clients = Client.objects.all().order_by('nom_client')
-    techniciens = Technicien.objects.all().order_by('nom', 'prenom')
+    techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
 
     return render(request, 'clients/ajouter_activite.html',{
         'clients': clients,
@@ -704,7 +704,7 @@ def modifier_activite(request, pk):
 
     # GET
     clients = Client.objects.all().order_by('nom_client')
-    techniciens = Technicien.objects.all().order_by('nom', 'prenom')
+    techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
 
     context = {
         'activite': activite,

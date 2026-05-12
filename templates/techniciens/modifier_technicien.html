@@ -54,49 +54,49 @@ Swal.fire({
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Nom *</label>
-                                        <input type="text" class="form-control" name="nom" 
-                                               value="{{ technicien.nom }}" required>
+                                        <input type="text" class="form-control" name="nom"
+                                               value="{{ technicien.employe.nom }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Prénom *</label>
-                                        <input type="text" class="form-control" name="prenom" 
-                                               value="{{ technicien.prenom }}" required>
+                                        <input type="text" class="form-control" name="prenom"
+                                               value="{{ technicien.employe.prenom }}" required>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Email & Téléphone -->
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Email </label>
-                                        <input type="email" class="form-control" name="email" 
-                                               value="{{ technicien.email }}">
+                                        <input type="email" class="form-control" name="email"
+                                               value="{{ technicien.employe.email }}">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold">Téléphone</label>
-                                        <input type="tel" class="form-control" name="telephone" 
-                                               value="{{ technicien.telephone }}">
+                                        <input type="tel" class="form-control" name="telephone"
+                                               value="{{ technicien.employe.telephone }}">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Nouvelle photo -->
                             <div class="mb-3">
                                 <label class="form-label">Nouvelle photo</label>
                                 <input type="file" class="form-control" name="photo" accept="image/*">
                                 <small class="text-muted">Laisser vide pour conserver la photo actuelle</small>
                             </div>
-                            
+
                             <!-- Date d'embauche -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Date d'embauche</label>
-                                <input type="date" class="form-control" name="date_embauche" 
-                                       value="{{ technicien.date_embauche|date:'Y-m-d' }}">
+                                <input type="date" class="form-control" name="date_embauche"
+                                       value="{{ technicien.employe.date_embauche|date:'Y-m-d' }}">
                             </div>
                         </div>
                         
@@ -108,16 +108,21 @@ Swal.fire({
                             
                             <!-- Spécialité -->
                             <div class="mb-3">
-                                <label class="form-label">Spécialité</label>
-                                <input type="text" class="form-control" name="specialite" 
-                                       value="{{ technicien.specialite|default:'' }}"
-                                       placeholder="Ex: Fibre optique, ADSL, Wi-Fi">
+                                <label class="form-label fw-bold">Spécialité</label>
+                                <select class="form-select" name="specialite">
+                                    <option value="">-- Sélectionner une spécialité --</option>
+                                    {% for code, label in specialites %}
+                                    <option value="{{ code }}" {% if technicien.specialite == code %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted d-block mt-1">Domaine de compétence principal du technicien</small>
                             </div>
                             
                             <!-- Statut -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Statut *</label>
-                                <select class="form-control" name="statut" required>
+                                <select class="form-select" name="statut" required>
+                                    <option value="">-- Choisir un statut --</option>
                                     <option value="actif" {% if technicien.statut == 'actif' %}selected{% endif %}>Actif</option>
                                     <option value="inactif" {% if technicien.statut == 'inactif' %}selected{% endif %}>Inactif</option>
                                     <option value="congé" {% if technicien.statut == 'congé' %}selected{% endif %}>En congé</option>
@@ -128,13 +133,13 @@ Swal.fire({
                             <!-- Adresse & Quartier -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Adresse</label>
-                                <textarea class="form-control" name="adresse" rows="2">{{ technicien.adresse }}</textarea>
+                                <textarea class="form-control" name="adresse" rows="2">{{ technicien.employe.adresse }}</textarea>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Quartier </label>
-                                <input type="text" class="form-control" name="quartier" 
-                                       value="{{ technicien.quartier }}">
+                                <input type="text" class="form-control" name="quartier"
+                                       value="{{ technicien.employe.quartier }}">
                             </div>
                             
                             <!-- Informations système -->

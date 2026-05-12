@@ -1,17 +1,5 @@
 from django import forms
-from .models import Departement, Employe, Poste
-
-
-class DepartementForm(forms.ModelForm):
-    class Meta:
-        model = Departement
-        fields = ['nom']
-        widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Nom du département'}),
-        }
-        labels = {
-            'nom': 'Département *',
-        }
+from .models import Employe, Poste
 
 
 class PosteForm(forms.ModelForm):
@@ -40,7 +28,6 @@ class EmployeForm(forms.ModelForm):
             'email',
             'adresse',
             'quartier',
-            'departement',
             'poste',
             'date_embauche',
             'statut',
@@ -54,7 +41,6 @@ class EmployeForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Email'}),
             'adresse': forms.Textarea(attrs={'class': 'form-control form-control-sm', 'rows': 3, 'placeholder': 'Adresse'}),
             'quartier': forms.TextInput(attrs={'class': 'form-control form-control-sm', 'placeholder': 'Quartier'}),
-            'departement': forms.Select(attrs={'class': 'form-select form-select-sm'}),
             'poste': forms.Select(attrs={'class': 'form-select form-select-sm'}),
             'date_embauche': forms.DateInput(attrs={'class': 'form-control form-control-sm', 'type': 'date'}),
             'statut': forms.Select(attrs={'class': 'form-select form-select-sm'}),
@@ -69,7 +55,6 @@ class EmployeForm(forms.ModelForm):
             'email': 'Email',
             'adresse': 'Adresse',
             'quartier': 'Quartier',
-            'departement': 'Département',
             'poste': 'Poste',
             'date_embauche': 'Date d\'embauche',
             'statut': 'Statut *',

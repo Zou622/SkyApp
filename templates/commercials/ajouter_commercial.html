@@ -11,7 +11,7 @@
             </div>
 
             <div class="card-body">
-                <form method="post" novalidate>
+                <form method="post" novalidate enctype="multipart/form-data">
                     {% csrf_token %}
 
                     <!-- Messages d'erreur/succès -->
@@ -24,96 +24,74 @@
                         {% endfor %}
                     {% endif %}
 
-                    <!-- Ligne 1 : Infos personnelles et professionnelles -->
                     <div class="row">
-                        <!-- Colonne gauche : Infos personnelles -->
+                        <!-- Colonne 1: Sélection employé -->
                         <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-user me-2"></i> Informations Personnelles
+                            <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold">
+                                <i class="fas fa-users me-2"></i> Sélection de l'employé
                             </h5>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Nom *</label>
-                                    <input type="text" name="nom" class="form-control" required>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Employé *</label>
+                                {% if eligible_employes %}
+                                <select name="employe_id" class="form-select" required>
+                                    <option value="">-- Choisir un employé --</option>
+                                    {% for employe in eligible_employes %}
+                                    <option value="{{ employe.id }}">{{ employe.nom }} {{ employe.prenom }} ({{ employe.matricule }})</option>
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <select name="employe_id" class="form-select" disabled>
+                                    <option value="">Aucun employé disponible</option>
+                                </select>
+                                <div class="alert alert-warning mt-2 mb-0">
+                                    <small>Aucun employé disponible. <a href="{% url 'employes:ajouter_employe' %}">Créer un employé</a> d'abord.</small>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Prénom *</label>
-                                    <input type="text" name="prenom" class="form-control" required>
-                                </div>
+                                {% endif %}
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Téléphone </label>
-                                    <input type="text" name="telephone" class="form-control">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Email</label>
-                                    <input type="email" name="email" class="form-control"
-                                           placeholder="Ex: jean@entreprise.com">
-                                </div>
-                            </div>
+
                         </div>
 
-                        <!-- Colonne droite : Infos professionnelles -->
+                        <!-- Colonne 2: Informations commerciales -->
                         <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-briefcase me-2"></i> Informations Professionnelles
+                            <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold">
+                                <i class="fas fa-briefcase me-2"></i> Informations Commerciales
                             </h5>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Spécialité</label>
-                                    <select name="specialite" class="form-control">
-                                        {% for code, label in specialites %}
-                                        <option value="{{ code }}">{{ label }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Taux de commission (%)</label>
-                                    <input type="number" name="taux_commission" class="form-control"
-                                           value="0.00" step="0.01" min="0" max="100">
-                                </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Spécialité (optionnel)</label>
+                                <select name="specialite" class="form-select">
+                                    <option value="">-- Sélectionner une spécialité --</option>
+                                    {% for code, label in specialites %}
+                                    <option value="{{ code }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted d-block mt-1">Domaine de compétence principal du commercial</small>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Date d'embauche</label>
-                                    <input type="date" name="date_embauche" class="form-control">
-                                </div>
-                                <div class="col-md-6 mb-3 d-flex align-items-center">
-                                    <div class="form-check mt-2">
-                                        <input type="checkbox" name="est_actif" class="form-check-input" id="est_actif" checked>
-                                        <label class="form-check-label fw-bold" for="est_actif">
-                                            Commercial actif
-                                        </label>
-                                    </div>
-                                </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Taux de commission (%)</label>
+                                <input type="number" name="taux_commission" class="form-control" value="10.00" step="0.01" min="0" max="100">
+                                <small class="text-muted d-block mt-1">Entre 0 et 100%</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Statut *</label>
+                                <select name="statut" class="form-select" required>
+                                    <option value="actif">Actif</option>
+                                    <option value="inactif">Inactif</option>
+                                </select>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ligne 2 : Adresse complète -->
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Quartier</label>
-                                    <input type="text" name="quartier" class="form-control" placeholder="Ex: kipé">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Adresse</label>
-                                    <textarea name="adresse" class="form-control" rows="3"
-                                              placeholder="Adresse complète..."></textarea>
-                                </div>
-                    </div>
-
-                    <!-- Boutons -->
-                    <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                        <a href="{% url 'list_commercial' %}" class="btn btn-secondary me-2">
-                            <i class="fas fa-times me-1"></i> Annuler
+                    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                        <a href="{% url 'list_commercial' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Annuler
                         </a>
                         <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save me-1"></i> Enregistrer
+                            <i class="fas fa-save me-1"></i> Enregistrer le commercial
                         </button>
                     </div>
                 </form>
@@ -127,15 +105,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     form.addEventListener('submit', function(event){
-        const nom = form.querySelector('input[name="nom"]').value.trim();
-        const prenom = form.querySelector('input[name="prenom"]').value.trim();
-        
+        const employeId = form.querySelector('select[name="employe_id"]').value;
 
-        if(!nom || !prenom) {
+        if(!employeId) {
             event.preventDefault();
-            alert('Veuillez remplir les champs obligatoires : Nom et Prénom.');
+            alert('Veuillez sélectionner un employé pour le commercial.');
             return false;
         }
+        return true;
     });
 });
 </script>

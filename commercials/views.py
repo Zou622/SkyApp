@@ -9,6 +9,7 @@ from django.db.models import Q
 from .models import Commercial
 from datetime import date
 from django.contrib.auth.decorators import login_required
+from employes.models import Employe
 
 
  #fonction pour afficher le formulaire de liste commercial.
@@ -45,59 +46,48 @@ def list_commercial(request):
 # Ajouter un commercial
 @login_required
 def ajouter_commercial(request):
-    from employes.models import Employe
-    from django.utils import timezone
+    eligible_employes = Employe.objects.filter(commercial_profile__isnull=True).order_by('nom', 'prenom')
 
     if request.method == 'POST':
-        # Récupérer les données du formulaire
-        nom = request.POST.get('nom')
-        prenom = request.POST.get('prenom')
-        telephone = request.POST.get('telephone')
-        email = request.POST.get('email')
-        quartier = request.POST.get('quartier')
-        adresse = request.POST.get('adresse')
+        employe_id = request.POST.get('employe_id')
         specialite = request.POST.get('specialite')
         taux_commission = request.POST.get('taux_commission')
-        date_embauche = request.POST.get('date_embauche')
-        est_actif = request.POST.get('est_actif') == 'on'
+        statut = request.POST.get('statut', 'actif')
+        est_actif = statut == 'actif'
 
-        # Validation simple
-        if not nom or not prenom:
-            messages.error(request, 'Nom et Prénom sont obligatoires')
-            return render(request, 'commercials/ajouter_commercial.html')
+        if not employe_id:
+            messages.error(request, 'Veuillez sélectionner un employé pour créer le commercial.')
+            return render(request, 'commercials/ajouter_commercial.html', {
+                'specialites': Commercial.SPECIALITES,
+                'eligible_employes': eligible_employes,
+            })
+
+        employe = get_object_or_404(Employe, id=employe_id)
+        if hasattr(employe, 'commercial_profile') and employe.commercial_profile is not None:
+            messages.error(request, 'Cet employé est déjà rattaché à un commercial.')
+            return render(request, 'commercials/ajouter_commercial.html', {
+                'specialites': Commercial.SPECIALITES,
+                'eligible_employes': eligible_employes,
+            })
 
         try:
-            # Créer d'abord l'employé
-            employe = Employe.objects.create(
-                nom=nom,
-                prenom=prenom,
-                telephone=telephone,
-                email=email if email else None,
-                quartier=quartier if quartier else None,
-                adresse=adresse if adresse else None,
-                date_embauche=date_embauche if date_embauche else date.today(),
-                statut='Actif'
-            )
-
-            # Créer le commercial lié à l'employé
-            commercial = Commercial.objects.create(
+            Commercial.objects.create(
                 employe=employe,
                 specialite=specialite if specialite else 'vente',
                 taux_commission=taux_commission if taux_commission else 10.00,
                 est_actif=est_actif
             )
-
-            messages.success(request, f'Commercial {nom} {prenom} ajouté avec succès!')
+            messages.success(request, f'Commercial {employe.nom} {employe.prenom} ajouté avec succès!')
             return redirect('list_commercial')
 
         except Exception as e:
             messages.error(request, f'Erreur: {str(e)}')
-            return render(request, 'commercials/ajouter_commercial.html')
 
     # GET request - afficher le formulaire vide
-    SPECIALITES = Commercial.SPECIALITES
-    context = {'specialites': SPECIALITES}
-    return render(request, 'commercials/ajouter_commercial.html', context)
+    return render(request, 'commercials/ajouter_commercial.html', {
+        'specialites': Commercial.SPECIALITES,
+        'eligible_employes': eligible_employes,
+    })
 
 
 
@@ -118,7 +108,8 @@ def modifier_commercial(request, pk):
         specialite = request.POST.get('specialite')
         taux_commission = request.POST.get('taux_commission')
         date_embauche = request.POST.get('date_embauche')
-        est_actif = request.POST.get('est_actif') == 'on'
+        statut = request.POST.get('statut', 'actif')
+        est_actif = statut == 'actif'
 
         # Validation
         if not nom or not prenom:
@@ -133,10 +124,13 @@ def modifier_commercial(request, pk):
             # Modifier l'employé lié
             commercial.employe.nom = nom
             commercial.employe.prenom = prenom
-            commercial.employe.telephone = telephone
-            commercial.employe.email = email if email else None
-            commercial.employe.quartier = quartier if quartier else None
-            commercial.employe.adresse = adresse if adresse else None
+            commercial.employe.telephone = telephone or commercial.employe.telephone
+            if email is not None:
+                commercial.employe.email = email or ''
+            if quartier is not None:
+                commercial.employe.quartier = quartier or None
+            if adresse is not None:
+                commercial.employe.adresse = adresse or ''
             if date_embauche:
                 commercial.employe.date_embauche = date_embauche
             commercial.employe.save()

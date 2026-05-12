@@ -139,9 +139,9 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div>
-                                            <h6 class="mb-0">{{ technicien.nom }} {{ technicien.prenom }}</h6>
+                                            <h6 class="mb-0">{{ technicien.employe.nom }} {{ technicien.employe.prenom }}</h6>
                                             <small class="text-muted">
-                                                Embauché: {{ technicien.date_embauche|date:"d/m/Y" }}
+                                                Embauché: {{ technicien.employe.date_embauche|date:"d/m/Y" }}
                                             </small>
                                         </div>
                                     </div>
@@ -149,23 +149,23 @@
 
                                 <td>
                                     <div class="small">
-                                        {% if technicien.telephone %}
+                                        {% if technicien.employe.telephone %}
                                         <div>
                                             <i class="fas fa-phone me-1 text-muted"></i>
-                                            <a href="tel:{{ technicien.telephone }}" class="text-decoration-none text-dark">
-                                                {{ technicien.telephone }}
+                                            <a href="tel:{{ technicien.employe.telephone }}" class="text-decoration-none text-dark">
+                                                {{ technicien.employe.telephone }}
                                             </a>
                                         </div>
                                         {% endif %}
-                                        {% if technicien.email %}
+                                        {% if technicien.employe.email %}
                                         <div>
                                             <i class="fas fa-envelope me-1 text-muted"></i>
-                                            <a href="mailto:{{ technicien.email }}" class="text-decoration-none text-dark">
-                                                {{ technicien.email|truncatechars:20 }}
+                                            <a href="mailto:{{ technicien.employe.email }}" class="text-decoration-none text-dark">
+                                                {{ technicien.employe.email|truncatechars:20 }}
                                             </a>
                                         </div>
                                         {% endif %}
-                                        {% if not technicien.telephone and not technicien.email %}
+                                        {% if not technicien.employe.telephone and not technicien.employe.email %}
                                         <span class="text-muted">-</span>
                                         {% endif %}
                                     </div>
@@ -204,8 +204,8 @@
                                 <!-- Quartier -->
                                 <td>
                                     <span class="text-truncate d-inline-block" style="max-width: 120px;"
-                                          title="{{ technicien.quartier }}">
-                                        {{ technicien.quartier|truncatechars:15 }}
+                                          title="{{ technicien.employe.quartier }}">
+                                        {{ technicien.employe.quartier|truncatechars:15 }}
                                     </span>
                                 </td>
 
@@ -244,7 +244,7 @@
                                                 <div class="modal-body">
                                                     <p>Supprimer le technicien :</p>
                                                     <p class="h5 text-center my-3">
-                                                        <strong>{{ technicien.nom }} {{ technicien.prenom }}</strong>
+                                                        <strong>{{ technicien.employe.nom }} {{ technicien.employe.prenom }}</strong>
                                                     </p>
                                                     <p class="text-danger text-center">
                                                         <small><i class="fas fa-exclamation-circle me-1"></i>

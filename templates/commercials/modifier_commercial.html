@@ -110,18 +110,13 @@
                                        value="{{ commercial.employe.date_embauche|date:'Y-m-d' }}">
                             </div>
                             
-                            <!-- Statut actif -->
+                            <!-- Statut -->
                             <div class="form-group mb-3">
-                                <div class="form-check">
-                                    <input type="checkbox" 
-                                           name="est_actif" 
-                                           class="form-check-input" 
-                                           id="est_actif" 
-                                           {% if commercial.est_actif %}checked{% endif %}>
-                                    <label class="form-check-label fw-bold" for="est_actif">
-                                        Commercial actif
-                                    </label>
-                                </div>
+                                <label class="form-label fw-bold">Statut *</label>
+                                <select name="statut" class="form-select" required>
+                                    <option value="actif" {% if commercial.est_actif %}selected{% endif %}>Actif</option>
+                                    <option value="inactif" {% if not commercial.est_actif %}selected{% endif %}>Inactif</option>
+                                </select>
                             </div>
                         </div>
                     </div>

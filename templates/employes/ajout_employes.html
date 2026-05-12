@@ -114,20 +114,6 @@
 
                             <div class="row g-3">
                                 <div class="col-12">
-                                    <label class="form-label fw-semibold">{{ form.departement.label }}</label>
-                                    {{ form.departement }}
-                                    {% if form.departement.errors %}
-                                        <div class="invalid-feedback d-block">{{ form.departement.errors.0 }}</div>
-                                    {% endif %}
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between mt-2">
-                                        <small class="text-muted">Gérer les départements existants.</small>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{% url 'employes:liste_departements' %}" class="btn btn-outline-secondary">Voir</a>
-                                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalAjouterDepartement">Ajouter</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12">
                                     <label class="form-label fw-semibold">{{ form.poste.label }}</label>
                                     {{ form.poste }}
                                     {% if form.poste.errors %}
@@ -187,31 +173,6 @@
 </div>
 
 <!-- Modals d'ajout rapide -->
-<div class="modal fade" id="modalAjouterDepartement" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">Ajouter un département</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="formAjouterDepartement" action="{% url 'employes:ajouter_departement' %}" method="post">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" for="departement_nom">Nom du département</label>
-                        <input type="text" class="form-control" id="departement_nom" name="nom" required>
-                        <div id="departementFeedback" class="invalid-feedback"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Ajouter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="modalAjouterPoste" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -280,7 +241,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        handleAjaxForm('formAjouterDepartement', 'departement', 'departementFeedback', 'modalAjouterDepartement');
         handleAjaxForm('formAjouterPoste', 'poste', 'posteFeedback', 'modalAjouterPoste');
     });
 </script>

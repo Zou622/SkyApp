@@ -14,8 +14,18 @@ class Technicien(models.Model):
     )
 
     # Informations professionnelles
+    SPECIALITES = [
+        ('fibre', 'Fibre optique'),
+        ('adsl', 'ADSL'),
+        ('wifi', 'Wi-Fi'),
+        ('installation', 'Installation'),
+        ('maintenance', 'Maintenance'),
+        ('autre', 'Autre'),
+    ]
+
     specialite = models.CharField(
         max_length=100,
+        choices=SPECIALITES,
         verbose_name="Spécialité",
         blank=True,
         null=True
@@ -43,11 +53,39 @@ class Technicien(models.Model):
     def __str__(self):
         return f"{self.employe.nom} {self.employe.prenom}"
 
+    @property
+    def nom(self):
+        return self.employe.nom if self.employe else ''
+
+    @property
+    def prenom(self):
+        return self.employe.prenom if self.employe else ''
+
+    @property
+    def email(self):
+        return self.employe.email if self.employe else ''
+
+    @property
+    def telephone(self):
+        return self.employe.telephone if self.employe else ''
+
+    @property
+    def adresse(self):
+        return self.employe.adresse if self.employe else ''
+
+    @property
+    def quartier(self):
+        return self.employe.quartier if self.employe else ''
+
+    @property
+    def date_embauche(self):
+        return self.employe.date_embauche if self.employe else None
+
     def nom_complet(self):
         return f"{self.employe.nom} {self.employe.prenom}"
 
     def get_photo_url(self):
-        if self.employe.photo and hasattr(self.employe.photo, 'url'):
+        if self.employe and self.employe.photo and hasattr(self.employe.photo, 'url'):
             return self.employe.photo.url
         return '/static/images/default-avatar.png'
 

@@ -6,8 +6,8 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 
-from .models import Departement, Employe, Poste
-from .forms import DepartementForm, EmployeForm, PosteForm
+from .models import Employe, Poste
+from .forms import EmployeForm, PosteForm
 from users.decorators import user_type_required
 
 User = get_user_model()
@@ -39,11 +39,13 @@ def liste_employes(request):
 
     #  STATISTIQUES
     total_employes = employes.count()
+    active_employes = employes.filter(statut='Actif').count()
 
     context = {
         "page_obj": page_obj,
         "search": search,
         "total_employes": total_employes,
+        "active_employes": active_employes,
     }
 
     return render(request, "employes/liste_employes.html", context)
@@ -79,47 +81,6 @@ def ajouter_employe(request):
     context = {"form": form, "titre": "Ajouter un employé"}
 
     return render(request, "employes/ajout_employes.html", context)
-
-
-@login_required
-@user_type_required(['admin', 'rh'])
-def liste_departements(request):
-    departements = Departement.objects.all().order_by('nom')
-    return render(request, 'employes/liste_departements.html', {
-        'departements': departements,
-    })
-
-
-@login_required
-@user_type_required(['admin', 'rh'])
-def ajouter_departement(request):
-    form = DepartementForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
-        departement = form.save()
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'id': departement.id, 'nom': departement.nom})
-        messages.success(request, 'Département ajouté avec succès.')
-        return redirect('employes:liste_departements')
-
-    return render(request, 'employes/ajout_departement.html', {
-        'form': form,
-        'titre': 'Ajouter un département',
-    })
-
-
-@login_required
-@user_type_required(['admin', 'rh'])
-def supprimer_departement(request, departement_id):
-    departement = get_object_or_404(Departement, id=departement_id)
-    if request.method == 'POST':
-        departement.delete()
-        messages.success(request, 'Département supprimé avec succès.')
-        return redirect('employes:liste_departements')
-    return render(request, 'employes/confirmer_suppression.html', {
-        'objet': departement,
-        'type': 'département',
-        'retour_url': 'employes:liste_departements',
-    })
 
 
 @login_required
@@ -195,6 +156,27 @@ def modifier_employe(request, employe_id):
         'employe': employe,
     }
     return render(request, 'employes/modifier_employes.html', context)
+
+
+@login_required
+@user_type_required(['admin', 'rh'])
+def supprimer_employe(request, employe_id):
+    employe = get_object_or_404(Employe, id=employe_id)
+    if request.method == 'POST':
+        # Supprimer la fiche commerciale/technicien liée pour éviter les enregistrements orphelins
+        if hasattr(employe, 'commercial_profile') and employe.commercial_profile is not None:
+            employe.commercial_profile.delete()
+        if hasattr(employe, 'technicien_profile') and employe.technicien_profile is not None:
+            employe.technicien_profile.delete()
+
+        employe.delete()
+        messages.success(request, f"L'employé {employe.nom} {employe.prenom} a été supprimé avec succès.")
+        return redirect('employes:liste_employes')
+    return render(request, 'employes/confirmer_suppression.html', {
+        'objet': employe,
+        'type': 'employé',
+        'retour_url': 'employes:liste_employes',
+    })
 
 
 @login_required

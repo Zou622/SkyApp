@@ -3,13 +3,6 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 
-class Departement(models.Model):
-    nom = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nom
-
-
 class Poste(models.Model):
     nom = models.CharField(max_length=100)
 
@@ -45,16 +38,14 @@ class Employe(models.Model):
     date_naissance = models.DateField(null=True, blank=True)
 
     telephone = models.CharField(max_length=20)
-    email = models.EmailField(blank=True)
+    email = models.EmailField(blank=True, null=True)
 
-    adresse = models.TextField(blank=True)
+    adresse = models.TextField(blank=True, null=True)
     quartier = models.CharField(max_length=100, blank=True, null=True)
 
-    departement = models.ForeignKey(Departement, on_delete=models.SET_NULL, null=True)
+    poste = models.ForeignKey(Poste, on_delete=models.SET_NULL, null=True, blank=True)
 
-    poste = models.ForeignKey(Poste, on_delete=models.SET_NULL, null=True)
-
-    date_embauche = models.DateField()
+    date_embauche = models.DateField(null=True, blank=True)
 
     statut = models.CharField(max_length=20, choices=STATUT, default="Actif")
 
