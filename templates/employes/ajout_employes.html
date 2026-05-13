@@ -114,18 +114,12 @@
 
                             <div class="row g-3">
                                 <div class="col-12">
-                                    <label class="form-label fw-semibold">{{ form.poste.label }}</label>
-                                    {{ form.poste }}
-                                    {% if form.poste.errors %}
-                                        <div class="invalid-feedback d-block">{{ form.poste.errors.0 }}</div>
+                                    <label class="form-label fw-semibold">{{ form.fonction.label }}</label>
+                                    {{ form.fonction }}
+                                    {% if form.fonction.errors %}
+                                        <div class="invalid-feedback d-block">{{ form.fonction.errors.0 }}</div>
                                     {% endif %}
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between mt-2">
-                                        <small class="text-muted">Gérer les postes actuels de l'entreprise.</small>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{% url 'employes:liste_postes' %}" class="btn btn-outline-secondary">Voir</a>
-                                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalAjouterPoste">Ajouter</button>
-                                        </div>
-                                    </div>
+                                    <div class="form-text text-muted">Choisissez la fonction de l'employé dans l'entreprise.</div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">{{ form.statut.label }}</label>
@@ -172,78 +166,6 @@
     </div>
 </div>
 
-<!-- Modals d'ajout rapide -->
-<div class="modal fade" id="modalAjouterPoste" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">Ajouter un poste</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="formAjouterPoste" action="{% url 'employes:ajouter_poste' %}" method="post">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" for="poste_nom">Nom du poste</label>
-                        <input type="text" class="form-control" id="poste_nom" name="nom" required>
-                        <div id="posteFeedback" class="invalid-feedback"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-success">Ajouter</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    function handleAjaxForm(formId, selectName, feedbackId, modalId) {
-        const form = document.getElementById(formId);
-        const feedback = document.getElementById(feedbackId);
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            feedback.textContent = '';
-            feedback.classList.remove('d-block');
-            const url = form.action;
-            const formData = new FormData(form);
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData,
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    const select = document.querySelector(`select[name="${selectName}"]`);
-                    if (select) {
-                        const option = document.createElement('option');
-                        option.value = data.id;
-                        option.textContent = data.nom;
-                        option.selected = true;
-                        select.appendChild(option);
-                    }
-                    form.reset();
-                    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
-                    modal.hide();
-                } else {
-                    feedback.textContent = data.errors ? data.errors.nom?.[0] || 'Une erreur est survenue.' : 'Une erreur est survenue.';
-                    feedback.classList.add('d-block');
-                }
-            } catch (error) {
-                feedback.textContent = 'Impossible de contacter le serveur.';
-                feedback.classList.add('d-block');
-            }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        handleAjaxForm('formAjouterPoste', 'poste', 'posteFeedback', 'modalAjouterPoste');
-    });
-</script>
 
 <style>
 /* Style pour les champs de formulaire */

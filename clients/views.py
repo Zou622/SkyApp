@@ -458,7 +458,7 @@ def ajouter_activite(request):
         statut = request.POST.get('statut', 'planifie')
 
         try:
-            client = Client.objects.get(id=client_id)
+            client = Client.objects.filter(id=client_id, est_supprime=False).get()
 
             # 1️Créer l'activité SANS technicien
             activite = Activite.objects.create(
@@ -487,7 +487,7 @@ def ajouter_activite(request):
         except Exception as e:
             messages.error(request, f'Erreur: {str(e)}')
 
-    clients = Client.objects.all().order_by('nom_client')
+    clients = Client.objects.filter(est_supprime=False).order_by('nom_client')
     techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
 
     return render(request, 'clients/ajouter_activite.html',{
@@ -682,7 +682,7 @@ def modifier_activite(request, pk):
             return redirect('clients:modifier_activite', pk=activite.pk)
 
         try:
-            activite.client = Client.objects.get(id=client_id)
+            activite.client = Client.objects.filter(id=client_id, est_supprime=False).get()
             activite.type_activite = type_activite
             activite.date_activite = date_activite
             activite.heure_debut = heure_debut or None
@@ -703,7 +703,7 @@ def modifier_activite(request, pk):
             messages.error(request, f'Erreur: {str(e)}')
 
     # GET
-    clients = Client.objects.all().order_by('nom_client')
+    clients = Client.objects.filter(est_supprime=False).order_by('nom_client')
     techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
 
     context = {

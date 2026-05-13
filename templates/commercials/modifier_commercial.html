@@ -76,19 +76,6 @@
                                 <i class="fas fa-briefcase me-2"></i>Informations Professionnelles
                             </h5>
                             
-                            <!-- Spécialité -->
-                            <div class="form-group mb-3">
-                                <label class="form-label fw-bold">Spécialité</label>
-                                <select name="specialite" class="form-control">
-                                    {% for code, label in specialites %}
-                                    <option value="{{ code }}" 
-                                            {% if commercial.specialite == code %}selected{% endif %}>
-                                        {{ label }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            
                             <!-- Taux de commission -->
                             <div class="form-group mb-3">
                                 <label class="form-label fw-bold">Taux de commission (%)</label>

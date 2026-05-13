@@ -27,7 +27,6 @@
                             <div class="card-body text-start">
                                 <h6>Détails :</h6>
                                 <p class="mb-1"><strong>Téléphone :</strong> {{ commercial.telephone|default:'N/A' }}</p>
-                                <p class="mb-1"><strong>Spécialité :</strong> {{ commercial.get_specialite_display }}</p>
                                 <p class="mb-0"><strong>Statut :</strong> {% if commercial.est_actif %}Actif{% else %}Inactif{% endif %}</p>
                             </div>
                         </div>

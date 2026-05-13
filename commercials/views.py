@@ -50,7 +50,6 @@ def ajouter_commercial(request):
 
     if request.method == 'POST':
         employe_id = request.POST.get('employe_id')
-        specialite = request.POST.get('specialite')
         taux_commission = request.POST.get('taux_commission')
         statut = request.POST.get('statut', 'actif')
         est_actif = statut == 'actif'
@@ -58,7 +57,6 @@ def ajouter_commercial(request):
         if not employe_id:
             messages.error(request, 'Veuillez sélectionner un employé pour créer le commercial.')
             return render(request, 'commercials/ajouter_commercial.html', {
-                'specialites': Commercial.SPECIALITES,
                 'eligible_employes': eligible_employes,
             })
 
@@ -66,14 +64,12 @@ def ajouter_commercial(request):
         if hasattr(employe, 'commercial_profile') and employe.commercial_profile is not None:
             messages.error(request, 'Cet employé est déjà rattaché à un commercial.')
             return render(request, 'commercials/ajouter_commercial.html', {
-                'specialites': Commercial.SPECIALITES,
                 'eligible_employes': eligible_employes,
             })
 
         try:
             Commercial.objects.create(
                 employe=employe,
-                specialite=specialite if specialite else 'vente',
                 taux_commission=taux_commission if taux_commission else 10.00,
                 est_actif=est_actif
             )
@@ -85,7 +81,6 @@ def ajouter_commercial(request):
 
     # GET request - afficher le formulaire vide
     return render(request, 'commercials/ajouter_commercial.html', {
-        'specialites': Commercial.SPECIALITES,
         'eligible_employes': eligible_employes,
     })
 
@@ -105,7 +100,6 @@ def modifier_commercial(request, pk):
         email = request.POST.get('email')
         quartier = request.POST.get('quartier')
         adresse = request.POST.get('adresse')
-        specialite = request.POST.get('specialite')
         taux_commission = request.POST.get('taux_commission')
         date_embauche = request.POST.get('date_embauche')
         statut = request.POST.get('statut', 'actif')
@@ -116,7 +110,6 @@ def modifier_commercial(request, pk):
             messages.error(request, 'Nom et Prénom sont obligatoires')
             context = {
                 'commercial': commercial,
-                'specialites': Commercial.SPECIALITES
             }
             return render(request, 'commercials/modifier_commercial.html', context)
 
@@ -136,7 +129,6 @@ def modifier_commercial(request, pk):
             commercial.employe.save()
 
             # Modifier le commercial
-            commercial.specialite = specialite if specialite else 'vente'
             commercial.taux_commission = taux_commission if taux_commission else 10.00
             commercial.est_actif = est_actif
             commercial.save()
@@ -148,14 +140,12 @@ def modifier_commercial(request, pk):
             messages.error(request, f'Erreur: {str(e)}')
             context = {
                 'commercial': commercial,
-                'specialites': Commercial.SPECIALITES
             }
             return render(request, 'commercials/modifier_commercial.html', context)
 
     # GET request - afficher le formulaire avec les données
     context = {
         'commercial': commercial,
-        'specialites': Commercial.SPECIALITES
     }
     return render(request, 'commercials/modifier_commercial.html', context)
 

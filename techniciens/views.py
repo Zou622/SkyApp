@@ -27,8 +27,7 @@ def list_technicien(request):
             Q(employe__prenom__icontains=search_query) |
             Q(employe__email__icontains=search_query) |
             Q(employe__telephone__icontains=search_query) |
-            Q(employe__quartier__icontains=search_query) |
-            Q(specialite__icontains=search_query)
+            Q(employe__quartier__icontains=search_query)
         )
 
     techniciens_list = techniciens_list.order_by('employe__nom', 'employe__prenom')
@@ -73,7 +72,6 @@ def ajouter_technicien(request):
     employes = Employe.objects.filter(technicien_profile__isnull=True).order_by('nom', 'prenom')
     return render(request, 'techniciens/ajouter_technicien.html', {
         'employes': employes,
-        'specialites': Technicien.SPECIALITES,
     })
 
 
@@ -82,8 +80,7 @@ def enregistrer_technicien(request):
     """Enregistrer un nouveau technicien"""
     if request.method == 'POST':
         employe_id = request.POST.get('employe_id')
-        specialite = request.POST.get('specialite', '').strip()
-        statut = request.POST.get('statut', 'actif').strip()
+        statut = request.POST.get('statut', 'actif')
         est_actif = True
 
         if not employe_id:
@@ -97,7 +94,6 @@ def enregistrer_technicien(request):
 
         technicien = Technicien(
             employe=employe,
-            specialite=specialite,
             statut=statut,
             est_actif=est_actif,
         )
@@ -141,7 +137,6 @@ def modifier_technicien(request, technicien_id):
 
         employe.save()
 
-        technicien.specialite = request.POST.get('specialite', technicien.specialite)
         technicien.statut = request.POST.get('statut', technicien.statut)
         if 'est_actif' in request.POST:
             technicien.est_actif = request.POST.get('est_actif') == 'on'
@@ -152,7 +147,6 @@ def modifier_technicien(request, technicien_id):
 
     return render(request, 'techniciens/modifier_technicien.html', {
         'technicien': technicien,
-        'specialites': Technicien.SPECIALITES,
     })
 
 

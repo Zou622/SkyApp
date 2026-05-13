@@ -124,7 +124,7 @@
                                 <th width="80" class="text-center">ID</th>
                                 <th>Employé</th>
                                 <th>Contact</th>
-                                <th>Poste</th>
+                                <th>Fonction</th>
                                 <th>Statut</th>
                                 <th class="text-center">Actions</th>
                             </tr>
@@ -184,11 +184,11 @@
                                     </div>
                                 </td>
 
-                                <!-- Poste -->
+                                <!-- Fonction -->
                                 <td>
-                                    {% if employe.poste %}
+                                    {% if employe.fonction %}
                                     <span class="badge bg-secondary">
-                                        {{ employe.poste.nom }}
+                                        {{ employe.get_fonction_display }}
                                     </span>
                                     {% else %}
                                     <span class="text-muted">-</span>

@@ -183,16 +183,24 @@ def supprimer_employe(request, employe_id):
 @user_type_required(['admin', 'rh'])
 def creer_compte_utilisateur(request, employe_id):
     employe = get_object_or_404(Employe, id=employe_id)
-    
+
+    fonction_role_map = {
+        'commercial': 'commercial',
+        'technicien': 'technicien',
+    }
+
     if employe.has_user_account:
         messages.warning(request, "Cet employé a déjà un compte utilisateur.")
         return redirect('employes:liste_employes')
-    
+
+    auto_user_type = fonction_role_map.get(employe.fonction)
+
     if request.method == "POST":
         username = request.POST.get('username')
-        user_type = request.POST.get('user_type')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
+
+        user_type = auto_user_type or request.POST.get('user_type')
 
         if not username or not password or not confirm_password or not user_type:
             messages.error(request, "Tous les champs obligatoires doivent être remplis.")
@@ -212,9 +220,10 @@ def creer_compte_utilisateur(request, employe_id):
             )
             messages.success(request, f"Compte utilisateur créé pour {employe.nom} {employe.prenom}.")
             return redirect('employes:liste_employes')
-    
+
     context = {
         'employe': employe,
-        'user_types': User.TYPE_USER
+        'user_types': User.TYPE_USER,
+        'auto_user_type': auto_user_type,
     }
     return render(request, "employes/creer_compte.html", context)

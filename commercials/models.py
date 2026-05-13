@@ -14,20 +14,6 @@ class Commercial(models.Model):
         related_name='commercial_profile'
     )
 
-    SPECIALITES = [
-        ('reseau', 'Réseau et Télécom'),
-        ('vente', 'Vente et Marketing'),
-        ('technique', 'Support Technique'),
-        ('gestion', 'Gestion Clientèle'),
-        ('autre', 'Autre'),
-    ]
-
-    specialite = models.CharField(
-        max_length=50,
-        choices=SPECIALITES,
-        default='vente'
-    )
-
     taux_commission = models.DecimalField(
         max_digits=5,
         decimal_places=2,

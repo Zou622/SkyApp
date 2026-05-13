@@ -82,6 +82,22 @@
                                 <small class="text-muted">Doit être identique au mot de passe ci-dessus</small>
                             </div>
 
+                            <!-- Fonction de l'employé -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-briefcase me-1"></i> Fonction de l'employé
+                                </label>
+                                <input type="text" class="form-control" value="{{ employe.get_fonction_display|default:'Non définie' }}" disabled>
+                                <small class="text-muted">La fonction sélectionnée sur la fiche employé détermine le rôle utilisateur.</small>
+                            </div>
+
+                            {% if auto_user_type %}
+                            <input type="hidden" name="user_type" value="{{ auto_user_type }}">
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Le rôle utilisateur sera automatiquement défini comme <strong>{{ employe.get_fonction_display }}</strong>.
+                            </div>
+                            {% else %}
                             <!-- Type d'utilisateur -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">
@@ -95,6 +111,7 @@
                                 </select>
                                 <small class="text-muted">Détermine les permissions et accès</small>
                             </div>
+                            {% endif %}
 
                             <!-- Information de sécurité -->
                             <div class="alert alert-warning">

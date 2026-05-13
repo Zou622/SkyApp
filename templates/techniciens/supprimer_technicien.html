@@ -28,7 +28,7 @@
                                 <h6>Détails :</h6>
                                 <p class="mb-1"><strong>Email :</strong> {{ technicien.employe.email|default:'N/A' }}</p>
                                 <p class="mb-1"><strong>Téléphone :</strong> {{ technicien.employe.telephone|default:'N/A' }}</p>
-                                <p class="mb-1"><strong>Spécialité :</strong> {{ technicien.specialite|default:'Non spécifiée' }}</p>
+
                                 <p class="mb-0"><strong>Statut :</strong> {{ technicien.get_statut_display }}</p>
                             </div>
                         </div>

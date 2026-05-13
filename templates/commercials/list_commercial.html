@@ -43,7 +43,6 @@
                                 <th width="80" class="text-center">ID</th>
                                 <th>Commercial</th>
                                 <th>Contact</th>
-                                <th>Spécialité</th>
                                 <th>Commission</th>
                                 <th>Statut</th>
                                 <th width="100" class="text-center">Actions</th>
@@ -86,18 +85,6 @@
                                         <div><i class="fas fa-envelope me-1 text-muted"></i> {{ commercial.employe.email|truncatechars:20 }}</div>
                                         {% endif %}
                                     </div>
-                                </td>
-
-                                <!-- Spécialité -->
-                                <td>
-                                    <span class="badge
-                                        {% if commercial.specialite == 'reseau' %}bg-primary
-                                        {% elif commercial.specialite == 'vente' %}bg-warning text-dark
-                                        {% elif commercial.specialite == 'technique' %}bg-info
-                                        {% elif commercial.specialite == 'gestion' %}bg-secondary
-                                        {% else %}bg-light text-dark{% endif %}">
-                                        {{ commercial.get_specialite_display }}
-                                    </span>
                                 </td>
 
                                 <!-- Commission -->

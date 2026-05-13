@@ -61,17 +61,6 @@
                             </h5>
                             
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Spécialité (optionnel)</label>
-                                <select class="form-select" name="specialite">
-                                    <option value="">-- Sélectionner une spécialité --</option>
-                                    {% for code, label in specialites %}
-                                    <option value="{{ code }}">{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                                <small class="text-muted d-block mt-1">Domaine de compétence principal du technicien</small>
-                            </div>
-                            
-                            <div class="mb-3">
                                 <label class="form-label fw-bold">Statut *</label>
                                 <select class="form-select" name="statut" required>
                                     <option value="">-- Choisir un statut --</option>

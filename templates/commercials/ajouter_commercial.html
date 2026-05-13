@@ -60,17 +60,6 @@
                             </h5>
                             
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Spécialité (optionnel)</label>
-                                <select name="specialite" class="form-select">
-                                    <option value="">-- Sélectionner une spécialité --</option>
-                                    {% for code, label in specialites %}
-                                    <option value="{{ code }}">{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                                <small class="text-muted d-block mt-1">Domaine de compétence principal du commercial</small>
-                            </div>
-                            
-                            <div class="mb-3">
                                 <label class="form-label fw-bold">Taux de commission (%)</label>
                                 <input type="number" name="taux_commission" class="form-control" value="10.00" step="0.01" min="0" max="100">
                                 <small class="text-muted d-block mt-1">Entre 0 et 100%</small>

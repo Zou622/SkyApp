@@ -406,7 +406,7 @@ def dashboard(request):
     if user.user_type in ['admin', 'superviseur']:
 
         stats['users'] = User.objects.count()
-        stats['clients'] = Client.objects.count()
+        stats['clients'] = Client.objects.filter(est_supprime=False).count()
         stats['activites'] = Activite.objects.count()
         stats['prospects'] = Prospect.objects.count()
 
@@ -478,7 +478,8 @@ def dashboard(request):
         if user.employe and hasattr(user.employe, 'commercial_profile') and user.employe.commercial_profile:
 
             stats['clients'] = Client.objects.filter(
-                commercial=user.employe.commercial_profile
+                commercial=user.employe.commercial_profile,
+                est_supprime=False
             ).count()
 
             stats['mes_prospects'] = Prospect.objects.filter(

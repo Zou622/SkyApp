@@ -13,24 +13,6 @@ class Technicien(models.Model):
         related_name='technicien_profile'
     )
 
-    # Informations professionnelles
-    SPECIALITES = [
-        ('fibre', 'Fibre optique'),
-        ('adsl', 'ADSL'),
-        ('wifi', 'Wi-Fi'),
-        ('installation', 'Installation'),
-        ('maintenance', 'Maintenance'),
-        ('autre', 'Autre'),
-    ]
-
-    specialite = models.CharField(
-        max_length=100,
-        choices=SPECIALITES,
-        verbose_name="Spécialité",
-        blank=True,
-        null=True
-    )
-
     # Statut
     STATUT_CHOICES = [
         ('actif', 'Actif'),

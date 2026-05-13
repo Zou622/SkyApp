@@ -122,7 +122,6 @@
                                 <th>ID</th>
                                 <th>Nom & Prénom</th>
                                 <th>Contact</th>
-                                <th>Spécialité</th>
                                 <th>Statut</th>
                                 <th>Quartier</th>
                                 <th>Actions</th>
@@ -169,15 +168,6 @@
                                         <span class="text-muted">-</span>
                                         {% endif %}
                                     </div>
-                                </td>
-
-                                <!-- Spécialité -->
-                                <td>
-                                    {% if technicien.specialite %}
-                                    <span class="badge bg-info">{{ technicien.specialite }}</span>
-                                    {% else %}
-                                    <span class="text-muted">-</span>
-                                    {% endif %}
                                 </td>
 
                                 <!-- Statut -->

@@ -109,10 +109,10 @@
                             </div>
                             <div class="card-body">
                                 <dl class="row">
-                                    <dt class="col-sm-5">Poste :</dt>
+                                    <dt class="col-sm-5">Fonction :</dt>
                                     <dd class="col-sm-7">
-                                        {% if employe.poste %}
-                                            <span class="badge bg-warning text-dark">{{ employe.poste.nom }}</span>
+                                        {% if employe.fonction %}
+                                            <span class="badge bg-warning text-dark">{{ employe.get_fonction_display }}</span>
                                         {% else %}
                                             <span class="text-muted">Non assigné</span>
                                         {% endif %}
