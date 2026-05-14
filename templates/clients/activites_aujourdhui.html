@@ -130,10 +130,12 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
 
+                                            {% if user.employe.technicien_profile in activite.techniciens.all %}
                                             <a href="{% url 'rapportActivites:creer_rapport' activite.id %}"
                                             class="btn btn-outline-success btn-sm">
                                                 <i class="fas fa-file-alt"></i>
                                             </a>
+                                            {% endif %}
 
                                         {% elif activite.statut == "en_attente" %}
 
@@ -148,10 +150,12 @@
                                                 <i class="fas fa-file-lines"></i>
                                             </a>
 
+                                            {% if user.employe.technicien_profile == activite.rapport.technicien %}
                                             <a href="{% url 'clients:modifier_rapport' activite.rapport.id %}"
                                             class="btn btn-outline-warning btn-sm">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            {% endif %}
                                             {% endif %}
 
                                         {% elif activite.statut == "termine" %}

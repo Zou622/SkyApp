@@ -98,6 +98,10 @@ def enregistrer_technicien(request):
             est_actif=est_actif,
         )
         technicien.save()
+        
+        # Mettre à jour la fonction de l'employé
+        employe.fonction = 'technicien'
+        employe.save(update_fields=['fonction'])
 
         messages.success(request, f'✅ Technicien "{employe.nom} {employe.prenom}" ajouté avec succès!')
         return redirect('list_technicien')
@@ -157,6 +161,9 @@ def supprimer_technicien(request, technicien_id):
 
     if request.method == 'POST':
         nom_complet = f"{technicien.employe.nom} {technicien.employe.prenom}"
+        # Remettre la fonction de l'employé à None
+        technicien.employe.fonction = None
+        technicien.employe.save(update_fields=['fonction'])
         technicien.delete()
         messages.success(request, f'❌ Technicien "{nom_complet}" supprimé avec succès!')
         return redirect('list_technicien')

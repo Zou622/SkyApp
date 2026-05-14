@@ -160,17 +160,6 @@ def valider_utilisateur(request, user_id):
     })
 
 
-@login_required
-def soft_delete_utilisateur(request, user_id):
-    if request.method == "POST":
-        user = get_object_or_404(User, id=user_id)
-        user.est_actif = False  # désactive le compte
-        user.save()
-        return JsonResponse({"success": True, "message": "Utilisateur supprimé avec succès."})
-    return JsonResponse({"success": False}, status=405)
-
-
-
 from django.contrib import messages
 
 @login_required
@@ -197,8 +186,12 @@ def get_user_stats(user):
     """Statistiques selon le type d'utilisateur"""
     stats = {}
 
-    if user.user_type == 'technicien' and user.technicien:
-        activites = Activite.objects.filter(techniciens=user.technicien)
+    # ✅ CORRECTED: Access technicien_profile through employe relationship
+    # Original code (commented): if user.user_type == 'technicien' and user.technicien:
+    
+    if user.user_type == 'technicien' and user.employe and hasattr(user.employe, 'technicien_profile') and user.employe.technicien_profile:
+        # Original code (commented): activites = Activite.objects.filter(techniciens=user.technicien)
+        activites = Activite.objects.filter(techniciens=user.employe.technicien_profile)
         stats['activites_total'] = activites.count()
 
         # ⚠️ IMPORTANT : Convertir la date en string
@@ -210,10 +203,16 @@ def get_user_stats(user):
         stats['planifie'] = activites.filter(statut='planifie').count()
         stats['termine'] = activites.filter(statut='termine').count()
 
-    elif user.user_type == 'commercial' and user.commercial:
+    # ✅ CORRECTED: Access commercial_profile through employe relationship
+    # Original code (commented): elif user.user_type == 'commercial' and user.commercial:
+    
+    elif user.user_type == 'commercial' and user.employe and hasattr(user.employe, 'commercial_profile') and user.employe.commercial_profile:
         from clients.models import Client
-        stats['clients_total'] = Client.objects.filter(commercial=user.commercial).count()
-        stats['clients_actifs'] = Client.objects.filter(commercial=user.commercial, statut='actif').count()
+        # Original code (commented): stats['clients_total'] = Client.objects.filter(commercial=user.commercial).count()
+        # Original code (commented): stats['clients_actifs'] = Client.objects.filter(commercial=user.commercial, statut='actif').count()
+        
+        stats['clients_total'] = Client.objects.filter(commercial=user.employe.commercial_profile).count()
+        stats['clients_actifs'] = Client.objects.filter(commercial=user.employe.commercial_profile, statut='actif').count()
 
     return stats
 
@@ -334,13 +333,9 @@ def password_reset_request(request):
 @login_required
 @admin_required
 def modifier_utilisateur(request, user_id):
-
-    user = get_object_or_404(User, id=user_id)
-
-@login_required
-@admin_required
-def modifier_utilisateur(request, user_id):
-
+    """
+    Modification d'un utilisateur (admin seulement)
+    """
     user = get_object_or_404(User, id=user_id)
 
     if request.method == "POST":
@@ -365,6 +360,8 @@ def modifier_utilisateur(request, user_id):
 def supprimer_utilisateur(request, user_id):
     """
     Suppression (soft delete) d'un utilisateur (admin seulement)
+    Désactive le compte au lieu de le supprimer, ce qui rend le bouton 
+    "Créer un compte" disponible à nouveau dans la liste des employés.
     """
     if request.method == "POST":
         user = get_object_or_404(User, id=user_id)

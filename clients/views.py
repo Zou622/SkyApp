@@ -505,18 +505,23 @@ def list_activite(request):
     # 🔐 Si technicien → il ne voit que ses activités
     if request.user.user_type.lower() == "technicien":
 
-        if not hasattr(request.user, "technicien"):
+        # ✅ CORRECTED: Access technicien_profile through employe relationship
+        # Original code (commented): if not hasattr(request.user, "technicien"):
+        # Original code (commented):     return redirect("dashboard")
+        # Original code (commented): technicien = request.user.technicien
+        
+        if not (request.user.employe and hasattr(request.user.employe, 'technicien_profile') and request.user.employe.technicien_profile):
             return redirect("dashboard")
 
-        technicien = request.user.technicien
+        technicien = request.user.employe.technicien_profile
 
         activites_list = Activite.objects.filter(
             techniciens=technicien
-        )
+        ).select_related('rapport', 'client')
 
     else:
         # Admin / Superviseur / Commercial
-        activites_list = Activite.objects.all()
+        activites_list = Activite.objects.all().select_related('rapport', 'client')
 
 
     """Liste toutes les activités"""
@@ -659,6 +664,11 @@ def modifier_activite(request, pk):
         pk=pk
     )
 
+    # 🔒 INTERDIRE LA MODIFICATION D'ACTIVITÉS TERMINÉES
+    if activite.statut == 'termine':
+        messages.error(request, "❌ Impossible de modifier une activité terminée.")
+        return redirect('clients:detail_activite', pk=activite.pk)
+
     if request.method == 'POST':
 
         client_id = request.POST.get('client_id')
@@ -793,7 +803,12 @@ def mes_activites(request):
     # =========================
     if user.user_type == "technicien":
 
-        technicien = getattr(user, 'technicien', None)
+        # ✅ CORRECTED: Access technicien_profile through employe relationship
+        # Original code (commented): technicien = getattr(user, 'technicien', None)
+        
+        technicien = None
+        if user.employe and hasattr(user.employe, 'technicien_profile'):
+            technicien = user.employe.technicien_profile
 
         if not technicien:
             return HttpResponseForbidden(
@@ -823,13 +838,16 @@ def modifier_rapport(request, rapport_id):
     rapport = get_object_or_404(RapportActivite, id=rapport_id)
     activite = rapport.activite
 
-    # 🔒 sécurité : seul le technicien peut modifier
+    # 🔒 sécurité : seul le technicien qui a créé le rapport peut modifier
     technicien = Technicien.objects.filter(employe__user_account=request.user).first()
     if not technicien:
-        return redirect('rapportActivites:liste_activites_technicien')
+        messages.error(request, "❌ Aucun profil technicien associé à votre compte.")
+        return redirect('clients:mes_activites')
 
+    # 🔒 VÉRIFIER QUE LE TECHNICIEN A CRÉÉ CE RAPPORT
     if rapport.technicien != technicien:
-        return redirect('rapportActivites:liste_activites_technicien')
+        messages.error(request, "❌ Vous n'êtes pas l'auteur de ce rapport. Vous ne pouvez pas le modifier.")
+        return redirect('clients:mes_activites')
 
     if request.method == "POST":
 

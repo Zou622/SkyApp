@@ -202,23 +202,39 @@ def creer_compte_utilisateur(request, employe_id):
 
         user_type = auto_user_type or request.POST.get('user_type')
 
+        existing_user = User.objects.filter(employe=employe).first()
+
         if not username or not password or not confirm_password or not user_type:
             messages.error(request, "Tous les champs obligatoires doivent être remplis.")
         elif password != confirm_password:
             messages.error(request, "Les mots de passe ne correspondent pas.")
-        elif User.objects.filter(username=username).exists():
+        elif existing_user and existing_user.est_actif:
+            messages.warning(request, "Cet employé a déjà un compte utilisateur actif.")
+            return redirect('employes:liste_employes')
+        elif User.objects.filter(username=username).exclude(pk=existing_user.pk if existing_user else None).exists():
             messages.error(request, "Ce nom d'utilisateur existe déjà.")
         else:
-            user = User.objects.create_user(
-                username=username,
-                first_name=employe.prenom,
-                last_name=employe.nom,
-                email=employe.email or '',
-                user_type=user_type,
-                password=password,
-                employe=employe
-            )
-            messages.success(request, f"Compte utilisateur créé pour {employe.nom} {employe.prenom}.")
+            if existing_user and not existing_user.est_actif:
+                existing_user.username = username
+                existing_user.first_name = employe.prenom
+                existing_user.last_name = employe.nom
+                existing_user.email = employe.email or ''
+                existing_user.user_type = user_type
+                existing_user.set_password(password)
+                existing_user.est_actif = True
+                existing_user.save()
+                messages.success(request, f"Compte utilisateur réactivé pour {employe.nom} {employe.prenom}.")
+            else:
+                User.objects.create_user(
+                    username=username,
+                    first_name=employe.prenom,
+                    last_name=employe.nom,
+                    email=employe.email or '',
+                    user_type=user_type,
+                    password=password,
+                    employe=employe
+                )
+                messages.success(request, f"Compte utilisateur créé pour {employe.nom} {employe.prenom}.")
             return redirect('employes:liste_employes')
 
     context = {

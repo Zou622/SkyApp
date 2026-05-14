@@ -73,6 +73,9 @@ def ajouter_commercial(request):
                 taux_commission=taux_commission if taux_commission else 10.00,
                 est_actif=est_actif
             )
+            # Mettre à jour la fonction de l'employé
+            employe.fonction = 'commercial'
+            employe.save(update_fields=['fonction'])
             messages.success(request, f'Commercial {employe.nom} {employe.prenom} ajouté avec succès!')
             return redirect('list_commercial')
 
@@ -172,6 +175,9 @@ def supprimer_commercial(request, pk):
 
     if request.method == 'POST':
         nom_complet = f"{commercial.employe.nom} {commercial.employe.prenom}"
+        # Remettre la fonction de l'employé à None
+        commercial.employe.fonction = None
+        commercial.employe.save(update_fields=['fonction'])
         commercial.delete()
         messages.success(request, f'Commercial {nom_complet} supprimé avec succès!')
         return redirect('list_commercial')

@@ -96,12 +96,12 @@
                                     </a>
 
                                     <!-- Créer rapport -->
-                                    {% if not activite.rapport %}
+                                    {% if not activite.rapport and user.employe.technicien_profile in activite.techniciens.all %}
                                     <a href="{% url 'creer_rapport' activite.id %}"
                                        class="btn btn-sm btn-success">
                                         <i class="fas fa-file-alt"></i>
                                     </a>
-                                    {% else %}
+                                    {% elif activite.rapport %}
                                     <button class="btn btn-sm btn-secondary" disabled>
                                         <i class="fas fa-check"></i>
                                     </button>

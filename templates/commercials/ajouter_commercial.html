@@ -37,7 +37,10 @@
                                 <select name="employe_id" class="form-select" required>
                                     <option value="">-- Choisir un employé --</option>
                                     {% for employe in eligible_employes %}
-                                    <option value="{{ employe.id }}">{{ employe.nom }} {{ employe.prenom }} ({{ employe.matricule }})</option>
+                                    <option value="{{ employe.id }}" data-fonction="{{ employe.fonction }}" data-fonction-label="{{ employe.get_fonction_display }}">
+                                        {{ employe.nom }} {{ employe.prenom }} ({{ employe.matricule }})
+                                        {% if employe.fonction %} - {{ employe.get_fonction_display }}{% endif %}
+                                    </option>
                                     {% endfor %}
                                 </select>
                                 {% else %}
@@ -93,14 +96,29 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
-    form.addEventListener('submit', function(event){
-        const employeId = form.querySelector('select[name="employe_id"]').value;
+    const employeSelect = form.querySelector('select[name="employe_id"]');
 
-        if(!employeId) {
+    form.addEventListener('submit', function(event){
+        const selectedOption = employeSelect.options[employeSelect.selectedIndex];
+        const employeId = employeSelect.value;
+        const fonction = selectedOption ? selectedOption.dataset.fonction : '';
+        const fonctionLabel = selectedOption ? selectedOption.dataset.fonctionLabel : '';
+
+        if (!employeId) {
             event.preventDefault();
             alert('Veuillez sélectionner un employé pour le commercial.');
             return false;
         }
+
+        if (fonction && fonction !== 'commercial') {
+            const label = fonctionLabel || fonction || 'une autre fonction';
+            const confirmation = confirm(`Attention : cet employé est déjà affecté à la fonction "${label}". Voulez-vous le basculer en commercial ?`);
+            if (!confirmation) {
+                event.preventDefault();
+                return false;
+            }
+        }
+
         return true;
     });
 });

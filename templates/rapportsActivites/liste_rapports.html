@@ -104,11 +104,13 @@
                                         </a>
 
                                         <!-- Modifier -->
+                                        {% if user.employe.technicien_profile == rapport.technicien %}
                                         <a href="{% url 'clients:modifier_rapport' rapport.id %}"
                                            class="btn btn-outline-warning btn-sm"
                                            title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        {% endif %}
 
                                         {% if rapport.statut_validation == "en_attente" %}
                                             <a href="#"

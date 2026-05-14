@@ -321,11 +321,18 @@ def mes_activites(request):
     if request.user.user_type != "technicien":
         return redirect("dashboard")  # sécurité
 
-    # récupérer le technicien lié au user connecté
-    technicien = request.user.technicien
+    # ✅ CORRECTED: Access technicien_profile through employe relationship
+    # Original code (commented): technicien = request.user.technicien
+    
+    technicien = None
+    if request.user.employe and hasattr(request.user.employe, 'technicien_profile'):
+        technicien = request.user.employe.technicien_profile
+
+    if not technicien:
+        return redirect("dashboard")
 
     # filtrer seulement SES activités
-    activites = Activite.objects.filter(technicien=technicien)
+    activites = Activite.objects.filter(techniciens=technicien)
 
     context = {
         "activites": activites

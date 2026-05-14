@@ -26,7 +26,11 @@ class Employe(models.Model):
 
     @property
     def has_user_account(self):
-        return hasattr(self, 'user_account')
+        """Vérifie si l'employé a un compte utilisateur actif."""
+        try:
+            return self.user_account is not None and self.user_account.est_actif
+        except:
+            return False
 
     photo = models.ImageField(upload_to="employes/photos/", null=True, blank=True)
 

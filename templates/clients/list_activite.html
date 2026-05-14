@@ -11,56 +11,56 @@
                     <h4 class="mb-0">
                         <i class="fas fa-calendar-alt me-2"></i> Liste des Activités
                     </h4>
-                    <div class="d-flex align-items-center">
-                        <!-- Filtres -->
-                        <form method="get" class="d-flex me-3">
-                            <select name="type" class="form-control form-control-sm me-2" style="width: 180px;" onchange="this.form.submit()">
-                                <option value="">Tous les types</option>
-                                {% for code, label in types_activite %}
-                                <option value="{{ code }}" {% if type_filter == code %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                            
-                            <select name="statut" class="form-control form-control-sm me-2" style="width: 150px;" onchange="this.form.submit()">
-                                <option value="">Tous statuts</option>
-                                {% for code, label in statuts %}
-                                <option value="{{ code }}" {% if statut_filter == code %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                            
-                            <input type="date" name="date" class="form-control form-control-sm me-2" style="width: 180px;" 
-                                   value="{{ date_filter }}" onchange="this.form.submit()">
-                            
-                            <div class="input-group input-group-sm" style="width: 200px;">
-                                <input type="text" 
-                                       name="search" 
-                                       class="form-control form-control-sm" 
-                                       placeholder="Rechercher..."
-                                       value="{{ search_query }}">
-                                <button class="btn btn-light btn-sm" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                                {% if search_query or statut_filter or date_filter or type_filter %}
-                                <a href="{% url 'list_activite' %}" class="btn btn-light btn-sm">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                                {% endif %}
-                            </div>
-                        </form>
-                        
-                        <div class="btn-group me-2">
-                            <a href="{% url 'clients:calendrier_activites' %}" class="btn btn-light btn-sm">
-                                <i class="fas fa-calendar me-1"></i> Calendrier
+                </div>
+
+                <!-- Filtres et Boutons sur la même ligne -->
+                <div class="mt-3">
+                    <form method="get" class="d-flex gap-3 align-items-center" style="flex-wrap: nowrap; overflow-x: auto;">
+                        <select name="type" class="form-control form-control-sm" style="width: 110px; flex-shrink: 0;" onchange="this.form.submit()">
+                            <option value="">Tous types</option>
+                            {% for code, label in types_activite %}
+                            <option value="{{ code }}" {% if type_filter == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <select name="statut" class="form-control form-control-sm" style="width: 105px; flex-shrink: 0;" onchange="this.form.submit()">
+                            <option value="">Tous statuts</option>
+                            {% for code, label in statuts %}
+                            <option value="{{ code }}" {% if statut_filter == code %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <input type="date" name="date" class="form-control form-control-sm" style="width: 125px; flex-shrink: 0;"
+                               value="{{ date_filter }}" onchange="this.form.submit()">
+
+                        <div class="input-group input-group-sm" style="width: 130px; flex-shrink: 0;">
+                            <input type="text"
+                                   name="search"
+                                   class="form-control form-control-sm"
+                                   placeholder="Rechercher..."
+                                   value="{{ search_query }}">
+                            <button class="btn btn-light btn-sm" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            {% if search_query or statut_filter or date_filter or type_filter %}
+                            <a href="{% url 'list_activite' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-times"></i>
                             </a>
-                            <a href="{% url 'clients:activites_aujourdhui' %}" class="btn btn-light btn-sm">
-                                <i class="fas fa-sun me-1"></i> Aujourd'hui
-                            </a>
+                            {% endif %}
                         </div>
-                        
-                        <a href="{% url 'clients:ajouter_activite' %}" class="btn btn-light btn-sm">
-                            <i class="fas fa-plus me-1"></i> Nouvelle activité
+
+                        <a href="{% url 'clients:ajouter_activite' %}" class="btn btn-light btn-sm" style="white-space: nowrap; flex-shrink: 0;">
+                            <i class="fas fa-plus me-1"></i> Planifier
                         </a>
-                    </div>
+
+                        <a href="{% url 'clients:activites_aujourdhui' %}" class="btn btn-light btn-sm" style="white-space: nowrap; flex-shrink: 0;">
+                            <i class="fas fa-sun me-1"></i> Aujourd'hui
+                        </a>
+
+                        <a href="{% url 'clients:calendrier_activites' %}" class="btn btn-light btn-sm" style="white-space: nowrap; flex-shrink: 0;">
+                            <i class="fas fa-calendar-week me-1"></i> Calendrier
+                        </a>
+                    </form>
                 </div>
                 
                 <!-- Statistiques -->
@@ -168,10 +168,12 @@
                                            class="btn btn-outline-primary" title="Détails">
                                             <i class="fas fa-eye"></i>
                                         </a>
+                                        {% if activite.statut != 'termine' %}
                                         <a href="{% url 'clients:modifier_activite' activite.id %}"
                                            class="btn btn-outline-warning" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        {% endif %}
                                         <button type="button" 
                                                 class="btn btn-outline-danger"
                                                 data-bs-toggle="modal"
@@ -180,6 +182,21 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
 
+                                        {% comment %} Bouton rapport - si disponible (en attente ou terminé) {% endcomment %}
+                                        {% if activite.rapport %}
+                                        <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                           class="btn btn-outline-info" title="Voir le rapport">
+                                            <i class="fas fa-file-alt"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% comment %} Bouton créer rapport - seulement pour techniciens participants {% endcomment %}
+                                        {% if user.user_type == 'technicien' and user.employe.technicien_profile in activite.techniciens.all and not activite.rapport %}
+                                        <a href="{% url 'creer_rapport' activite.id %}"
+                                           class="btn btn-outline-success btn-sm" title="Créer rapport">
+                                            <i class="fas fa-plus"></i> Rapport
+                                        </a>
+                                        {% endif %}
 
                                     </div>
                                     

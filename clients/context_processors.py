@@ -3,7 +3,14 @@ def role_user(request):
 
     if request.user.is_authenticated:
         try:
-            est_technicien = request.user.technicien is not None
+            # ✅ CORRECTED: Access technicien_profile through employe relationship
+            # Original code (commented): est_technicien = request.user.technicien is not None
+            
+            est_technicien = (
+                request.user.employe and 
+                hasattr(request.user.employe, 'technicien_profile') and 
+                request.user.employe.technicien_profile is not None
+            )
         except:
             est_technicien = False
 

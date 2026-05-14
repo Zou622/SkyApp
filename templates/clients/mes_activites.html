@@ -269,10 +269,12 @@
                                                 <i class="fas fa-file-lines"></i>
                                             </a>
 
+                                            {% if user.employe.technicien_profile == activite.rapport.technicien %}
                                             <a href="{% url 'clients:modifier_rapport' activite.rapport.id %}"
                                             class="btn btn-outline-warning btn-sm">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            {% endif %}
 
                                             <a href="#"
                                                 class="btn btn-outline-success btn-sm btn-valider"

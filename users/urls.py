@@ -3,11 +3,6 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from . import views
 from django.urls import reverse_lazy
-from django.urls import path
-from django.contrib.auth import views as auth_views
-from django.conf import settings
-from . import views
-from django.urls import reverse_lazy
 from django.shortcuts import redirect
 
 app_name = 'users'
@@ -32,7 +27,7 @@ urlpatterns = [
     # Admin
     path('users/', views.list_utilisateurs, name='liste_utilisateurs'),
     path('valider-utilisateur/<int:user_id>/', views.valider_utilisateur, name ='valider_utilisateur'),
-    path('supprimer-utilisateur/<int:user_id>/', views.soft_delete_utilisateur, name='supprimer_utilisateur'),
+    path('supprimer-utilisateur/<int:user_id>/', views.supprimer_utilisateur, name='supprimer_utilisateur'),
 
     # Password reset
     path('password_reset/', views.password_reset_request, name='password_reset_request'),
