@@ -1,0 +1,88 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <div class="card shadow-lg">
+            
+            <!-- Header -->
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    Modifier le rapport - {{ activite.get_type_activite_display }}
+                </h4>
+            </div>
+
+            <!-- Body -->
+            <div class="card-body">
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="row">
+
+                        {% for field in form %}
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label fw-bold">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+                        {% endfor %}
+
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="d-flex justify-content-between mt-4">
+
+                        <a href="{% url 'rapportActivites:liste_activites_technicien' %}" 
+                           class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour
+                        </a>
+
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-1"></i> Mettre à jour
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.card-header.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+}
+
+.form-label {
+    font-size: 0.9rem;
+}
+
+input, textarea, select {
+    font-size: 0.9rem !important;
+}
+
+img {
+    max-width: 100px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+</style>
+
+{% endblock %}

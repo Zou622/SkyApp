@@ -1,0 +1,192 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container mt-4">
+
+        <div class="card shadow-lg border-0 rounded-4">
+
+            <!-- HEADER -->
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-bullseye me-2"></i>
+                    Modifier un Objectif
+                </h4>
+            </div>
+
+            <div class="card-body">
+
+                <!-- ERREURS -->
+                {% if errors %}
+                <div class="alert alert-danger">
+                    <strong>Veuillez corriger les erreurs :</strong>
+                    <ul class="mb-0">
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="row">
+
+                        <!-- LEFT -->
+                        <div class="col-md-6">
+
+                            <h5 class="border-bottom pb-2 mb-3 text-info">
+                                <i class="fas fa-user me-2"></i>
+                                Employé concerné
+                            </h5>
+
+                            <!-- EMPLOYÉ -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Employé</label>
+                                <select name="employe" class="form-select">
+                                    {% for emp in employes %}
+                                        <option value="{{ emp.id }}"
+                                            {% if objectif.employe.id == emp.id %}selected{% endif %}>
+                                            {{ emp }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- TITRE -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Titre</label>
+                                <input type="text"
+                                       name="titre"
+                                       class="form-control"
+                                       value="{{ objectif.titre }}">
+                            </div>
+
+                            <!-- STATUT -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Statut</label>
+                                <select name="statut" class="form-select">
+                                    <option value="en_cours"
+                                        {% if objectif.statut == "en_cours" %}selected{% endif %}>
+                                        En cours
+                                    </option>
+
+                                    <option value="termine"
+                                        {% if objectif.statut == "termine" %}selected{% endif %}>
+                                        Terminé
+                                    </option>
+
+                                    <option value="retard"
+                                        {% if objectif.statut == "retard" %}selected{% endif %}>
+                                        Retard
+                                    </option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT -->
+                        <div class="col-md-6">
+
+                            <h5 class="border-bottom pb-2 mb-3 text-info">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Suivi Objectif
+                            </h5>
+
+                            <!-- DATES -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Date début</label>
+                                    <input type="date"
+                                           name="date_debut"
+                                           class="form-control"
+                                           value="{{ objectif.date_debut|date:'Y-m-d' }}">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Date fin</label>
+                                    <input type="date"
+                                           name="date_fin"
+                                           class="form-control"
+                                           value="{{ objectif.date_fin|date:'Y-m-d' }}">
+                                </div>
+                            </div>
+
+                            <!-- POURCENTAGE -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    Pourcentage de réalisation
+                                </label>
+
+                                <input type="number"
+                                       name="pourcentage_realisation"
+                                       class="form-control"
+                                       min="0" max="100"
+                                       value="{{ objectif.pourcentage_realisation }}">
+
+                                <small class="text-muted">
+                                    Valeur entre 0 et 100
+                                </small>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="mt-4">
+
+                        <h5 class="border-bottom pb-2 mb-3 text-info">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Description
+                        </h5>
+
+                        <textarea name="description"
+                                  class="form-control"
+                                  rows="4">{{ objectif.description }}</textarea>
+
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="d-flex justify-content-between mt-4">
+
+                        <a href="{% url 'objectifs:liste_objectifs' %}"
+                           class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Retour
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-info text-white">
+                            <i class="fas fa-save me-2"></i>
+                            Mettre à jour
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0dcaf0;
+    box-shadow: 0 0 0 .2rem rgba(13, 202, 240, .25);
+}
+</style>
+
+{% endblock %}

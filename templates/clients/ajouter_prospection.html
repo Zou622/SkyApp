@@ -1,0 +1,65 @@
+{% extends 'main.html' %}
+{% block contenu %}
+
+<div class="container mt-4">
+    <div class="card shadow">
+
+        <div class="card-header bg-info text-white">
+            <h4>📡 Nouvelle Prospection</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-info">
+                Client : <strong>{{ client.nom_client }}</strong>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- DATE -->
+                <div class="mb-3">
+                    <label>Date</label>
+                    <input type="date" name="date_activite"
+                           class="form-control"
+                           value="{{ aujourdhui }}">
+                </div>
+
+                <!-- LIEU -->
+                <div class="mb-3">
+                    <label>Zone / Quartier</label>
+                    <input type="text" name="lieu"
+                           class="form-control"
+                           placeholder="Ex: Kipé, Sonfonia...">
+                </div>
+
+                <!-- STATUT -->
+                <div class="mb-3">
+                    <label>Statut</label>
+                    <select name="statut" class="form-control">
+                        {% for code, label in statuts %}
+                            <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="mb-3">
+                    <label>Observation terrain</label>
+                    <textarea name="description"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Client intéressé ? zone couverte ? concurrence ?"></textarea>
+                </div>
+
+                <button class="btn btn-info">
+                    💾 Enregistrer la prospection
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

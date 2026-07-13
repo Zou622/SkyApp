@@ -1,0 +1,153 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <div class="card">
+
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white py-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h4 class="mb-0">
+                        <i class="fas fa-bullseye me-2"></i>
+                        Liste des Objectifs
+                    </h4>
+
+                    <a href="{% url 'objectifs:ajouter_objectif' %}"
+                       class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-1"></i>
+                        Ajouter
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- TABLE -->
+            <div class="card-body p-0">
+
+                {% if objectifs %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Employé</th>
+                                <th>Titre</th>
+                                <th>Période</th>
+                                <th>Statut</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for o in objectifs %}
+
+                            <tr>
+
+                                <td><strong>{{ o.employe }}</strong></td>
+                                <td>{{ o.titre }}</td>
+
+                                <td>
+                                    <small>{{ o.date_debut }} → {{ o.date_fin }}</small>
+                                </td>
+
+                                <td>
+                                    {% if o.statut == "termine" %}
+                                        <span class="badge bg-success">Terminé</span>
+                                    {% elif o.statut == "en_cours" %}
+                                        <span class="badge bg-primary">En cours</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Retard</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- ACTIONS -->
+                                <td class="text-center">
+
+                                    <div class="btn-group">
+
+                                        <a href="{% url 'objectifs:detail_objectif' o.id %}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <a href="{% url 'objectifs:modifier_objectif' o.id %}"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <!-- DELETE BUTTON -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                onclick="confirmDelete('{% url 'objectifs:supprimer_objectif' o.id %}')">
+
+                                            <i class="fas fa-trash"></i>
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="text-center py-5">
+                    <i class="fas fa-bullseye fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucun objectif trouvé</h5>
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- SWEETALERT -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmDelete(url) {
+
+    Swal.fire({
+        title: "Supprimer cet objectif ?",
+        text: "Cette action est irréversible !",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Oui, supprimer",
+        cancelButtonText: "Annuler"
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+
+    });
+
+}
+</script>
+
+{% endblock %}

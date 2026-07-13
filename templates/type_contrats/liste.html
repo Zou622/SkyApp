@@ -1,0 +1,59 @@
+{% extends 'main.html' %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container mt-4">
+
+        <div class="d-flex justify-content-between mb-3">
+            <h4>Type de Contrat</h4>
+            <a href="{% url 'type_contrat:ajouter_type' %}" class="btn btn-primary">Ajouter</a>
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in types %}
+                <tr>
+                    <td>{{ t.id }}</td>
+                    <td>{{ t.nom }}</td>
+                    <td>{{ t.description }}</td>
+                    <td>
+                        <a href="{% url 'type_contrat:modifier_type' t.id %}" class="btn btn-warning btn-sm">Modifier</a>
+
+                        <button onclick="confirmDelete({{ t.id }}, '{{ t.nom }}')" class="btn btn-danger btn-sm">Supprimer</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+function confirmDelete(id){
+    Swal.fire({
+        title: "Supprimer ?",
+        text: "Action irréversible",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Oui",
+        cancelButtonText: "Annuler"
+    }).then((result) => {
+        if (result.isConfirmed){
+            let url = "{% url 'type_contrat:supprimer_type' 9999 %}";
+            url = url.replace('9999', id);
+            window.location.href = url;
+        }
+    });
+}
+</script>
+
+{% endblock %}

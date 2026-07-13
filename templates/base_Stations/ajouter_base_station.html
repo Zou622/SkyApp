@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="container mt-4">
+    <h3>{% if bs %}Modifier{% else %}Ajouter{% endif %} Base Station</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">
+            {% if bs %}Modifier{% else %}Ajouter{% endif %}
+        </button>
+        <a href="{% url 'base_stations:liste_base_stations' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+
+<!-- SweetAlert -->
+<script>
+{% if messages %}
+    {% for message in messages %}
+        Swal.fire({
+            icon: "{% if message.tags == 'success' %}success{% else %}error{% endif %}",
+            title: "{{ message }}",
+            showConfirmButton: false,
+            timer: 2000
+        });
+    {% endfor %}
+{% endif %}
+</script>
+
+{% endblock %}

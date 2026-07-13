@@ -1,0 +1,277 @@
+{% load static %}
+
+<!-- ================= NAVBAR ================= -->
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+
+    <!-- LEFT -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#">
+                <i class="fas fa-bars"></i>
+            </a>
+        </li>
+
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="{% url 'users:dashboard' %}" class="nav-link">
+                <i class="fas fa-home me-1"></i> Dashboard
+            </a>
+        </li>
+    </ul>
+
+    <!-- RIGHT -->
+    <ul class="navbar-nav ml-auto align-items-center">
+
+        <!-- PARAMÉTRAGE -->
+        <li class="nav-item dropdown">
+
+            <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+                <i class="fas fa-cog me-2"></i>
+                <span>Paramétrage</span>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+
+                {% if user.user_type == "admin" or user.user_type == "rh" %}
+
+                    {% if user.user_type == "admin" %}
+                    <li>
+                        <a class="dropdown-item" href="{% url 'users:register' %}">
+                            <i class="fas fa-user-plus me-2 text-primary"></i>
+                            Nouvel utilisateur
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" href="{% url 'users:liste_utilisateurs' %}">
+                            <i class="fas fa-users me-2 text-info"></i>
+                            Liste des utilisateurs
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" href="{% url 'base_stations:liste_base_stations' %}">
+                            <i class="fas fa-broadcast-tower me-2 text-success"></i>
+                            Base stations
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item" href="{% url 'type_contrat:liste_type' %}">
+                            <i class="fas fa-file-contract me-2 text-warning"></i>
+                            Types de contrats
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li>
+                        <a class="dropdown-item" href="{% url 'employes:liste_employes' %}">
+                            <i class="fas fa-user-friends me-2 text-success"></i>
+                            Gestion des employés
+                        </a>
+                    </li>
+                    
+
+                {% endif %}
+
+                <li><hr class="dropdown-divider"></li>
+
+                <li>
+                    <a class="dropdown-item text-danger" href="{% url 'users:logout' %}">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Déconnexion
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+    </ul>
+
+</nav>
+
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+
+    <!-- LOGO -->
+    <a href="{% url 'users:dashboard' %}" class="brand-link">
+        <img src="{% static 'dist/img/New_logo.jpg.jpeg' %}"
+             alt="SkyApp"
+             class="brand-image img-circle elevation-3"
+             style="opacity: .8">
+        <span class="brand-text font-weight-light">SkyApp</span>
+    </a>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <!-- USER PANEL -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+
+            <div class="image">
+                {% if user.photo %}
+                    <img src="{{ user.photo.url }}"
+                         class="img-circle elevation-2"
+                         alt="{{ user.username }}">
+                {% else %}
+                    <img src="{% static 'dist/img/avatar3.png' %}"
+                         class="img-circle elevation-2"
+                         alt="{{ user.username }}">
+                {% endif %}
+            </div>
+
+            <div class="info">
+                <a href="{% url 'users:profile' %}" class="d-block">
+                    <i class="fas fa-user me-1"></i>
+                    {{ user.get_full_name|default:user.username }}
+                </a>
+                <small class="text-muted">
+                    {{ user.get_user_type_display }}
+                </small>
+            </div>
+
+        </div>
+
+        <!-- MENU -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column">
+
+                <!-- DASHBOARD -->
+                <li class="nav-item">
+                    <a href="{% url 'users:dashboard' %}"
+                       class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+
+                <!-- ADMIN / SUPERVISEUR -->
+                {% if user.user_type == "admin" or user.user_type == "superviseur" %}
+
+                    <li class="nav-item">
+                        <a href="{% url 'clients:list_client' %}"
+                           class="nav-link {% if request.resolver_match.namespace == 'clients' %}active{% endif %}">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Clients</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'list_technicien' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'list_technicien' %}active{% endif %}">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <p>Techniciens</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'list_commercial' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'list_commercial' %}active{% endif %}">
+                            <i class="nav-icon fas fa-briefcase"></i>
+                            <p>Commerciaux</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'clients:list_activite' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'list_activite' %}active{% endif %}">
+                            <i class="nav-icon fas fa-tasks"></i>
+                            <p>Activités</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'rapportActivites:liste_rapports' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'list_rapports' %}rapport{% endif %}">
+                            <i class="nav-icon fas fa-file-alt"></i>
+                            <p>Rapports</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'prospects:list_prospects' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'list_prospects' %}prospects{% endif %}">
+                            <i class="nav-icon fas fa-bullseye"></i>
+                            <p>Prospects</p>
+                        </a>
+                    </li>
+
+                {% endif %}
+
+                <!-- RESSOURCES HUMAINES -->
+                {% if user.user_type == "admin" or user.user_type == "rh" %}
+
+                    <li class="nav-item">
+                        <a href="{% url 'employes:liste_employes' %}"
+                           class="nav-link {% if request.resolver_match.namespace == 'employes' %}active{% endif %}">
+                            <i class="nav-icon fas fa-user-friends"></i>
+                            <p>Employés</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'evaluations:liste_evaluations' %}"
+                        class="nav-link {% if request.resolver_match.namespace == 'evaluations' %}active{% endif %}">
+                            <i class="nav-icon fas fa-clipboard-check"></i>
+                            <p>Évaluations</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'objectifs:liste_objectif' %}"
+                        class="nav-link {% if request.resolver_match.namespace == 'objectifs' %}active{% endif %}">
+                            <i class="nav-icon fas fa-bullseye"></i>
+                            <p>Objectifs des employés</p>
+                        </a>
+                    </li>
+                   
+
+                {% endif %}
+
+                <!-- COMMERCIAL -->
+                {% if user.user_type == "commercial" %}
+
+                    <li class="nav-item">
+                        <a href="{% url 'clients:list_client' %}"
+                           class="nav-link {% if request.resolver_match.namespace == 'clients' %}active{% endif %}">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p>Mes clients</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'prospects:list_prospects' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'list_prospects' %}prospects{% endif %}">
+                            <i class="nav-icon fas fa-bullseye"></i>
+                            <p>Mes prospects</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'activities:activites_aujourdhui' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'activites_aujourdhui' %}active{% endif %}">
+                            <i class="nav-icon fas fa-calendar-day"></i>
+                            <p>Activités aujourd’hui</p>
+                        </a>
+                    </li>
+
+                {% endif %}
+
+                <!-- TECHNICIEN -->
+                {% if user.user_type == "technicien" %}
+
+                    <li class="nav-item">
+                        <a href="{% url 'clients:mes_activites' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'mes_activites' %}active{% endif %}">
+                            <i class="nav-icon fas fa-wrench"></i>
+                            <p>Mes activités</p>
+                        </a>
+                    </li>
+                    
+
+                {% endif %}
+
+            </ul>
+        </nav>
+
+    </div>
+</aside>

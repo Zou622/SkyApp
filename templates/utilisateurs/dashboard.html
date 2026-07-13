@@ -1,0 +1,359 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <!-- ============================= -->
+        <!-- BIENVENUE -->
+        <!-- ============================= -->
+        <div class="card shadow border-0 mb-4">
+            <div class="card-body">
+                <h3>👋 Bonjour {{ user.first_name|default:user.username }}</h3>
+                <p class="text-muted">Bienvenue sur SkyApp</p>
+            </div>
+        </div>
+
+        <!-- ============================= -->
+        <!-- ADMIN / SUPERVISEUR -->
+        <!-- ============================= -->
+        {% if user.user_type == "admin" or user.user_type == "superviseur" %}
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h3>{{ stats.users }}</h3>
+                        <p>Total Utilisateurs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-info text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-check fa-2x mb-2"></i>
+                        <h3>{{ stats.clients }}</h3>
+                        <p>Total Clients</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tasks fa-2x mb-2"></i>
+                        <h3>{{ stats.activites }}</h3>
+                        <p>Total Activités</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-dark text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-bullseye fa-2x mb-2"></i>
+                        <h3>{{ stats.prospects }}</h3>
+                        <p>Total Prospects</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-file-alt fa-2x mb-2"></i>
+                        <h3>{{ stats.total_converti }}</h3>
+                        <p>Total prospect convertis en client</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CONVERSION PAR COMMERCIAL -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-chart-bar me-2"></i> Conversions par commercial
+            </div>
+            <div class="card-body">
+
+                {% for c in stats.conversion_stats %}
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span>
+                        <i class="fas fa-user me-2"></i>
+                        {{ c.commercial__employe__nom }} {{ c.commercial__employe__prenom }}
+                    </span>
+                    <span class="badge bg-success">{{ c.total }}</span>
+                </div>
+                {% empty %}
+                <p>Aucune donnée</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- TOP TECHNICIENS -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-trophy me-2"></i> Top techniciens
+            </div>
+            <div class="card-body">
+
+                {% for t in stats.top_techniciens %}
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span>
+                        <i class="fas fa-user-cog me-2"></i>
+                        {{ t.nom }} {{ t.prenom }}
+                    </span>
+                    <span class="badge bg-success">{{ t.total_activites }}</span>
+                </div>
+                {% empty %}
+                <p>Aucune donnée</p>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        {% endif %}
+
+        <!-- ============================= -->
+        <!-- RESSOURCES HUMAINES -->
+        <!-- ============================= -->
+        {% if user.user_type == "admin" or user.user_type == "rh" %}
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="card bg-info text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-friends fa-2x mb-2"></i>
+                        <h3>{{ stats.total_employes|default:0 }}</h3>
+                        <p>Total Employés</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-check fa-2x mb-2"></i>
+                        <h3>{{ stats.employes_actifs|default:0 }}</h3>
+                        <p>Employés Actifs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tools fa-2x mb-2"></i>
+                        <h3>{{ stats.techniciens|default:0 }}</h3>
+                        <p>Techniciens</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-briefcase fa-2x mb-2"></i>
+                        <h3>{{ stats.commerciaux|default:0 }}</h3>
+                        <p>Commerciaux</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACTIONS RAPIDES RH -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <i class="fas fa-plus-circle me-2"></i> Actions Rapides
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'employes:ajouter_employe' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-plus me-2"></i> Ajouter un employé
+                            </a>
+                            <a href="{% url 'employes:liste_employes' %}" class="btn btn-outline-info">
+                                <i class="fas fa-list me-2"></i> Voir tous les employés
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-chart-bar me-2"></i> Statistiques RH
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h5 class="text-success">{{ stats.nouveaux_employes|default:0 }}</h5>
+                                <small class="text-muted">Nouveaux ce mois</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="text-warning">{{ stats.employes_inactifs|default:0 }}</h5>
+                                <small class="text-muted">Inactifs</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+
+        <!-- ============================= -->
+        <!-- COMMERCIAL -->
+        <!-- ============================= -->
+        {% if user.user_type == "commercial" %}
+
+        <div class="row">
+
+            <div class="col-md-4">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h3>{{ stats.clients }}</h3>
+                        <p>Mes Clients</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-dark text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-plus fa-2x mb-2"></i>
+                        <h3>{{ stats.mes_prospects }}</h3>
+                        <p>Mes Prospects</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-exchange-alt fa-2x mb-2"></i>
+                        <h3>{{ stats.mes_conversions }}</h3>
+                        <p>Conversions</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        <!-- ============================= -->
+        <!-- TECHNICIEN -->
+        <!-- ============================= -->
+        {% if user.user_type == "technicien" %}
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-list fa-2x mb-2"></i>
+                        <h3>{{ stats.activites }}</h3>
+                        <p>Total activités</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_terminees }}</h3>
+                        <p>Activités Terminées</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-warning text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-spinner fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_en_cours }}</h3>
+                        <p>Activités En cours</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="card bg-info text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_planifiees }}</h3>
+                        <p>Activités Planifiées</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <h3>{{ stats.activites_en_attente }}</h3>
+                        <p>Activités En attente</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PROGRESSION -->
+        <div class="card mb-4 shadow">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-chart-line me-2"></i> Progression des activités
+            </div>
+            <div class="card-body">
+
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar bg-success"
+                         style="width: {{ stats.taux_realisation }}%">
+                        {{ stats.taux_realisation }}%
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {% endif %}
+
+        <!-- ============================= -->
+        <!-- ACTIONS RAPIDES -->
+        <!-- ============================= -->
+        <div class="card shadow border-0 mt-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-bolt me-2"></i> Actions rapides
+            </div>
+
+            <div class="card-body">
+                <div class="row text-center">
+
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-user me-2"></i> Profil
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

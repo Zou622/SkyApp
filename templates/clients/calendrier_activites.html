@@ -1,0 +1,506 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container mt-3">
+
+        <div class="card shadow">
+
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white py-2">
+                <h4 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i> Calendrier des activités
+                </h4>
+            </div>
+
+            <div class="card-body">
+
+                <!-- FILTRE -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body py-3">
+                        <form method="get" class="row g-2 align-items-center">
+
+                            <div class="col-auto">
+                                <label class="fw-bold small">Période :</label>
+                            </div>
+
+                            <div class="col-auto">
+                                <select name="mois" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    {% for i in mois_range %}
+                                        <option value="{{ i }}" {% if i == mois %}selected{% endif %}>
+                                            {{ i }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-auto">
+                                <input type="number" name="annee"
+                                       class="form-control form-control-sm"
+                                       value="{{ annee }}"
+                                       onchange="this.form.submit()">
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <!-- LISTE -->
+                {% if activites %}
+                <div class="row g-3">
+
+                    {% for activite in activites %}
+                    <div class="col-md-3">
+
+                        <div class="card h-100 shadow-sm border-primary">
+
+                            <!-- HEADER -->
+                            <div class="card-header d-flex justify-content-between bg-primary text-white py-1">
+                                <small>{{ activite.date_activite|date:"d/m/Y" }}</small>
+
+                                <span class="badge {{ activite.statut_badge_class }}">
+                                    {{ activite.get_statut_display }}
+                                </span>
+                            </div>
+
+                            <!-- TYPE -->
+                            <div class="text-center mt-2">
+                                <span class="badge {{ activite.type_badge_class }} px-3 py-1">
+                                    {{ activite.get_type_activite_display }}
+                                </span>
+                            </div>
+
+                            <!-- BODY -->
+                            <div class="card-body pt-2 pb-2">
+
+                                <!-- CLIENT -->
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-user me-1"></i> Client
+                                    </small>
+                                    <strong class="ms-3 small">
+                                        {{ activite.client.nom_client }}
+                                    </strong>
+                                </div>
+
+                                <!-- HEURE -->
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-clock me-1"></i> Heure
+                                    </small>
+
+                                    <span class="badge bg-light text-dark ms-3">
+                                        {{ activite.heure_debut|time:"H:i" }}
+                                        →
+                                        {{ activite.heure_fin|time:"H:i" }}
+                                    </span>
+                                </div>
+
+                                <!-- DURÉE -->
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-hourglass-half me-1"></i> Durée
+                                    </small>
+
+                                    <span class="badge bg-secondary ms-3">
+                                        {{ activite.duree_activite }}
+                                    </span>
+                                </div>
+
+                                <!-- TECHNICIENS -->
+                                <div>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-users me-1"></i> Techniciens
+                                    </small>
+
+                                    <div class="ms-3 mt-1">
+                                        {% for tech in activite.techniciens.all %}
+                                            <span class="badge bg-secondary me-1 mb-1">
+                                                {{ tech.prenom }} {{ tech.nom }}
+                                            </span>
+                                        {% empty %}
+                                            <span class="text-muted small">Non assigné</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- ACTIONS -->
+                            <div class="card-footer bg-transparent border-0 pt-0 pb-2">
+                                <div class="d-flex justify-content-end gap-1">
+
+                                    <!-- ========================= -->
+                                    <!-- 👨‍🔧 TECHNICIEN -->
+                                    <!-- ========================= -->
+                                    {% if user.user_type == "technicien" %}
+
+                                        {% if activite.statut == "planifie" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <a href="#"
+                                                class="btn btn-success btn-sm btn-commencer"
+                                                data-url="{% url 'rapportActivites:commencer_activite' activite.id %}">
+                                                    <i class="fas fa-play"></i>
+                                            </a>
+
+                                        {% elif activite.statut == "en_cours" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            {% if user.employe.technicien_profile in activite.techniciens.all %}
+                                            <a href="{% url 'rapportActivites:creer_rapport' activite.id %}"
+                                            class="btn btn-outline-success btn-sm">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                            {% endif %}
+
+                                        {% elif activite.statut == "en_attente" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            {% if activite.rapport %}
+                                            <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-file-lines"></i>
+                                            </a>
+
+                                            {% if user.employe.technicien_profile == activite.rapport.technicien %}
+                                            <a href="{% url 'clients:modifier_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% endif %}
+                                            {% endif %}
+
+                                        {% elif activite.statut == "termine" %}
+
+                                            {% if activite.rapport %}
+                                            <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-dark btn-sm">
+                                                <i class="fas fa-file-lines"></i>
+                                            </a>
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    <!-- ========================= -->
+                                    <!-- 💼 COMMERCIAL -->
+                                    <!-- ========================= -->
+                                    {% elif user.user_type == "commercial" %}
+
+                                        {% if activite.statut == "planifie" or activite.statut == "en_cours" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                        {% elif activite.statut == "en_attente" or activite.statut == "termine" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            {% if activite.rapport %}
+                                            <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-dark btn-sm">
+                                                <i class="fas fa-file-lines"></i>
+                                            </a>
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    <!-- ========================= -->
+                                    <!-- 👑 ADMIN -->
+                                    <!-- ========================= -->
+                                    {% elif user.user_type == "admin" %}
+
+                                    <!-- ========================= -->
+                                    <!-- 🔥 CAS SPECIAL : NOC SUPPORT -->
+                                    <!-- ========================= -->
+                                    {% if activite.type_activite == "noc support" %}
+
+                                        <!-- PLANIFIE -->
+                                        {% if activite.statut == "planifie" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <a href="{% url 'clients:modifier_activite' activite.id %}"
+                                            class="btn btn-outline-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <a href="#"
+                                                class="btn btn-success btn-sm btn-commencer"
+                                                data-url="{% url 'rapportActivites:commencer_activite' activite.id %}">
+                                                <i class="fas fa-play"></i>
+                                            </a>
+
+                                            <button class="btn btn-outline-danger btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal{{ activite.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+
+                                        <!-- EN COURS -->
+                                        {% elif activite.statut == "en_cours" %}
+
+                                        <a href="{% url 'clients:detail_activite' activite.id %}"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <a href="{% url 'rapportActivites:creer_rapport' activite.id %}"
+                                           class="btn btn-outline-success btn-sm">
+                                            <i class="fas fa-file-alt"></i>
+                                        </a>
+
+                                        <a href="{% url 'clients:modifier_activite' activite.id %}"
+                                          class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <button class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal{{ activite.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+                                        <!-- EN ATTENTE -->
+                                        {% elif activite.statut == "en_attente" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            {% if activite.rapport %}
+                                            <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-file-lines"></i>
+                                            </a>
+
+                                            <a href="{% url 'clients:modifier_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <a href="#"
+                                                class="btn btn-outline-success btn-sm btn-valider"
+                                                data-url="{% url 'rapportActivites:valider_rapport' activite.rapport.id %}">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            {% endif %}
+
+                                        <!-- TERMINE -->
+                                        {% elif activite.statut == "termine" %}
+
+                                            {% if activite.rapport %}
+                                            <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-dark btn-sm">
+                                                <i class="fas fa-file-lines"></i>
+                                            </a>
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    <!-- ========================= -->
+                                    <!-- 🧠 CAS ADMIN NORMAL -->
+                                    <!-- ========================= -->
+                                    {% else %}
+
+                                        {% if activite.statut == "planifie" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <a href="{% url 'clients:modifier_activite' activite.id %}"
+                                            class="btn btn-outline-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <button class="btn btn-outline-danger btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal{{ activite.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+
+                                        {% elif activite.statut == "en_cours" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <a href="{% url 'clients:modifier_activite' activite.id %}"
+                                            class="btn btn-outline-warning btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                        {% elif activite.statut == "en_attente" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            {% if activite.rapport %}
+                                            <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-file-lines"></i>
+                                            </a>
+
+                                            <a href="#"
+                                                class="btn btn-outline-success btn-sm btn-valider"
+                                                data-url="{% url 'rapportActivites:valider_rapport' activite.rapport.id %}">
+                                                    <i class="fas fa-check"></i>
+                                            </a>
+                                            {% endif %}
+
+                                        {% elif activite.statut == "termine" %}
+
+                                            <a href="{% url 'clients:detail_activite' activite.id %}"
+                                            class="btn btn-outline-success btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            {% if activite.rapport %}
+                                            <a href="{% url 'rapportActivites:detail_rapport' activite.rapport.id %}"
+                                            class="btn btn-outline-dark btn-sm">
+                                                <i class="fas fa-file-lines"></i>
+                                            </a>
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    {% endif %}
+                                    {% endif %}
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    {% endfor %}
+
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <h4 class="text-muted">Aucune activité</h4>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODALS -->
+{% for activite in activites %}
+{% if activite.statut != "termine" %}
+<div class="modal fade" id="deleteModal{{ activite.id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+                <h5>Confirmation</h5>
+            </div>
+
+            <div class="modal-body">
+                Supprimer cette activité ?
+            </div>
+
+            <div class="modal-footer">
+                <form method="post" action="{% url 'clients:supprimer_activite' activite.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ===============================
+    // COMMENCER ACTIVITÉ
+    // ===============================
+    document.querySelectorAll('.btn-commencer').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let url = this.dataset.url;
+
+            Swal.fire({
+                title: 'Commencer cette activité ?',
+                text: "Le statut passera à EN COURS",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, commencer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        });
+    });
+
+    // ===============================
+    // VALIDER RAPPORT
+    // ===============================
+    document.querySelectorAll('.btn-valider').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            let url = this.dataset.url;
+
+            Swal.fire({
+                title: 'Valider ce rapport ?',
+                text: "Cette action est définitive",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, valider',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        });
+    });
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,239 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container mt-4">
+
+        <div class="card shadow">
+
+            <!-- Header -->
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-bullseye me-2"></i>
+                    Ajouter un Objectif
+                </h4>
+            </div>
+
+            <div class="card-body">
+
+                <!-- Affichage erreurs -->
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <h5>
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Veuillez corriger les erreurs
+                    </h5>
+
+                    <ul class="mb-0">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>
+                                    <strong>{{ field.label }}</strong> :
+                                    {{ error }}
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+                {% endif %}
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <div class="row">
+
+                        <!-- COLONNE GAUCHE -->
+                        <div class="col-md-6">
+
+                            <h5 class="border-bottom pb-2 mb-3 text-primary">
+
+                                <i class="fas fa-user me-2"></i>
+
+                                Employé concerné
+
+                            </h5>
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-bold">
+
+                                    {{ form.employe.label }}
+
+                                </label>
+
+                                {{ form.employe }}
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-bold">
+
+                                    {{ form.titre.label }}
+
+                                </label>
+
+                                {{ form.titre }}
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-bold">
+
+                                    {{ form.statut.label }}
+
+                                </label>
+
+                                {{ form.statut }}
+
+                            </div>
+
+                        </div>
+
+                        <!-- COLONNE DROITE -->
+                        <div class="col-md-6">
+
+                            <h5 class="border-bottom pb-2 mb-3 text-primary">
+
+                                <i class="fas fa-chart-line me-2"></i>
+
+                                Suivi Objectif
+
+                            </h5>
+
+                            <div class="row">
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label fw-bold">
+
+                                        {{ form.date_debut.label }}
+
+                                    </label>
+
+                                    {{ form.date_debut }}
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label fw-bold">
+
+                                        {{ form.date_fin.label }}
+
+                                    </label>
+
+                                    {{ form.date_fin }}
+
+                                </div>
+
+                            </div>
+
+                            <div class="mt-3">
+
+                                <label class="form-label fw-bold">
+                                    {{ form.pourcentage_realisation.label }}
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                {{ form.pourcentage_realisation }}
+
+                                <small class="text-muted d-block mt-1">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Entrez un nombre entre 0 et 100 (champ obligatoire)
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mt-4">
+
+                        <h5 class="border-bottom pb-2 mb-3 text-primary">
+
+                            <i class="fas fa-file-alt me-2"></i>
+
+                            Description Objectif
+
+                        </h5>
+
+                        <label class="form-label fw-bold">
+
+                            {{ form.description.label }}
+
+                        </label>
+
+                        {{ form.description }}
+
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="d-flex justify-content-between mt-4">
+
+                        <a href="{% url 'objectifs:liste_objectif' %}"
+                           class="btn btn-secondary">
+
+                            <i class="fas fa-arrow-left me-2"></i>
+
+                            Retour
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-primary text-white">
+
+                            <i class="fas fa-save me-2"></i>
+
+                            Enregistrer
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+
+.form-control,
+.form-select{
+
+    border-radius:8px;
+
+}
+
+.form-control:focus,
+.form-select:focus{
+
+    border-color:#0dcaf0;
+
+    box-shadow:0 0 0 .2rem rgba(
+        13,
+        202,
+        240,
+        .25
+    );
+
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends 'main.html' %}
+{% block contenu %}
+
+<div class="content-wrapper">
+<div class="container-fluid mt-4">
+
+<div class="card shadow border-0">
+
+    <!-- HEADER -->
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+        <h4 class="mb-0">
+            <i class="fas fa-users me-2"></i>
+            Liste des Prospects
+        </h4>
+
+        <div class="d-flex align-items-center">
+
+            <!-- SEARCH -->
+            <form method="get" class="d-flex me-2">
+                <input type="text"
+                       name="search"
+                       value="{{ search_query }}"
+                       class="form-control form-control-sm me-2"
+                       placeholder="Recherche...">
+
+                <select name="statut"
+                        class="form-select form-select-sm me-2"
+                        onchange="this.form.submit()">
+
+                    <option value="">Tous</option>
+                    <option value="nouveau" {% if statut_filter == 'nouveau' %}selected{% endif %}>Nouveau</option>
+                    <option value="en_cours" {% if statut_filter == 'en_cours' %}selected{% endif %}>En cours</option>
+                    <option value="converti" {% if statut_filter == 'converti' %}selected{% endif %}>Converti</option>
+                    <option value="perdu" {% if statut_filter == 'perdu' %}selected{% endif %}>Perdu</option>
+
+                </select>
+
+                <button class="btn btn-light btn-sm">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <a href="{% url 'prospects:add_prospect' %}" class="btn btn-light btn-sm">
+                <i class="fas fa-plus me-1"></i> Ajouter
+            </a>
+
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-body p-0">
+
+        <table class="table table-hover mb-0">
+
+            <thead class="table-light">
+                <tr>
+                    <th width="80" class="text-center">ID</th>
+                    <th>Prospect</th>
+                    <th>Téléphone</th>
+                    <th>Email</th>
+                    <th>Quartier</th>
+                    <th>Statut</th>
+                    {% if not is_commercial %}
+                    <th>Commercial</th>
+                    {% endif %}
+                    <th>Date</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for p in prospects %}
+            <tr>
+
+                <!-- ID -->
+                <td class="text-center">
+                    <span class="badge bg-success rounded-pill px-3">
+                        #{{ p.id }}
+                    </span>
+                </td>
+
+                <!-- PROSPECT (dropdown comme client) -->
+                <td>
+                    <div class="d-flex align-items-center">
+
+                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                             style="width:40px;height:40px;">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+
+                        <div class="ms-2 dropdown">
+
+                            <a href="#"
+                               class="fw-bold text-dark dropdown-toggle text-decoration-none"
+                               data-bs-toggle="dropdown">
+
+                                {{ p.nom }}
+                            </a>
+
+                            <ul class="dropdown-menu shadow">
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="#">
+                                        <i class="fas fa-plus text-primary me-2"></i>
+                                        Nouvelle prospection
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="#">
+                                        <i class="fas fa-list text-info me-2"></i>
+                                        Liste prospections
+                                    </a>
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+                </td>
+
+                <!-- TELEPHONE -->
+                <td>{{ p.telephone|default:"-" }}</td>
+
+                <!-- EMAIL -->
+                <td>{{ p.email|default:"-" }}</td>
+
+                <!-- QUARTIER -->
+                <td>{{ p.quartier|default:"-" }}</td>
+
+                <!-- STATUT -->
+                <td>
+                    {% if p.statut == "nouveau" %}
+                        <span class="badge bg-primary">Nouveau</span>
+                    {% elif p.statut == "en_cours" %}
+                        <span class="badge bg-warning text-dark">En cours</span>
+                    {% elif p.statut == "converti" %}
+                        <span class="badge bg-success">Converti</span>
+                    {% elif p.statut == "perdu" %}
+                        <span class="badge bg-danger">Perdu</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ p.statut }}</span>
+                    {% endif %}
+                </td>
+
+                <!-- COMMERCIAL -->
+                {% if not is_commercial %}
+                <td>
+                    {% if p.commercial %}
+                        {{ p.commercial.prenom }} {{ p.commercial.nom }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                {% endif %}
+
+                <!-- DATE -->
+                <td>{{ p.date_creation|date:"d/m/Y" }}</td>
+
+                <!-- ACTIONS -->
+                <td class="text-center">
+
+                    <div class="btn-group btn-group-sm">
+
+                        <a href="{% url 'prospects:detail_prospect' p.id %}"
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+
+                        <a href="{% url 'prospects:edit_prospect' p.id %}"
+                           class="btn btn-outline-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+
+                        {% if p.statut != "converti" %}
+                        <button class="btn btn-outline-success btn-convert"
+                                data-id="{{ p.id }}"
+                                data-nom="{{ p.nom }}">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        {% endif %}
+
+                    </div>
+
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="text-center py-4 text-muted">
+                    Aucun prospect trouvé
+                </td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+</div>
+
+<!-- ================= SWEETALERT ================= -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".btn-convert").forEach(btn => {
+
+        btn.addEventListener("click", function () {
+
+            const id = this.dataset.id;
+            const nom = this.dataset.nom;
+
+            Swal.fire({
+                title: "Confirmation",
+                text: `Convertir ${nom} en client ?`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Oui",
+                cancelButtonText: "Annuler"
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    const form = document.createElement("form");
+                    form.method = "POST";
+
+                    // 🔥 CORRECT URL DJANGO
+                    form.action = "{% url 'prospects:convertir_prospect' 0 %}".replace("0", id);
+
+                    const csrf = document.createElement("input");
+                    csrf.type = "hidden";
+                    csrf.name = "csrfmiddlewaretoken";
+                    csrf.value = "{{ csrf_token }}";
+
+                    form.appendChild(csrf);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+
+            });
+
+        });
+
+    });
+
+});
+</script>
+{% endblock %}

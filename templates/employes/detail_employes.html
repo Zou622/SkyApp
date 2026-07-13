@@ -1,0 +1,214 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user me-2"></i> Fiche Employé
+                    </h4>
+                    <div>
+                        <a href="{% url 'employes:liste_employes' %}" class="btn btn-light btn-sm me-2">
+                            <i class="fas fa-arrow-left me-1"></i> Retour
+                        </a>
+                        <a href="{% url 'employes:modifier_employe' employe.id %}" class="btn btn-warning btn-sm me-2">
+                            <i class="fas fa-edit me-1"></i> Modifier
+                        </a>
+                        {% if not employe.has_user_account %}
+                        <a href="{% url 'employes:creer_compte_utilisateur' employe.id %}" class="btn btn-success btn-sm me-2">
+                            <i class="fas fa-user-plus me-1"></i> Créer un compte
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row mb-4">
+                    <!-- Photo et informations principales -->
+                    <div class="col-md-12 mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-4">
+                                {% if employe.photo %}
+                                    <img src="{{ employe.photo.url }}" alt="Photo de {{ employe.nom }}" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                        <i class="fas fa-user text-white fa-2x"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h2 class="mb-0">{{ employe.nom }} {{ employe.prenom }}</h2>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-id-badge me-1"></i>Matricule: <strong>{{ employe.matricule }}</strong>
+                                </p>
+                                <p class="text-muted mb-0">
+                                    <span class="badge 
+                                        {% if employe.statut == 'Actif' %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ employe.statut }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations personnelles -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user-circle me-2"></i> Informations Personnelles
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-sm-5">Nom :</dt>
+                                    <dd class="col-sm-7">{{ employe.nom }}</dd>
+
+                                    <dt class="col-sm-5">Prénom :</dt>
+                                    <dd class="col-sm-7">{{ employe.prenom }}</dd>
+
+                                    <dt class="col-sm-5">Sexe :</dt>
+                                    <dd class="col-sm-7">{{ employe.sexe }}</dd>
+
+                                    <dt class="col-sm-5">Date naissance :</dt>
+                                    <dd class="col-sm-7">
+                                        {% if employe.date_naissance %}
+                                            {{ employe.date_naissance|date:"d/m/Y" }}
+                                        {% else %}
+                                            <span class="text-muted">Non renseignée</span>
+                                        {% endif %}
+                                    </dd>
+
+                                    <dt class="col-sm-5">Téléphone :</dt>
+                                    <dd class="col-sm-7">{{ employe.telephone }}</dd>
+
+                                    <dt class="col-sm-5">Email :</dt>
+                                    <dd class="col-sm-7">
+                                        {% if employe.email %}
+                                            <a href="mailto:{{ employe.email }}">{{ employe.email }}</a>
+                                        {% else %}
+                                            <span class="text-muted">Non renseigné</span>
+                                        {% endif %}
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations professionnelles -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-briefcase me-2"></i> Informations Professionnelles
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-sm-5">Fonction :</dt>
+                                    <dd class="col-sm-7">
+                                        {% if employe.fonction %}
+                                            <span class="badge bg-warning text-dark">{{ employe.get_fonction_display }}</span>
+                                        {% else %}
+                                            <span class="text-muted">Non assigné</span>
+                                        {% endif %}
+                                    </dd>
+
+                                    <dt class="col-sm-5">Date embauche :</dt>
+                                    <dd class="col-sm-7">{{ employe.date_embauche|date:"d/m/Y" }}</dd>
+
+                                    <dt class="col-sm-5">Statut :</dt>
+                                    <dd class="col-sm-7">
+                                        <span class="badge 
+                                            {% if employe.statut == 'Actif' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ employe.statut }}
+                                        </span>
+                                    </dd>
+
+                                    <dt class="col-sm-5">Compte utilisateur :</dt>
+                                    <dd class="col-sm-7">
+                                        {% if employe.has_user_account %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>{{ employe.user_account.username }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Pas de compte</span>
+                                        {% endif %}
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Localisation -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-map-marker-alt me-2"></i> Localisation
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-sm-5">Quartier :</dt>
+                                    <dd class="col-sm-7">{{ employe.quartier|default:"Non renseigné" }}</dd>
+
+                                    <dt class="col-sm-5">Adresse :</dt>
+                                    <dd class="col-sm-7">{{ employe.adresse|default:"Non renseignée"|linebreaks }}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dates de création -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-clock me-2"></i> Informations Système
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-sm-5">Créé le :</dt>
+                                    <dd class="col-sm-7">{{ employe.created_at|date:"d/m/Y à H:i" }}</dd>
+
+                                    <dt class="col-sm-5">ID :</dt>
+                                    <dd class="col-sm-7">#{{ employe.id }}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="row mt-3 pt-3 border-top">
+                    <div class="col-12 d-flex justify-content-between">
+                        <a href="{% url 'employes:liste_employes' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                        <div>
+                            <a href="{% url 'employes:modifier_employe' employe.id %}" class="btn btn-warning me-2">
+                                <i class="fas fa-edit me-1"></i> Modifier
+                            </a>
+                            <a href="{% url 'employes:supprimer_employe' employe.id %}" class="btn btn-danger me-2">
+                                <i class="fas fa-trash me-1"></i> Supprimer
+                            </a>
+                            {% if not employe.user_account %}
+                            <a href="{% url 'employes:creer_compte_utilisateur' employe.id %}" class="btn btn-success">
+                                <i class="fas fa-user-plus me-1"></i> Créer un compte
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

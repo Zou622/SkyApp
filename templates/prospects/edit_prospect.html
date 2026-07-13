@@ -1,0 +1,58 @@
+{% extends 'main.html' %}
+{% block contenu %}
+
+<div class="container mt-4">
+
+<div class="card shadow">
+    <div class="card-header bg-warning">
+        <h4>Modifier Prospect</h4>
+    </div>
+
+    <div class="card-body">
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label>Nom</label>
+                <input type="text" name="nom"
+                       value="{{ prospect.nom }}"
+                       class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Téléphone</label>
+                <input type="text" name="telephone"
+                       value="{{ prospect.telephone }}"
+                       class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" name="email"
+                       value="{{ prospect.email }}"
+                       class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Statut</label>
+                <select name="statut" class="form-control">
+                    <option value="nouveau" {% if prospect.statut == "nouveau" %}selected{% endif %}>Nouveau</option>
+                    <option value="en_cours" {% if prospect.statut == "en_cours" %}selected{% endif %}>En cours</option>
+                    <option value="converti" {% if prospect.statut == "converti" %}selected{% endif %}>Converti</option>
+                    <option value="perdu" {% if prospect.statut == "perdu" %}selected{% endif %}>Perdu</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary">
+                Sauvegarder
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'main.html' %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container mt-4">
+
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                Modifier Type Contrat
+            </div>
+
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label>Nom</label>
+                        <input type="text" name="nom" value="{{ type.nom }}" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control">{{ type.description }}</textarea>
+                    </div>
+
+                    <button class="btn btn-warning">Modifier</button>
+                    <a href="{% url 'type_contrat:liste_type' %}" class="btn btn-secondary">Retour</a>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

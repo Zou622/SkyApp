@@ -1,0 +1,185 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container mt-4">
+
+        <!-- AFFICHAGE DES MESSAGES -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas 
+                        {% if message.tags == 'success' %}fa-check-circle
+                        {% elif message.tags == 'error' %}fa-exclamation-circle
+                        {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                        {% else %}fa-info-circle{% endif %} me-2">
+                    </i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card shadow">
+
+            <!-- HEADER -->
+            <div class="card-header bg-info text-white">
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h4 class="mb-0">
+                        {% if prospect %}
+                            <i class="fas fa-edit me-2"></i>
+                            Modifier un Prospect
+                        {% else %}
+                            <i class="fas fa-user-plus me-2"></i>
+                            Nouveau Prospect
+                        {% endif %}
+                    </h4>
+
+                    <a href="{% url 'prospects:list_prospects' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body">
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="row">
+
+                        <!-- GAUCHE -->
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nom *</label>
+                                <input type="text"
+                                       name="nom"
+                                       class="form-control"
+                                       value="{{ prospect.nom|default:'' }}"
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Téléphone</label>
+                                <input type="text"
+                                       name="telephone"
+                                       class="form-control"
+                                       value="{{ prospect.telephone|default:'' }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email"
+                                       name="email"
+                                       class="form-control"
+                                       value="{{ prospect.email|default:'' }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Quartier</label>
+                                <input type="text"
+                                       name="quartier"
+                                       class="form-control"
+                                       value="{{ prospect.quartier|default:'' }}">
+                            </div>
+
+                        </div>
+
+                        <!-- DROITE -->
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+                                <label class="form-label">Adresse</label>
+                                <textarea name="adresse"
+                                          class="form-control"
+                                          rows="3">{{ prospect.adresse|default:'' }}</textarea>
+                            </div>
+
+                            <!-- STATUT -->
+                            <div class="mb-3">
+                                <label class="form-label">Statut</label>
+                                <select name="statut" class="form-control">
+
+                                    {% for value,label in statuts %}
+                                        <option value="{{ value }}"
+                                            {% if prospect.statut == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+
+                            <!-- COMMERCIAL -->
+                            {% if not is_commercial %}
+                            <div class="mb-3">
+                                <label class="form-label">Commercial</label>
+
+                                <select name="commercial" class="form-control">
+                                    <option value="">-- Aucun --</option>
+
+                                    {% for c in commercials %}
+                                        <option value="{{ c.id }}"
+                                            {% if prospect.commercial_id == c.id %}selected{% endif %}>
+                                            {{ c.prenom }} {{ c.nom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="mt-4 border-top pt-3 d-flex justify-content-between">
+
+                        <a href="{% url 'prospects:list_prospects' %}" class="btn btn-secondary">
+                            Annuler
+                        </a>
+
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-save me-1"></i>
+
+                            {% if prospect %}
+                                Modifier
+                            {% else %}
+                                Enregistrer
+                            {% endif %}
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- JavaScript pour fermer automatiquement les messages après 5 secondes -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-fermeture des messages après 5 secondes
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+
+{% endblock %}

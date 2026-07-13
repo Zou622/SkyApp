@@ -1,0 +1,63 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <div class="card card-outline card-primary shadow">
+            <!-- Header -->
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-edit mr-2"></i>
+                    Gestion des Champs
+                </h4>
+            </div>
+
+            <!-- Formulaire Ajout -->
+            <div class="card-body">
+                <form method="POST" action="{% url 'rapportActivites:admin_champs' %}">
+                    {% csrf_token %}
+
+                    <!-- Choix du typeActivites depuis Activite -->
+                    <div class="form-group">
+                        <label for="typeActivites">Type d'activité :</label>
+                        <select class="form-control" name="typeActivites" id="typeActivites" required>
+                            <option value="" disabled selected>-- Sélectionner un type --</option>
+                            {% for activite in activites %}
+                                <option value="{{ activite.typeActivites }}">{{ activite.typeActivites }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Nom du champ -->
+                    <div class="form-group mt-3">
+                        <label for="nomChamp">Nom du champ :</label>
+                        <input type="text" class="form-control" name="nomChamp" id="nomChamp" required>
+                    </div>
+                    <!-- Type du champ -->
+                    <div class="form-group mt-3">
+                        <label for="typeChamp">Type du champ :</label>
+                        <input type="text" class="form-control" name="typeChamp" id="typeChamp" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3">Ajouter</button>
+                </form>
+            </div>
+
+            <!-- Liste des champs existants -->
+            <div class="card-footer">
+                <h5>Champs existants :</h5>
+                <ul>
+                    {% for champ in champs %}
+                        <li>{{ champ.nomChamp }} — {{ champ.typeActivites }}</li>
+                    {% empty %}
+                        <li>Aucun champ enregistré.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

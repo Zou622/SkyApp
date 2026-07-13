@@ -1,0 +1,159 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <div class="card shadow-lg border-0">
+
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h4 class="mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Liste des Évaluations
+                    </h4>
+
+                    <a href="{% url 'evaluations:ajouter_evaluation' %}"
+                       class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-1"></i>
+                        Ajouter
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="card-body p-0">
+
+                {% if evaluations %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Employé</th>
+                                <th>Objectif</th>
+                                <th>Date</th>
+                                <th>Score</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% for e in evaluations %}
+                            <tr>
+
+                                <!-- EMPLOYÉ -->
+                                <td>
+                                    <div class="fw-bold text-dark">
+                                        {{ e.employe }}
+                                    </div>
+                                </td>
+
+                                <!-- OBJECTIF -->
+                                <td>
+                                    <span class="text-dark">
+                                        {{ e.objectif }}
+                                    </span>
+                                </td>
+
+                                <!-- DATE -->
+                                <td>
+                                    {{ e.date_evaluation }}
+                                </td>
+
+                                <!-- SCORE -->
+                                <td>
+                                    <span class="badge bg-success">
+                                        {{ e.score_total }}
+                                    </span>
+                                </td>
+
+                                <!-- ACTIONS -->
+                                <td class="text-center">
+
+                                    <div class="btn-group">
+
+                                        <a href="{% url 'evaluations:detail_evaluation' e.pk %}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <a href="{% url 'evaluations:modifier_evaluation' e.pk %}"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                onclick="confirmDelete('{% url 'evaluations:supprimer_evaluation' e.pk %}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+
+                {% else %}
+
+                <!-- EMPTY STATE -->
+                <div class="text-center py-5">
+                    <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Aucune évaluation trouvée</h5>
+                    <p class="text-muted">Ajoutez une première évaluation pour commencer.</p>
+
+                    <a href="{% url 'evaluations:ajouter_evaluation' %}"
+                       class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>
+                        Ajouter une évaluation
+                    </a>
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= SWEETALERT ================= -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmDelete(url) {
+
+    Swal.fire({
+        title: "Supprimer cette évaluation ?",
+        text: "Cette action est irréversible !",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Oui, supprimer",
+        cancelButtonText: "Annuler"
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+
+    });
+
+}
+</script>
+
+{% endblock %}

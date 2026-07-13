@@ -1,0 +1,74 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="container mt-4">
+    <h3>Modifier la Base Station : {{ bs.nom }}</h3>
+    <form id="formModification" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Enregistrer
+        </button>
+        <a href="{% url 'base_stations:liste_base_stations' %}" class="btn btn-secondary">
+            Annuler
+        </a>
+        <button type="button" class="btn btn-danger" onclick="confirmerSuppression({{ bs.id }}, '{{ bs.nom_bs }}')">
+            <i class="fas fa-trash me-1"></i> Supprimer
+        </button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+// Confirmation avant la modification
+document.getElementById('formModification').addEventListener('submit', function(e){
+    e.preventDefault(); // Empêche le submit direct
+    Swal.fire({
+        title: 'Confirmer la modification',
+        text: `Voulez-vous vraiment modifier la Base Station "${{ bs.nom }}" ?`,
+        icon: 'information',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Oui, modifier',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if(result.isConfirmed){
+            this.submit(); // soumet le formulaire
+        }
+    })
+});
+
+// Confirmation avant suppression
+function confirmerSuppression(id, nom){
+    Swal.fire({
+        title: 'Confirmer la suppression',
+        text: `Voulez-vous vraiment supprimer la Base Station "${{ bs.nom }}" ?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Oui, supprimer',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if(result.isConfirmed){
+            window.location.href = "{% url 'base_stations:supprimer_base_station' 0 %}".replace('0', id);
+        }
+    })
+}
+
+// Messages Django avec SweetAlert
+{% if messages %}
+    {% for message in messages %}
+        Swal.fire({
+            icon: "{% if message.tags == 'success' %}success{% else %}error{% endif %}",
+            title: "{{ message }}",
+            showConfirmButton: false,
+            timer: 2000
+        });
+    {% endfor %}
+{% endif %}
+</script>
+{% endblock %}

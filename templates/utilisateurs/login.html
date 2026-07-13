@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="login-page">
+
+    <div class="login-container">
+
+        <!-- LEFT -->
+        <div class="login-left">
+            <div class="overlay"></div>
+
+            <div class="left-content">
+                <h2>SkyApp</h2>
+                <p>Plateforme de gestion des activités</p>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="login-right">
+
+            <div class="login-box">
+
+                <h3>Connexion</h3>
+                <p class="subtitle">Accédez à votre espace sécurisé</p>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" id="loginForm">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        {{ form.username }}
+                    </div>
+
+                    <div class="form-group password-group">
+                        {{ form.password }}
+                        <span id="togglePassword">👁</span>
+                    </div>
+
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <span class="btn-text">Se connecter</span>
+                        <span class="btn-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Connexion...
+                        </span>
+                    </button>
+                </form>
+
+                <div class="extra-links">
+                    <button id="resetPasswordBtn" class="btn-reset">
+                        🔒 Mot de passe oublié ?
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+/* GLOBAL */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: "Segoe UI", sans-serif;
+    background: #eef2f7;
+}
+
+/* PAGE */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* CONTAINER */
+.login-container {
+    display: flex;
+    width: 100%;
+    max-width: 1050px;
+    min-height: 580px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* LEFT */
+.login-left {
+    width: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+}
+
+/* IMAGE NON ZOOMÉE */
+.login-left::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("{% static 'dist/img/New_logo.jpg.jpeg' %}") center no-repeat;
+    background-size: contain; /* 🔥 correction zoom */
+    opacity: 0.25;
+}
+
+/* overlay */
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.15);
+}
+
+/* TEXTE */
+.left-content {
+    position: relative;
+    text-align: center;
+    color: white;
+    margin-top: 50px;
+    z-index: 2;
+}
+
+.left-content h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.left-content p {
+    font-size: 14px;
+}
+
+/* RIGHT */
+.login-right {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 380px;
+}
+
+h3 {
+    font-size: 28px;
+}
+
+.subtitle {
+    color: #64748b;
+    margin-bottom: 25px;
+}
+
+/* INPUT */
+.form-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 13px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.form-group input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.password-group span {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+}
+
+/* BUTTON */
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+
+.btn-loading {
+    display: none;
+}
+
+/* RESET */
+.extra-links {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.btn-reset {
+    border: none;
+    background: transparent;
+    color: #3b82f6;
+    cursor: pointer;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    .login-container {
+        flex-direction: column;
+        box-shadow: none;
+    }
+
+    .login-left {
+        width: 100%;
+        min-height: 160px;
+    }
+
+    .login-right {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .login-box {
+        max-width: 100%;
+    }
+}
+
+</style>
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("loginForm");
+    const btn = document.getElementById("loginBtn");
+    const text = document.querySelector(".btn-text");
+    const loading = document.querySelector(".btn-loading");
+
+    form.addEventListener("submit", function () {
+        btn.disabled = true;
+        text.style.display = "none";
+        loading.style.display = "inline-block";
+    });
+
+    // Version Django avec id généré dynamiquement
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordInput = document.querySelector("#{{ form.password.id_for_label }}"); // ou "#id_password"
+
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener("click", function () {
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            this.textContent = isPassword ? "🙈" : "👁️";
+            passwordInput.focus();
+        });
+    }
+
+    document.getElementById('resetPasswordBtn').addEventListener('click', function () {
+
+        Swal.fire({
+            title: 'Mot de passe oublié',
+            input: 'email',
+            showCancelButton: true,
+            confirmButtonText: 'Envoyer'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Envoi...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch("{% url 'users:password_reset_request' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: new URLSearchParams({
+                        email: result.value
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    Swal.fire(data.status === 'success' ? 'Succès' : 'Erreur', data.message);
+                });
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}
+
+{% endblock %}

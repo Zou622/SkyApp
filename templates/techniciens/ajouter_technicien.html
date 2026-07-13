@@ -1,0 +1,153 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block contenu %}
+<div class="content-wrapper">
+    <div class="container mt-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i> Ajouter un Nouveau Technicien
+                </h4>
+            </div>
+            
+            <div class="card-body">
+                <form method="post" action="{% url 'enregistrer_technicien' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Messages d'erreur -->
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="row">
+                        <!-- Colonne 1: Sélection employé -->
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold">
+                                <i class="fas fa-users me-2"></i> Sélection de l'employé
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Employé *</label>
+                                {% if employes %}
+                                <select name="employe_id" class="form-select" required>
+                                    <option value="">-- Choisir un employé --</option>
+                                    {% for employe in employes %}
+                                    <option value="{{ employe.id }}" data-fonction="{{ employe.fonction }}" data-fonction-label="{{ employe.get_fonction_display }}">
+                                        {{ employe.nom }} {{ employe.prenom }} ({{ employe.matricule }})
+                                        {% if employe.fonction %} - {{ employe.get_fonction_display }}{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <select name="employe_id" class="form-select" disabled>
+                                    <option value="">Aucun employé disponible</option>
+                                </select>
+                                <div class="alert alert-warning mt-2 mb-0">
+                                    <small>Aucun employé disponible. <a href="{% url 'employes:ajouter_employe' %}">Créer un employé</a> d'abord.</small>
+                                </div>
+                                {% endif %}
+                            </div>
+
+
+                        </div>
+                        
+                        <!-- Colonne 2: Informations professionnelles -->
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2 mb-3 text-primary fw-bold">
+                                <i class="fas fa-briefcase me-2"></i> Informations Professionnelles
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Statut *</label>
+                                <select class="form-select" name="statut" required>
+                                    <option value="">-- Choisir un statut --</option>
+                                    <option value="actif">Actif</option>
+                                    <option value="inactif">Inactif</option>
+                                    <option value="congé">En congé</option>
+                                    <option value="mission">En mission</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 border-top pt-3">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'list_technicien' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i> Enregistrer le technicien
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const employeSelect = form.querySelector('select[name="employe_id"]');
+
+    form.addEventListener('submit', function(e) {
+        const selectedOption = employeSelect.options[employeSelect.selectedIndex];
+        const fonction = selectedOption ? selectedOption.dataset.fonction : '';
+        const fonctionLabel = selectedOption ? selectedOption.dataset.fonctionLabel : '';
+        const emailInput = document.querySelector('input[name="email"]');
+        const email = emailInput ? emailInput.value.trim() : '';
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!employeSelect.value) {
+            e.preventDefault();
+            alert('Veuillez sélectionner un employé.');
+            return false;
+        }
+
+        if (fonction && fonction !== 'technicien') {
+            const label = fonctionLabel || fonction || 'une autre fonction';
+            const confirmation = confirm(`Attention : cet employé est déjà affecté à la fonction "${label}". Voulez-vous le basculer en technicien ?`);
+            if (!confirmation) {
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        if (email !== "" && !emailRegex.test(email)) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Email invalide',
+                text: 'Veuillez entrer une adresse email valide.',
+            });
+            return false;
+        }
+
+        return true;
+    });
+});
+</script>
+{% endblock contenu %}

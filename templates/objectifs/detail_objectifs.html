@@ -1,0 +1,146 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <div class="card shadow-lg border-0 rounded-4">
+
+            <!-- HEADER -->
+            <div class="card-header bg-gradient bg-info text-white py-3 rounded-top-4">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h4 class="mb-0">
+                        <i class="fas fa-bullseye me-2"></i>
+                        Détail de l’objectif
+                    </h4>
+
+                    <div class="d-flex gap-2">
+
+                        <a href="{% url 'objectifs:liste_objectif' %}"
+                           class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour
+                        </a>
+
+                        <a href="{% url 'objectifs:modifier_objectif' objectif.id %}"
+                           class="btn btn-warning btn-sm text-white">
+                            <i class="fas fa-edit me-1"></i>
+                            Modifier
+                        </a>
+
+                        <a href="{% url 'objectifs:supprimer_objectif' objectif.id %}"
+                           class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash me-1"></i>
+                            Supprimer
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body p-4">
+
+                <div class="row g-4">
+
+                    <!-- LEFT -->
+                    <div class="col-md-6">
+
+                        <div class="card border-0 shadow-sm h-100 rounded-4">
+
+                            <div class="card-header bg-light rounded-top-4">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    Informations générales
+                                </h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="mb-4">
+                                    <small class="text-muted">Employé</small>
+                                    <h5 class="fw-bold text-dark mb-0">
+                                        {{ objectif.employe }}
+                                    </h5>
+                                </div>
+
+                                <div class="mb-4">
+                                    <small class="text-muted">Titre</small>
+                                    <h6 class="text-dark mb-0">
+                                        {{ objectif.titre }}
+                                    </h6>
+                                </div>
+
+                                <div>
+                                    <small class="text-muted">Description</small>
+                                    <div class="p-3 bg-light rounded-3 mt-1">
+                                        {{ objectif.description }}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT -->
+                    <div class="col-md-6">
+
+                        <div class="card border-0 shadow-sm h-100 rounded-4">
+
+                            <div class="card-header bg-light rounded-top-4">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chart-line text-success me-2"></i>
+                                    Suivi de performance
+                                </h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                <!-- PÉRIODE -->
+                                <div class="mb-4">
+                                    <small class="text-muted">Période</small>
+                                    <div class="fw-bold">
+                                        {{ objectif.date_debut }} → {{ objectif.date_fin }}
+                                    </div>
+                                </div>
+
+                                <!-- STATUT -->
+                                
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card-footer bg-light d-flex justify-content-between rounded-bottom-4">
+
+                <span class="text-muted">
+                    ID: #{{ objectif.id }}
+                </span>
+
+                <span class="text-muted">
+                    SkyApp • Système RH
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

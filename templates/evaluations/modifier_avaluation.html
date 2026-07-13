@@ -1,0 +1,229 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block contenu %}
+
+<div class="content-wrapper">
+    <div class="container-fluid mt-4">
+
+        <div class="card shadow-lg border-0">
+
+            <!-- HEADER -->
+            <div class="card-header bg-gradient bg-warning text-white py-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Modifier l’évaluation
+                    </h4>
+
+                    <a href="{% url 'evaluations:liste_evaluations' %}"
+                       class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Retour
+                    </a>
+
+                </div>         
+
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body p-4">
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+
+                        <!-- LEFT -->
+                        <div class="col-md-6">
+
+                            <div class="card border-0 shadow-sm h-100">
+
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user text-primary me-2"></i>
+                                        Informations générales
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <!-- EMPLOYÉ -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Employé</label>
+                                        <select name="employe" class="form-select" id="employe">
+                                            {% for emp in employes %}
+                                                <option value="{{ emp.id }}"
+                                                    {% if emp.id == evaluation.employe.id %}selected{% endif %}>
+                                                    {{ emp }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <!-- OBJECTIF -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Objectif</label>
+                                        <select name="objectif" class="form-select" id="objectif">
+                                            {% for obj in objectifs %}
+                                                <option value="{{ obj.id }}"
+                                                    {% if obj.id == evaluation.objectif.id %}selected{% endif %}>
+                                                    {{ obj.titre }}
+                                                </option>
+                                            {% endfor %}
+                                        </select> 
+                                    </div>
+
+                                    <!-- COMMENTAIRE -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Commentaire</label>
+                                        <textarea name="commentaire"
+                                                  class="form-control"
+                                                  rows="5"
+                                                  placeholder="Ajouter un commentaire...">{{ evaluation.commentaire }}</textarea>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT -->
+                        <div class="col-md-6">
+
+                            <div class="card border-0 shadow-sm h-100">
+
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-chart-line text-success me-2"></i>
+                                        Critères d’évaluation
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="row g-3">
+
+                                        <!-- PONCTUALITÉ -->
+                                        <div class="col-4 text-center">
+                                            <label class="form-label">Ponctualité</label>
+                                            <input type="number"
+                                                   name="ponctualite"
+                                                   id="ponctualite"
+                                                   class="form-control text-center"
+                                                   min="0" max="10"
+                                                   value="{{ evaluation.ponctualite }}">
+                                        </div>
+
+                                        <!-- DISCIPLINE -->
+                                        <div class="col-4 text-center">
+                                            <label class="form-label">Discipline</label>
+                                            <input type="number"
+                                                   name="discipline"
+                                                   id="discipline"
+                                                   class="form-control text-center"
+                                                   min="0" max="10"
+                                                   value="{{ evaluation.discipline }}">
+                                        </div>
+
+                                        <!-- PERFORMANCE -->
+                                        <div class="col-4 text-center">
+                                            <label class="form-label">Performance</label>
+                                            <input type="number"
+                                                   name="performance"
+                                                   id="performance"
+                                                   class="form-control text-center"
+                                                   min="0" max="10"
+                                                   value="{{ evaluation.performance }}">
+                                        </div>
+
+                                    </div>
+
+                                    <!-- SCORE -->
+                                    <div class="text-center mt-4">
+
+                                        <div class="p-3 bg-dark text-white rounded-3">
+
+                                            <small>Score total</small>
+
+                                            <h3 id="scoreTotal" class="mb-0">
+                                                {{ evaluation.score_total }}
+                                            </h3>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="d-flex justify-content-between mt-4">
+
+                        <a href="{% url 'evaluations:liste_evaluations' %}"
+                           class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-1"></i>
+                            Mettre à jour
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- STYLE -->
+<style>
+.form-control, .form-select {
+    border-radius: 10px;
+}
+
+.card {
+    border-radius: 14px;
+}
+</style>
+
+<!-- JS SCORE LIVE -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const p = document.getElementById("ponctualite");
+    const d = document.getElementById("discipline");
+    const pr = document.getElementById("performance");
+    const score = document.getElementById("scoreTotal");
+
+    function updateScore() {
+        let total = (parseFloat(p.value || 0) +
+                     parseFloat(d.value || 0) +
+                     parseFloat(pr.value || 0)) / 3;
+
+        score.innerText = total.toFixed(2);
+    }
+
+    [p, d, pr].forEach(el => {
+        el.addEventListener("input", updateScore);
+    });
+
+});
+</script>
+
+{% endblock %}
