@@ -60,11 +60,23 @@ class UserRegistrationForm(UserCreationForm):
         max_length=30,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
+<<<<<<< HEAD
+=======
+    telephone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email',
+<<<<<<< HEAD
                   'user_type', 'password1', 'password2')
+=======
+                  'user_type', 'telephone', 'password1', 'password2')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -75,8 +87,11 @@ class UserRegistrationForm(UserCreationForm):
 
 
 User = get_user_model()
+<<<<<<< HEAD
 from employes.models import Employe
 
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 class UserProfileForm(forms.ModelForm):
     password = forms.CharField(
         required=False,
@@ -85,6 +100,7 @@ class UserProfileForm(forms.ModelForm):
     )
 
     class Meta:
+<<<<<<< HEAD
         model = Employe
         fields = ['nom', 'prenom', 'email', 'telephone', 'adresse', 'quartier', 'photo']
 
@@ -104,6 +120,18 @@ class UserProfileForm(forms.ModelForm):
         if commit:
             employe.save()
         return employe
+=======
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'telephone', 'photo', 'password']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get("password")
+
+        # 🔹 Ne changer le mot de passe que si un mot de passe est saisi
+        if password:
+            user.set_password(password)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         # Sinon on conserve l'ancien mot de passe
 
         if commit:
@@ -127,7 +155,13 @@ class UserProfileForm1(forms.ModelForm):
             "first_name",
             "last_name",
             "email",
+<<<<<<< HEAD
             "user_type",
+=======
+            "telephone",
+            "user_type",
+            "photo",
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
             "password"
         ]
 
@@ -165,6 +199,11 @@ class UserProfileForm(forms.ModelForm):
             'first_name',
             'last_name',
             'email',
+<<<<<<< HEAD
+=======
+            'telephone',
+            'photo'
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         ]
 
         labels = {
@@ -172,6 +211,11 @@ class UserProfileForm(forms.ModelForm):
             'first_name': "Prénom",
             'last_name': "Nom",
             'email': "Email",
+<<<<<<< HEAD
+=======
+            'telephone': "Téléphone",
+            'photo': "Photo de profil",
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         }
 
         widgets = {
@@ -179,6 +223,11 @@ class UserProfileForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
             'email': forms.EmailInput(attrs={'class': 'form-control form-control-sm'}),
+<<<<<<< HEAD
+=======
+            'telephone': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
+            'photo': forms.FileInput(attrs={'class': 'form-control form-control-sm'}),
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         }
 
 

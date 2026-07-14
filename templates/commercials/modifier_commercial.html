@@ -37,7 +37,11 @@
                                 <input type="text" 
                                        name="nom" 
                                        class="form-control" 
+<<<<<<< HEAD
                                        value="{{ commercial.employe.nom }}"
+=======
+                                       value="{{ commercial.nom }}"
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                        required>
                             </div>
                             
@@ -47,7 +51,11 @@
                                 <input type="text" 
                                        name="prenom" 
                                        class="form-control" 
+<<<<<<< HEAD
                                        value="{{ commercial.employe.prenom }}"
+=======
+                                       value="{{ commercial.prenom }}"
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                        required>
                             </div>
                             
@@ -57,7 +65,11 @@
                                 <input type="text" 
                                        name="telephone" 
                                        class="form-control" 
+<<<<<<< HEAD
                                        value="{{ commercial.employe.telephone }}">
+=======
+                                       value="{{ commercial.telephone }}">
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                             </div>
                             
                             <!-- Email -->
@@ -66,7 +78,11 @@
                                 <input type="email" 
                                        name="email" 
                                        class="form-control" 
+<<<<<<< HEAD
                                        value="{{ commercial.employe.email|default:'' }}">
+=======
+                                       value="{{ commercial.email|default:'' }}">
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                             </div>
                         </div>
                         
@@ -76,6 +92,22 @@
                                 <i class="fas fa-briefcase me-2"></i>Informations Professionnelles
                             </h5>
                             
+<<<<<<< HEAD
+=======
+                            <!-- Spécialité -->
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold">Spécialité</label>
+                                <select name="specialite" class="form-control">
+                                    {% for code, label in specialites %}
+                                    <option value="{{ code }}" 
+                                            {% if commercial.specialite == code %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                             <!-- Taux de commission -->
                             <div class="form-group mb-3">
                                 <label class="form-label fw-bold">Taux de commission (%)</label>
@@ -94,6 +126,7 @@
                                 <input type="date" 
                                        name="date_embauche" 
                                        class="form-control" 
+<<<<<<< HEAD
                                        value="{{ commercial.employe.date_embauche|date:'Y-m-d' }}">
                             </div>
                             
@@ -104,6 +137,23 @@
                                     <option value="actif" {% if commercial.est_actif %}selected{% endif %}>Actif</option>
                                     <option value="inactif" {% if not commercial.est_actif %}selected{% endif %}>Inactif</option>
                                 </select>
+=======
+                                       value="{{ commercial.date_embauche|date:'Y-m-d' }}">
+                            </div>
+                            
+                            <!-- Statut actif -->
+                            <div class="form-group mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" 
+                                           name="est_actif" 
+                                           class="form-check-input" 
+                                           id="est_actif" 
+                                           {% if commercial.est_actif %}checked{% endif %}>
+                                    <label class="form-check-label fw-bold" for="est_actif">
+                                        Commercial actif
+                                    </label>
+                                </div>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                             </div>
                         </div>
                     </div>
@@ -121,7 +171,11 @@
                                 <input type="text" 
                                        name="quartier" 
                                        class="form-control" 
+<<<<<<< HEAD
                                        value="{{ commercial.employe.quartier|default:'' }}">
+=======
+                                       value="{{ commercial.quartier|default:'' }}">
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                             </div>
                         </div>
                         
@@ -135,7 +189,11 @@
                                 <label class="form-label fw-bold">Adresse</label>
                                 <textarea name="adresse" 
                                           class="form-control" 
+<<<<<<< HEAD
                                           rows="3">{{ commercial.employe.adresse|default:'' }}</textarea>
+=======
+                                          rows="3">{{ commercial.adresse|default:'' }}</textarea>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                             </div>
                         </div>
                     </div>
@@ -143,6 +201,7 @@
                     <!-- Informations complémentaires -->
                     <div class="alert alert-light border mt-4">
                         <div class="row">
+<<<<<<< HEAD
                             <div class="col-md-6">
                                 <small class="text-muted">Date de création</small>
                                 <div class="fw-bold">{{ commercial.date_creation|date:"d/m/Y H:i" }}</div>
@@ -151,6 +210,20 @@
                                 <small class="text-muted">Dernière modification</small>
                                 <div class="fw-bold">{{ commercial.date_modification|date:"d/m/Y H:i" }}</div>
                             </div>
+=======
+                            <div class="col-md-4">
+                                <small class="text-muted">Date de création</small>
+                                <div class="fw-bold">{{ commercial.date_creation|date:"d/m/Y H:i" }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Dernière modification</small>
+                                <div class="fw-bold">{{ commercial.date_modification|date:"d/m/Y H:i" }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted">Ancienneté</small>
+                                <div class="fw-bold">{{ commercial.anciennete }} an{{ commercial.anciennete|pluralize:"s" }}</div>
+                            </div>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                         </div>
                     </div>
                     

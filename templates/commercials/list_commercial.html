@@ -43,6 +43,10 @@
                                 <th width="80" class="text-center">ID</th>
                                 <th>Commercial</th>
                                 <th>Contact</th>
+<<<<<<< HEAD
+=======
+                                <th>Spécialité</th>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                 <th>Commission</th>
                                 <th>Statut</th>
                                 <th width="100" class="text-center">Actions</th>
@@ -66,11 +70,19 @@
                                             </div>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
+<<<<<<< HEAD
                                             <h6 class="mb-0">{{ commercial.employe.prenom }} {{ commercial.employe.nom }}</h6>
                                             <small class="text-muted">
                                                 {% if commercial.employe.date_embauche %}
                                                 <i class="fas fa-calendar-alt me-1"></i>
                                                 {{ commercial.employe.date_embauche|date:"d/m/Y" }}
+=======
+                                            <h6 class="mb-0">{{ commercial.prenom }} {{ commercial.nom }}</h6>
+                                            <small class="text-muted">
+                                                {% if commercial.date_embauche %}
+                                                <i class="fas fa-calendar-alt me-1"></i>
+                                                {{ commercial.date_embauche|date:"d/m/Y" }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                                 {% endif %}
                                             </small>
                                         </div>
@@ -80,13 +92,34 @@
                                 <!-- Contact -->
                                 <td>
                                     <div class="small">
+<<<<<<< HEAD
                                         <div><i class="fas fa-phone me-1 text-muted"></i> {{ commercial.employe.telephone }}</div>
                                         {% if commercial.employe.email %}
                                         <div><i class="fas fa-envelope me-1 text-muted"></i> {{ commercial.employe.email|truncatechars:20 }}</div>
+=======
+                                        <div><i class="fas fa-phone me-1 text-muted"></i> {{ commercial.telephone }}</div>
+                                        {% if commercial.email %}
+                                        <div><i class="fas fa-envelope me-1 text-muted"></i> {{ commercial.email|truncatechars:20 }}</div>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                         {% endif %}
                                     </div>
                                 </td>
 
+<<<<<<< HEAD
+=======
+                                <!-- Spécialité -->
+                                <td>
+                                    <span class="badge
+                                        {% if commercial.specialite == 'reseau' %}bg-primary
+                                        {% elif commercial.specialite == 'vente' %}bg-warning text-dark
+                                        {% elif commercial.specialite == 'technique' %}bg-info
+                                        {% elif commercial.specialite == 'gestion' %}bg-secondary
+                                        {% else %}bg-light text-dark{% endif %}">
+                                        {{ commercial.get_specialite_display }}
+                                    </span>
+                                </td>
+
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                 <!-- Commission -->
                                 <td>
                                     <span class="fw-bold text-success">{{ commercial.taux_commission }}%</span>
@@ -139,7 +172,11 @@
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
+<<<<<<< HEAD
                                             <p>Supprimer le commercial <strong>"{{ commercial.employe.prenom }} {{ commercial.employe.nom }}"</strong> ?</p>
+=======
+                                            <p>Supprimer le commercial <strong>"{{ commercial.prenom }} {{ commercial.nom }}"</strong> ?</p>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                             <p class="text-danger"><small>Cette action est irréversible !</small></p>
                                         </div>
                                         <div class="modal-footer">

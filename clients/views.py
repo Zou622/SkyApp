@@ -142,7 +142,11 @@ def list_client(request):
     user = request.user
 
     # 🔐 Détection du commercial (CORRECT)
+<<<<<<< HEAD
     commercial = Commercial.objects.filter(employe__user_account=user).first()
+=======
+    commercial = Commercial.objects.filter(user_account=user).first()
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     is_commercial = commercial is not None
 
     # ================= BASE QUERY =================
@@ -285,7 +289,11 @@ def modifier_client(request, client_id):
         return redirect('clients:list_client')
 
     # ================= DATA POUR FORM =================
+<<<<<<< HEAD
     commerciaux = Commercial.objects.all().order_by('employe__nom', 'employe__prenom')
+=======
+    commerciaux = Commercial.objects.all().order_by('nom', 'prenom')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     base_stations = BaseStation.objects.all().order_by('nom')
     types_contrat = TypeContrat.objects.all().order_by('nom')
 
@@ -310,7 +318,11 @@ def supprimer_client(request, client_id):
     
     # Vérifier si l'utilisateur a le droit de supprimer ce client
     user = request.user
+<<<<<<< HEAD
     commercial = Commercial.objects.filter(employe__user_account=user).first()
+=======
+    commercial = Commercial.objects.filter(user_account=user).first()
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     
     # Si c'est un commercial, vérifier que le client lui appartient
     if commercial and client.commercial != commercial:
@@ -362,7 +374,11 @@ def voir_pdf(request, client_id):
 def ajouter_activite_avec_client(request, client_id):
 
     client = get_object_or_404(Client, id=client_id)
+<<<<<<< HEAD
     techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
+=======
+    techniciens = Technicien.objects.all().order_by('nom', 'prenom')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     if request.method == "POST":
 
@@ -458,7 +474,11 @@ def ajouter_activite(request):
         statut = request.POST.get('statut', 'planifie')
 
         try:
+<<<<<<< HEAD
             client = Client.objects.filter(id=client_id, est_supprime=False).get()
+=======
+            client = Client.objects.get(id=client_id)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
             # 1️Créer l'activité SANS technicien
             activite = Activite.objects.create(
@@ -487,8 +507,13 @@ def ajouter_activite(request):
         except Exception as e:
             messages.error(request, f'Erreur: {str(e)}')
 
+<<<<<<< HEAD
     clients = Client.objects.filter(est_supprime=False).order_by('nom_client')
     techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
+=======
+    clients = Client.objects.all().order_by('nom_client')
+    techniciens = Technicien.objects.all().order_by('nom', 'prenom')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     return render(request, 'clients/ajouter_activite.html',{
         'clients': clients,
@@ -505,6 +530,7 @@ def list_activite(request):
     # 🔐 Si technicien → il ne voit que ses activités
     if request.user.user_type.lower() == "technicien":
 
+<<<<<<< HEAD
         # ✅ CORRECTED: Access technicien_profile through employe relationship
         # Original code (commented): if not hasattr(request.user, "technicien"):
         # Original code (commented):     return redirect("dashboard")
@@ -522,6 +548,20 @@ def list_activite(request):
     else:
         # Admin / Superviseur / Commercial
         activites_list = Activite.objects.all().select_related('rapport', 'client')
+=======
+        if not hasattr(request.user, "technicien"):
+            return redirect("dashboard")
+
+        technicien = request.user.technicien
+
+        activites_list = Activite.objects.filter(
+            techniciens=technicien
+        )
+
+    else:
+        # Admin / Superviseur / Commercial
+        activites_list = Activite.objects.all()
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
 
     """Liste toutes les activités"""
@@ -664,11 +704,14 @@ def modifier_activite(request, pk):
         pk=pk
     )
 
+<<<<<<< HEAD
     # 🔒 INTERDIRE LA MODIFICATION D'ACTIVITÉS TERMINÉES
     if activite.statut == 'termine':
         messages.error(request, "❌ Impossible de modifier une activité terminée.")
         return redirect('clients:detail_activite', pk=activite.pk)
 
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     if request.method == 'POST':
 
         client_id = request.POST.get('client_id')
@@ -692,7 +735,11 @@ def modifier_activite(request, pk):
             return redirect('clients:modifier_activite', pk=activite.pk)
 
         try:
+<<<<<<< HEAD
             activite.client = Client.objects.filter(id=client_id, est_supprime=False).get()
+=======
+            activite.client = Client.objects.get(id=client_id)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
             activite.type_activite = type_activite
             activite.date_activite = date_activite
             activite.heure_debut = heure_debut or None
@@ -713,8 +760,13 @@ def modifier_activite(request, pk):
             messages.error(request, f'Erreur: {str(e)}')
 
     # GET
+<<<<<<< HEAD
     clients = Client.objects.filter(est_supprime=False).order_by('nom_client')
     techniciens = Technicien.objects.all().order_by('employe__nom', 'employe__prenom')
+=======
+    clients = Client.objects.all().order_by('nom_client')
+    techniciens = Technicien.objects.all().order_by('nom', 'prenom')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     context = {
         'activite': activite,
@@ -803,12 +855,16 @@ def mes_activites(request):
     # =========================
     if user.user_type == "technicien":
 
+<<<<<<< HEAD
         # ✅ CORRECTED: Access technicien_profile through employe relationship
         # Original code (commented): technicien = getattr(user, 'technicien', None)
         
         technicien = None
         if user.employe and hasattr(user.employe, 'technicien_profile'):
             technicien = user.employe.technicien_profile
+=======
+        technicien = getattr(user, 'technicien', None)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
         if not technicien:
             return HttpResponseForbidden(
@@ -838,6 +894,7 @@ def modifier_rapport(request, rapport_id):
     rapport = get_object_or_404(RapportActivite, id=rapport_id)
     activite = rapport.activite
 
+<<<<<<< HEAD
     # 🔒 sécurité : seul le technicien qui a créé le rapport peut modifier
     technicien = Technicien.objects.filter(employe__user_account=request.user).first()
     if not technicien:
@@ -848,6 +905,15 @@ def modifier_rapport(request, rapport_id):
     if rapport.technicien != technicien:
         messages.error(request, "❌ Vous n'êtes pas l'auteur de ce rapport. Vous ne pouvez pas le modifier.")
         return redirect('clients:mes_activites')
+=======
+    # 🔒 sécurité : seul le technicien peut modifier
+    technicien = Technicien.objects.filter(user=request.user).first()
+    if not technicien:
+        return redirect('rapportActivites:liste_activites_technicien')
+
+    if rapport.technicien != technicien:
+        return redirect('rapportActivites:liste_activites_technicien')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     if request.method == "POST":
 

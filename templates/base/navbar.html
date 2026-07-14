@@ -31,9 +31,14 @@
 
             <ul class="dropdown-menu dropdown-menu-end shadow">
 
+<<<<<<< HEAD
                 {% if user.user_type == "admin" or user.user_type == "rh" %}
 
                     {% if user.user_type == "admin" %}
+=======
+                {% if user.user_type == "admin" %}
+
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                     <li>
                         <a class="dropdown-item" href="{% url 'users:register' %}">
                             <i class="fas fa-user-plus me-2 text-primary"></i>
@@ -61,6 +66,7 @@
                             Types de contrats
                         </a>
                     </li>
+<<<<<<< HEAD
                     {% endif %}
 
                     <li>
@@ -70,6 +76,8 @@
                         </a>
                     </li>
                     
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
                 {% endif %}
 
@@ -198,6 +206,7 @@
 
                 {% endif %}
 
+<<<<<<< HEAD
                 <!-- RESSOURCES HUMAINES -->
                 {% if user.user_type == "admin" or user.user_type == "rh" %}
 
@@ -227,6 +236,8 @@
 
                 {% endif %}
 
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                 <!-- COMMERCIAL -->
                 {% if user.user_type == "commercial" %}
 
@@ -266,7 +277,10 @@
                             <p>Mes activités</p>
                         </a>
                     </li>
+<<<<<<< HEAD
                     
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
                 {% endif %}
 

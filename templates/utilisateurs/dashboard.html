@@ -86,7 +86,11 @@
                 <div class="d-flex justify-content-between border-bottom py-2">
                     <span>
                         <i class="fas fa-user me-2"></i>
+<<<<<<< HEAD
                         {{ c.commercial__employe__nom }} {{ c.commercial__employe__prenom }}
+=======
+                        {{ c.commercial__nom }} {{ c.commercial__prenom }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                     </span>
                     <span class="badge bg-success">{{ c.total }}</span>
                 </div>
@@ -122,6 +126,7 @@
         {% endif %}
 
         <!-- ============================= -->
+<<<<<<< HEAD
         <!-- RESSOURCES HUMAINES -->
         <!-- ============================= -->
         {% if user.user_type == "admin" or user.user_type == "rh" %}
@@ -214,6 +219,8 @@
         {% endif %}
 
         <!-- ============================= -->
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         <!-- COMMERCIAL -->
         <!-- ============================= -->
         {% if user.user_type == "commercial" %}

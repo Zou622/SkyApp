@@ -66,10 +66,14 @@ def demarrer_activite(request, activite_id):
     activite = get_object_or_404(Activite, id=activite_id)
 
     try:
+<<<<<<< HEAD
         # ✅ CORRECTED: Query technicien through employe.user_account relationship
         # Original code (commented): technicien = Technicien.objects.get(user=request.user)
         
         technicien = Technicien.objects.get(employe__user_account=request.user)
+=======
+        technicien = Technicien.objects.get(user=request.user)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     except Technicien.DoesNotExist:
         messages.error(request, "Vous n'êtes pas enregistré comme technicien")
         return redirect('clients:mes_activites')
@@ -103,19 +107,26 @@ def creer_rapport(request, activite_id):
 
     # 🔥 récupérer technicien connecté
     try:
+<<<<<<< HEAD
         # ✅ CORRECTED: Query technicien through employe.user_account relationship
         # Original code (commented): technicien = Technicien.objects.get(user=request.user)
         
         technicien = Technicien.objects.get(employe__user_account=request.user)
+=======
+        technicien = Technicien.objects.get(user=request.user)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     except Technicien.DoesNotExist:
         messages.error(request, "Aucun technicien associé à votre compte. Contactez l'administrateur.")
         return redirect('clients:mes_activites')
 
+<<<<<<< HEAD
     # 🔒 VÉRIFIER QUE LE TECHNICIEN PARTICIPE À L'ACTIVITÉ
     if technicien not in activite.techniciens.all():
         messages.error(request, "❌ Vous ne participez pas à cette activité. Vous ne pouvez pas créer de rapport.")
         return redirect('clients:mes_activites')
 
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     if request.method == "POST":
 
         form = RapportActiviteForm(

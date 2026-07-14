@@ -1,4 +1,5 @@
 from django import forms
+<<<<<<< HEAD
 from .models import Employe, Poste
 
 
@@ -12,12 +13,16 @@ class PosteForm(forms.ModelForm):
         labels = {
             'nom': 'Poste *',
         }
+=======
+from .models import Employe
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
 
 class EmployeForm(forms.ModelForm):
 
     class Meta:
         model = Employe
+<<<<<<< HEAD
         fields = [
             'photo',
             'nom',
@@ -98,3 +103,6 @@ class EmployeForm(forms.ModelForm):
             if field.required:
                 field.widget.attrs.setdefault('required', 'required')
 
+=======
+        fields = "__all__"
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad

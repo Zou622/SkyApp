@@ -24,7 +24,11 @@
                                         border-radius: 50%;
                                         border: 4px solid #0dcaf0;">
                             </div>
+<<<<<<< HEAD
                             <h3>{{ technicien.employe.nom }} {{ technicien.employe.prenom }}</h3>
+=======
+                            <h3>{{ technicien.nom }} {{ technicien.prenom }}</h3>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                             <span class="badge 
                                 {% if technicien.statut == 'actif' %}bg-success
                                 {% elif technicien.statut == 'inactif' %}bg-secondary
@@ -82,15 +86,25 @@
                                         <p>
                                             <i class="fas fa-envelope text-primary me-2"></i>
                                             <strong>Email:</strong><br>
+<<<<<<< HEAD
                                             <a href="mailto:{{ technicien.employe.email }}" class="text-decoration-none">
                                                 {{ technicien.employe.email }}
+=======
+                                            <a href="mailto:{{ technicien.email }}" class="text-decoration-none">
+                                                {{ technicien.email }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                             </a>
                                         </p>
                                         <p>
                                             <i class="fas fa-phone text-success me-2"></i>
                                             <strong>Téléphone:</strong><br>
+<<<<<<< HEAD
                                             <a href="tel:{{ technicien.employe.telephone }}" class="text-decoration-none">
                                                 {{ technicien.employe.telephone }}
+=======
+                                            <a href="tel:{{ technicien.telephone }}" class="text-decoration-none">
+                                                {{ technicien.telephone }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                             </a>
                                         </p>
                                     </div>
@@ -107,12 +121,20 @@
                                         <p class="mb-2">
                                             <i class="fas fa-home me-2 text-muted"></i>
                                             <strong>Adresse:</strong><br>
+<<<<<<< HEAD
                                             {{ technicien.employe.adresse|linebreaks }}
+=======
+                                            {{ technicien.adresse|linebreaks }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                         </p>
                                         <p class="mb-0">
                                             <i class="fas fa-map-pin me-2 text-muted"></i>
                                             <strong>Quartier:</strong><br>
+<<<<<<< HEAD
                                             {{ technicien.employe.quartier|default:"Non spécifié" }}
+=======
+                                            {{ technicien.quartier|default:"Non spécifié" }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                         </p>
                                     </div>
                                 </div>
@@ -127,6 +149,19 @@
                                         </h6>
                                     </div>
                                     <div class="card-body">
+<<<<<<< HEAD
+=======
+                                        <p class="mb-3">
+                                            <i class="fas fa-cogs text-warning me-2"></i>
+                                            <strong>Spécialité:</strong><br>
+                                            {% if technicien.specialite %}
+                                            <span class="badge bg-info fs-6">{{ technicien.specialite }}</span>
+                                            {% else %}
+                                            <span class="text-muted">Non spécifiée</span>
+                                            {% endif %}
+                                        </p>
+                                        
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                         <div class="mt-4">
                                             <h6>Statut actuel:</h6>
                                             <div class="alert 
@@ -216,7 +251,11 @@
             <div class="modal-body">
                 <p>Voulez-vous vraiment supprimer le technicien :</p>
                 <p class="h5 text-center my-3">
+<<<<<<< HEAD
                     <strong>{{ technicien.employe.nom }} {{ technicien.employe.prenom }}</strong>
+=======
+                    <strong>{{ technicien.nom }} {{ technicien.prenom }}</strong>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                 </p>
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-circle me-2"></i>

@@ -321,6 +321,7 @@ def mes_activites(request):
     if request.user.user_type != "technicien":
         return redirect("dashboard")  # sécurité
 
+<<<<<<< HEAD
     # ✅ CORRECTED: Access technicien_profile through employe relationship
     # Original code (commented): technicien = request.user.technicien
     
@@ -333,6 +334,13 @@ def mes_activites(request):
 
     # filtrer seulement SES activités
     activites = Activite.objects.filter(techniciens=technicien)
+=======
+    # récupérer le technicien lié au user connecté
+    technicien = request.user.technicien
+
+    # filtrer seulement SES activités
+    activites = Activite.objects.filter(technicien=technicien)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     context = {
         "activites": activites
@@ -444,12 +452,20 @@ def modifier_prospection(request, id):
     user = request.user
 
     # 🔐 rôle commercial
+<<<<<<< HEAD
     is_commercial = user.employe and hasattr(user.employe, 'commercial_profile')
+=======
+    is_commercial = hasattr(user, 'commercial_profile')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     # ================= BASE QUERY =================
     if is_commercial:
         prospects_list = Client.objects.filter(
+<<<<<<< HEAD
             commercial=user.employe.commercial_profile,
+=======
+            commercial=user.commercial_profile,
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
             type_client='prospect'
         )
     else:
@@ -489,7 +505,11 @@ def modifier_prospection(request, id):
     if not is_commercial:
         commercial_stats = (
             prospects_list
+<<<<<<< HEAD
             .values('commercial__id', 'commercial__employe__nom', 'commercial__employe__prenom')
+=======
+            .values('commercial__id', 'commercial__nom', 'commercial__prenom')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
             .annotate(total=Count('id'))
             .order_by('-total')
         )

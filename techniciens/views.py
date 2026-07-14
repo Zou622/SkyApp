@@ -3,7 +3,10 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Technicien
+<<<<<<< HEAD
 from employes.models import Employe
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
@@ -23,6 +26,7 @@ def list_technicien(request):
 
     if search_query:
         techniciens_list = techniciens_list.filter(
+<<<<<<< HEAD
             Q(employe__nom__icontains=search_query) |
             Q(employe__prenom__icontains=search_query) |
             Q(employe__email__icontains=search_query) |
@@ -31,6 +35,17 @@ def list_technicien(request):
         )
 
     techniciens_list = techniciens_list.order_by('employe__nom', 'employe__prenom')
+=======
+            Q(nom__icontains=search_query) |
+            Q(prenom__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(telephone__icontains=search_query) |
+            Q(quartier__icontains=search_query) |
+            Q(specialite__icontains=search_query)
+        )
+
+    techniciens_list = techniciens_list.order_by('nom', 'prenom')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     # Pagination
     page = request.GET.get('page', 1)
@@ -69,16 +84,21 @@ def list_technicien(request):
 @login_required
 def ajouter_technicien(request):
     """Afficher le formulaire d'ajout de technicien"""
+<<<<<<< HEAD
     employes = Employe.objects.filter(technicien_profile__isnull=True).order_by('nom', 'prenom')
     return render(request, 'techniciens/ajouter_technicien.html', {
         'employes': employes,
     })
+=======
+    return render(request, 'techniciens/ajouter_technicien.html')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
 
 @login_required
 def enregistrer_technicien(request):
     """Enregistrer un nouveau technicien"""
     if request.method == 'POST':
+<<<<<<< HEAD
         employe_id = request.POST.get('employe_id')
         statut = request.POST.get('statut', 'actif')
         est_actif = True
@@ -104,6 +124,51 @@ def enregistrer_technicien(request):
         employe.save(update_fields=['fonction'])
 
         messages.success(request, f'✅ Technicien "{employe.nom} {employe.prenom}" ajouté avec succès!')
+=======
+        # Récupérer les données
+        nom = request.POST.get('nom', '').strip()
+        prenom = request.POST.get('prenom', '').strip()
+        email = request.POST.get('email', '').strip() or None
+        telephone = request.POST.get('telephone', '').strip()
+        quartier = request.POST.get('quartier', '').strip()
+        adresse = request.POST.get('adresse', '').strip()
+        specialite = request.POST.get('specialite', '').strip()
+        statut = request.POST.get('statut', 'actif').strip()
+        photo = request.FILES.get('photo')
+        # pour gérer le cas où la date d'embauche n'est pas fournie
+        date_embauche = request.POST.get('date_embauche') or None
+        if date_embauche:
+            date_embauche = date_embauche
+        else:
+            date_embauche = None
+
+        # Validation
+        if not nom or not prenom:
+            messages.error(request, 'Le nom et le prénom sont obligatoires')
+            return render(request, 'techniciens/ajouter_technicien.html')
+
+        # Vérifier si l'email existe déjà
+        if Technicien.objects.filter(email=email).exists():
+            messages.error(request, f'Un technicien avec l\'email "{email}" existe déjà')
+            return render(request, 'techniciens/ajouter_technicien.html')
+
+        # Créer et sauvegarder le technicien
+        technicien = Technicien(
+            nom=nom,
+            prenom=prenom,
+            email=email,
+            telephone=telephone,
+            quartier=quartier,
+            adresse=adresse,
+            specialite=specialite,
+            statut=statut,
+            date_embauche=date_embauche,
+            photo=photo
+        )
+        technicien.save()
+
+        messages.success(request, f'✅ Technicien "{nom} {prenom}" ajouté avec succès!')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         return redirect('list_technicien')
 
     return redirect('ajouter_technicien')
@@ -120,6 +185,7 @@ def detail_technicien(request, technicien_id):
 def modifier_technicien(request, technicien_id):
     """Modifier un technicien existant"""
     technicien = get_object_or_404(Technicien, id=technicien_id)
+<<<<<<< HEAD
     employe = technicien.employe
 
     if request.method == 'POST':
@@ -152,6 +218,35 @@ def modifier_technicien(request, technicien_id):
     return render(request, 'techniciens/modifier_technicien.html', {
         'technicien': technicien,
     })
+=======
+
+    if request.method == 'POST':
+        # Mettre à jour les données
+        technicien.nom = request.POST.get('nom', technicien.nom)
+        technicien.prenom = request.POST.get('prenom', technicien.prenom)
+        technicien.email = request.POST.get('email', technicien.email) or None
+        technicien.telephone = request.POST.get('telephone', technicien.telephone)
+        technicien.quartier = request.POST.get('quartier', technicien.quartier)
+        technicien.adresse = request.POST.get('adresse', technicien.adresse)
+        technicien.specialite = request.POST.get('specialite', technicien.specialite)
+        technicien.statut = request.POST.get('statut', technicien.statut)
+        # pour gérer le cas où la date d'embauche n'est pas fournie
+        technicien.date_embauche = request.POST.get('date_embauche', technicien.date_embauche) or None
+        if technicien.date_embauche:
+            technicien.date_embauche = technicien.date_embauche
+        else:
+            technicien.date_embauche = None
+
+        # Gérer la photo (si une nouvelle photo est téléchargée)
+        if 'photo' in request.FILES:
+            technicien.photo = request.FILES['photo']
+
+        technicien.save()
+        messages.success(request, f'✅ Technicien "{technicien.nom} {technicien.prenom}" modifié avec succès!')
+        return redirect('list_technicien')
+
+    return render(request, 'techniciens/modifier_technicien.html', {'technicien': technicien})
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
 
 @login_required
@@ -160,10 +255,14 @@ def supprimer_technicien(request, technicien_id):
     technicien = get_object_or_404(Technicien, id=technicien_id)
 
     if request.method == 'POST':
+<<<<<<< HEAD
         nom_complet = f"{technicien.employe.nom} {technicien.employe.prenom}"
         # Remettre la fonction de l'employé à None
         technicien.employe.fonction = None
         technicien.employe.save(update_fields=['fonction'])
+=======
+        nom_complet = f"{technicien.nom} {technicien.prenom}"
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         technicien.delete()
         messages.success(request, f'❌ Technicien "{nom_complet}" supprimé avec succès!')
         return redirect('list_technicien')

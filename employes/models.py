@@ -3,6 +3,16 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 
+<<<<<<< HEAD
+=======
+class Departement(models.Model):
+    nom = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nom
+
+
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 class Poste(models.Model):
     nom = models.CharField(max_length=100)
 
@@ -22,6 +32,7 @@ class Employe(models.Model):
         ("Inactif", "Inactif"),
     )
 
+<<<<<<< HEAD
     matricule = models.CharField(max_length=50, unique=True, blank=True)
 
     @property
@@ -31,6 +42,13 @@ class Employe(models.Model):
             return self.user_account is not None and self.user_account.est_actif
         except:
             return False
+=======
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    matricule = models.CharField(max_length=50, unique=True)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     photo = models.ImageField(upload_to="employes/photos/", null=True, blank=True)
 
@@ -42,6 +60,7 @@ class Employe(models.Model):
     date_naissance = models.DateField(null=True, blank=True)
 
     telephone = models.CharField(max_length=20)
+<<<<<<< HEAD
     email = models.EmailField(blank=True, null=True)
 
     adresse = models.TextField(blank=True, null=True)
@@ -60,11 +79,23 @@ class Employe(models.Model):
     )
 
     date_embauche = models.DateField(null=True, blank=True)
+=======
+    email = models.EmailField(blank=True)
+
+    adresse = models.TextField(blank=True)
+
+    departement = models.ForeignKey(Departement, on_delete=models.SET_NULL, null=True)
+
+    poste = models.ForeignKey(Poste, on_delete=models.SET_NULL, null=True)
+
+    date_embauche = models.DateField()
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     statut = models.CharField(max_length=20, choices=STATUT, default="Actif")
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+<<<<<<< HEAD
     def save(self, *args, **kwargs):
         if not self.matricule:
             # Générer automatiquement le matricule basé sur l'ID
@@ -74,5 +105,7 @@ class Employe(models.Model):
         else:
             super().save(*args, **kwargs)
 
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     def __str__(self):
         return f"{self.nom} {self.prenom}"

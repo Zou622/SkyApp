@@ -11,4 +11,4 @@ RUN pip install gunicorn
 
 COPY . .
 
-CMD ["gunicorn", "SkyApp.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "SkyApp.wsgi:application", "--bind", "0.0.0.0:80"]

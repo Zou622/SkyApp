@@ -28,6 +28,7 @@
                         {{ rapport.activite.get_type_activite_display }}
                     </h5>
 
+<<<<<<< HEAD
                     <div class="d-flex gap-2">
                         <span class="badge bg-light text-dark">
                             Client : {{ rapport.activite.client.nom_client }}
@@ -37,6 +38,11 @@
                             Rapport par : {{ rapport.technicien.employe.nom }} {{ rapport.technicien.employe.prenom }}
                         </span>
                     </div>
+=======
+                    <span class="badge bg-light text-dark">
+                        Client : {{ rapport.activite.client.nom_client }}
+                    </span>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
                 </div>
             </div>
@@ -88,6 +94,7 @@
             <!-- Footer -->
             <div class="card-footer text-end">
 
+<<<<<<< HEAD
                 {% if rapport.statut_validation == 'en_attente' %}
                     <button type="button" 
                             class="btn btn-success btn-sm me-2"
@@ -97,6 +104,8 @@
                     </button>
                 {% endif %}
 
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                 {% comment %} <a href="{% url 'clients:modifier_rapport' rapport.id %}"
                    class="btn btn-warning btn-sm">
                     <i class="fas fa-edit"></i> Modifier
@@ -110,6 +119,7 @@
 
         </div>
 
+<<<<<<< HEAD
         {% if rapport.statut_validation == 'en_attente' %}
         <!-- Modal de validation -->
         <div class="modal fade" id="validationModal" tabindex="-1">
@@ -142,6 +152,8 @@
         </div>
         {% endif %}
 
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     </div>
 </div>
 

@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+<<<<<<< HEAD
 app_name = 'employes'
 
 urlpatterns = [
@@ -13,4 +14,9 @@ urlpatterns = [
     path("postes/", views.liste_postes, name="liste_postes"),
     path("postes/ajouter/", views.ajouter_poste, name="ajouter_poste"),
     path("postes/<int:poste_id>/supprimer/", views.supprimer_poste, name="supprimer_poste"),
+=======
+urlpatterns = [
+    path("", views.liste_employes, name="liste_employes"),
+    path("ajouter/", views.ajouter_employe, name="ajouter_employe"),
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 ]

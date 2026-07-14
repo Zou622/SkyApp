@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -15,6 +16,19 @@ User = get_user_model()
 
 @login_required
 @user_type_required(['admin', 'rh'])
+=======
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Q
+
+from .models import Employe
+from .forms import EmployeForm
+
+
+@login_required
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 def liste_employes(request):
 
     #  RECHERCHE
@@ -39,20 +53,29 @@ def liste_employes(request):
 
     #  STATISTIQUES
     total_employes = employes.count()
+<<<<<<< HEAD
     active_employes = employes.filter(statut='Actif').count()
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     context = {
         "page_obj": page_obj,
         "search": search,
         "total_employes": total_employes,
+<<<<<<< HEAD
         "active_employes": active_employes,
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     }
 
     return render(request, "employes/liste_employes.html", context)
 
 
 @login_required
+<<<<<<< HEAD
 @user_type_required(['admin', 'rh'])
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 def ajouter_employe(request):
 
     if request.method == "POST":
@@ -68,7 +91,11 @@ def ajouter_employe(request):
                 f"L'employé {employe.nom} {employe.prenom} a été ajouté avec succès.",
             )
 
+<<<<<<< HEAD
             return redirect("employes:liste_employes")
+=======
+            return redirect("liste_employes")
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
         else:
 
@@ -81,6 +108,7 @@ def ajouter_employe(request):
     context = {"form": form, "titre": "Ajouter un employé"}
 
     return render(request, "employes/ajout_employes.html", context)
+<<<<<<< HEAD
 
 
 @login_required
@@ -243,3 +271,5 @@ def creer_compte_utilisateur(request, employe_id):
         'auto_user_type': auto_user_type,
     }
     return render(request, "employes/creer_compte.html", context)
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad

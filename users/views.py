@@ -160,6 +160,20 @@ def valider_utilisateur(request, user_id):
     })
 
 
+<<<<<<< HEAD
+=======
+@login_required
+def soft_delete_utilisateur(request, user_id):
+    if request.method == "POST":
+        user = get_object_or_404(User, id=user_id)
+        user.est_actif = False  # désactive le compte
+        user.save()
+        return JsonResponse({"success": True, "message": "Utilisateur supprimé avec succès."})
+    return JsonResponse({"success": False}, status=405)
+
+
+
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 from django.contrib import messages
 
 @login_required
@@ -167,6 +181,7 @@ def modifier_profile(request):
     user = request.user
 
     if request.method == "POST":
+<<<<<<< HEAD
         form = UserProfileForm(request.POST, request.FILES, instance=user.employe, user=user)
 
         if form.is_valid():
@@ -176,6 +191,26 @@ def modifier_profile(request):
 
     else:
         form = UserProfileForm(instance=user.employe, user=user)
+=======
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+
+            password = form.cleaned_data.get("password")
+
+            if password:
+                user.set_password(password)
+
+            user.save()
+
+            messages.success(request, "Profil modifié avec succès")
+
+            return redirect('users:profile')
+
+    else:
+        form = UserProfileForm(instance=user)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     return render(request, "utilisateurs/modifier_profile.html", {"form": form})
 
@@ -186,12 +221,17 @@ def get_user_stats(user):
     """Statistiques selon le type d'utilisateur"""
     stats = {}
 
+<<<<<<< HEAD
     # ✅ CORRECTED: Access technicien_profile through employe relationship
     # Original code (commented): if user.user_type == 'technicien' and user.technicien:
     
     if user.user_type == 'technicien' and user.employe and hasattr(user.employe, 'technicien_profile') and user.employe.technicien_profile:
         # Original code (commented): activites = Activite.objects.filter(techniciens=user.technicien)
         activites = Activite.objects.filter(techniciens=user.employe.technicien_profile)
+=======
+    if user.user_type == 'technicien' and user.technicien:
+        activites = Activite.objects.filter(techniciens=user.technicien)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         stats['activites_total'] = activites.count()
 
         # ⚠️ IMPORTANT : Convertir la date en string
@@ -203,6 +243,7 @@ def get_user_stats(user):
         stats['planifie'] = activites.filter(statut='planifie').count()
         stats['termine'] = activites.filter(statut='termine').count()
 
+<<<<<<< HEAD
     # ✅ CORRECTED: Access commercial_profile through employe relationship
     # Original code (commented): elif user.user_type == 'commercial' and user.commercial:
     
@@ -213,6 +254,12 @@ def get_user_stats(user):
         
         stats['clients_total'] = Client.objects.filter(commercial=user.employe.commercial_profile).count()
         stats['clients_actifs'] = Client.objects.filter(commercial=user.employe.commercial_profile, statut='actif').count()
+=======
+    elif user.user_type == 'commercial' and user.commercial:
+        from clients.models import Client
+        stats['clients_total'] = Client.objects.filter(commercial=user.commercial).count()
+        stats['clients_actifs'] = Client.objects.filter(commercial=user.commercial, statut='actif').count()
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     return stats
 
@@ -333,6 +380,7 @@ def password_reset_request(request):
 @login_required
 @admin_required
 def modifier_utilisateur(request, user_id):
+<<<<<<< HEAD
     """
     Modification d'un utilisateur (admin seulement)
     """
@@ -343,11 +391,33 @@ def modifier_utilisateur(request, user_id):
 
         if form.is_valid():
             form.save()
+=======
+
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+
+            password = form.cleaned_data.get("password")
+
+            if password:
+                user.set_password(password)
+
+            user.save()
+
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
             messages.success(request, "Utilisateur modifié avec succès")
             return redirect('users:liste_utilisateurs')
 
     else:
+<<<<<<< HEAD
         form = UserProfileForm(instance=user.employe, user=user)
+=======
+        form = UserProfileForm(instance=user)
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
     return render(request, "utilisateurs/modifier_utilisateur.html", {
         "form": form,
@@ -360,8 +430,11 @@ def modifier_utilisateur(request, user_id):
 def supprimer_utilisateur(request, user_id):
     """
     Suppression (soft delete) d'un utilisateur (admin seulement)
+<<<<<<< HEAD
     Désactive le compte au lieu de le supprimer, ce qui rend le bouton 
     "Créer un compte" disponible à nouveau dans la liste des employés.
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     """
     if request.method == "POST":
         user = get_object_or_404(User, id=user_id)
@@ -403,7 +476,11 @@ def dashboard(request):
     if user.user_type in ['admin', 'superviseur']:
 
         stats['users'] = User.objects.count()
+<<<<<<< HEAD
         stats['clients'] = Client.objects.filter(est_supprime=False).count()
+=======
+        stats['clients'] = Client.objects.count()
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
         stats['activites'] = Activite.objects.count()
         stats['prospects'] = Prospect.objects.count()
 
@@ -415,7 +492,11 @@ def dashboard(request):
 
         stats['conversion_stats'] = (
             Prospect.objects.filter(statut="converti")
+<<<<<<< HEAD
             .values('commercial__employe__nom', 'commercial__employe__prenom')
+=======
+            .values('commercial__nom', 'commercial__prenom')
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
             .annotate(total=Count('id'))
             .order_by('-total')
         )
@@ -427,6 +508,7 @@ def dashboard(request):
         )
 
     # =========================
+<<<<<<< HEAD
     # RESSOURCES HUMAINES
     # =========================
     if user.user_type in ['admin', 'rh']:
@@ -447,14 +529,23 @@ def dashboard(request):
         stats['employes_inactifs'] = Employe.objects.filter(statut='Inactif').count()
 
     # =========================
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
     # TECHNICIEN
     # =========================
     elif user.user_type == 'technicien':
 
+<<<<<<< HEAD
         if user.employe and hasattr(user.employe, 'technicien_profile') and user.employe.technicien_profile:
 
             qs = Activite.objects.filter(
                 techniciens=user.employe.technicien_profile
+=======
+        if hasattr(user, 'technicien') and user.technicien:
+
+            qs = Activite.objects.filter(
+                techniciens=user.technicien
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
             )
 
             stats['activites'] = qs.count()
@@ -472,6 +563,7 @@ def dashboard(request):
     # =========================
     elif user.user_type == 'commercial':
 
+<<<<<<< HEAD
         if user.employe and hasattr(user.employe, 'commercial_profile') and user.employe.commercial_profile:
 
             stats['clients'] = Client.objects.filter(
@@ -485,6 +577,20 @@ def dashboard(request):
 
             stats['mes_conversions'] = Prospect.objects.filter(
                 commercial=user.employe.commercial_profile,
+=======
+        if hasattr(user, 'commercial') and user.commercial:
+
+            stats['clients'] = Client.objects.filter(
+                commercial=user.commercial
+            ).count()
+
+            stats['mes_prospects'] = Prospect.objects.filter(
+                commercial=user.commercial
+            ).count()
+
+            stats['mes_conversions'] = Prospect.objects.filter(
+                commercial=user.commercial,
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                 statut="converti"
             ).count()
 

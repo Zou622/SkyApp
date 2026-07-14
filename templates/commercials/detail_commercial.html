@@ -38,6 +38,7 @@
                                 </div>
                             </div>
                             <div>
+<<<<<<< HEAD
                                 <h2 class="mb-0">{{ commercial.employe.prenom }} {{ commercial.employe.nom }}</h2>
                                 <p class="text-muted mb-0">
                                     <i class="fas fa-hashtag me-1"></i>ID: #{{ commercial.id }}
@@ -45,6 +46,16 @@
                                     <span class="ms-3">
                                         <i class="fas fa-calendar-alt me-1"></i>
                                         Embauché le {{ commercial.employe.date_embauche|date:"d/m/Y" }}
+=======
+                                <h2 class="mb-0">{{ commercial.prenom }} {{ commercial.nom }}</h2>
+                                <p class="text-muted mb-0">
+                                    <i class="fas fa-hashtag me-1"></i>ID: #{{ commercial.id }}
+                                    {% if commercial.date_embauche %}
+                                    <span class="ms-3">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        Embauché le {{ commercial.date_embauche|date:"d/m/Y" }}
+                                        ({{ commercial.anciennete }} an{{ commercial.anciennete|pluralize:"s" }})
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                     </span>
                                     {% endif %}
                                 </p>
@@ -64,22 +75,38 @@
                             <div class="card-body">
                                 <dl class="row">
                                     <dt class="col-sm-4">Téléphone:</dt>
+<<<<<<< HEAD
                                     <dd class="col-sm-8">{{ commercial.employe.telephone }}</dd>
 
                                     <dt class="col-sm-4">Email:</dt>
                                     <dd class="col-sm-8">
                                         {% if commercial.employe.email %}
                                         <a href="mailto:{{ commercial.employe.email }}">{{ commercial.employe.email }}</a>
+=======
+                                    <dd class="col-sm-8">{{ commercial.telephone }}</dd>
+
+                                    <dt class="col-sm-4">Email:</dt>
+                                    <dd class="col-sm-8">
+                                        {% if commercial.email %}
+                                        <a href="mailto:{{ commercial.email }}">{{ commercial.email }}</a>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                         {% else %}
                                         <span class="text-muted">Non renseigné</span>
                                         {% endif %}
                                     </dd>
 
                                     <dt class="col-sm-4">Quartier:</dt>
+<<<<<<< HEAD
                                     <dd class="col-sm-8">{{ commercial.employe.quartier|default:"Non renseigné" }}</dd>
 
                                     <dt class="col-sm-4">Adresse:</dt>
                                     <dd class="col-sm-8">{{ commercial.employe.adresse|default:"Non renseignée"|linebreaks }}</dd>
+=======
+                                    <dd class="col-sm-8">{{ commercial.quartier|default:"Non renseigné" }}</dd>
+
+                                    <dt class="col-sm-4">Adresse:</dt>
+                                    <dd class="col-sm-8">{{ commercial.adresse|default:"Non renseignée"|linebreaks }}</dd>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                 </dl>
                             </div>
                         </div>
@@ -114,7 +141,11 @@
                                     </dd>
 
                                     <dt class="col-sm-4">Date embauche:</dt>
+<<<<<<< HEAD
                                     <dd class="col-sm-8">{{ commercial.employe.date_embauche|date:"d/m/Y"|default:"Non renseignée" }}</dd>
+=======
+                                    <dd class="col-sm-8">{{ commercial.date_embauche|date:"d/m/Y"|default:"Non renseignée" }}</dd>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
                                     <dt class="col-sm-4">Statut:</dt>
                                     <dd class="col-sm-8">
@@ -148,8 +179,13 @@
                                     <div class="fw-bold">{{ commercial.date_modification|date:"d/m/Y à H:i" }}</div>
                                 </div>
                                 <div class="col-md-4">
+<<<<<<< HEAD
                                     <small class="text-muted">ID Commercial</small>
                                     <div class="fw-bold">#{{ commercial.id }}</div>
+=======
+                                    <small class="text-muted">Ancienneté</small>
+                                    <div class="fw-bold">{{ commercial.anciennete }} an{{ commercial.anciennete|pluralize:"s" }}</div>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                 </div>
                             </div>
                         </div>
@@ -174,7 +210,11 @@
             <div class="modal-body">
                 <p>Voulez-vous vraiment supprimer le commercial :</p>
                 <p class="h4 text-center my-3 text-danger">
+<<<<<<< HEAD
                     <strong>{{ commercial.employe.prenom }} {{ commercial.employe.nom }}</strong>
+=======
+                    <strong>{{ commercial.prenom }} {{ commercial.nom }}</strong>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                 </p>
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-circle me-2"></i>

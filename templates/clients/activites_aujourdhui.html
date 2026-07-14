@@ -130,12 +130,18 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
 
+<<<<<<< HEAD
                                             {% if user.employe.technicien_profile in activite.techniciens.all %}
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                             <a href="{% url 'rapportActivites:creer_rapport' activite.id %}"
                                             class="btn btn-outline-success btn-sm">
                                                 <i class="fas fa-file-alt"></i>
                                             </a>
+<<<<<<< HEAD
                                             {% endif %}
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
                                         {% elif activite.statut == "en_attente" %}
 
@@ -150,13 +156,19 @@
                                                 <i class="fas fa-file-lines"></i>
                                             </a>
 
+<<<<<<< HEAD
                                             {% if user.employe.technicien_profile == activite.rapport.technicien %}
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                             <a href="{% url 'clients:modifier_rapport' activite.rapport.id %}"
                                             class="btn btn-outline-warning btn-sm">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                             {% endif %}
+<<<<<<< HEAD
                                             {% endif %}
+=======
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
 
                                         {% elif activite.statut == "termine" %}
 

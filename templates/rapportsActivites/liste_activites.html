@@ -96,12 +96,20 @@
                                     </a>
 
                                     <!-- Créer rapport -->
+<<<<<<< HEAD
                                     {% if not activite.rapport and user.employe.technicien_profile in activite.techniciens.all %}
+=======
+                                    {% if not activite.rapport %}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                     <a href="{% url 'creer_rapport' activite.id %}"
                                        class="btn btn-sm btn-success">
                                         <i class="fas fa-file-alt"></i>
                                     </a>
+<<<<<<< HEAD
                                     {% elif activite.rapport %}
+=======
+                                    {% else %}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                     <button class="btn btn-sm btn-secondary" disabled>
                                         <i class="fas fa-check"></i>
                                     </button>

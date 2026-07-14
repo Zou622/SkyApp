@@ -122,6 +122,10 @@
                                 <th>ID</th>
                                 <th>Nom & Prénom</th>
                                 <th>Contact</th>
+<<<<<<< HEAD
+=======
+                                <th>Spécialité</th>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                 <th>Statut</th>
                                 <th>Quartier</th>
                                 <th>Actions</th>
@@ -138,9 +142,15 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div>
+<<<<<<< HEAD
                                             <h6 class="mb-0">{{ technicien.employe.nom }} {{ technicien.employe.prenom }}</h6>
                                             <small class="text-muted">
                                                 Embauché: {{ technicien.employe.date_embauche|date:"d/m/Y" }}
+=======
+                                            <h6 class="mb-0">{{ technicien.nom }} {{ technicien.prenom }}</h6>
+                                            <small class="text-muted">
+                                                Embauché: {{ technicien.date_embauche|date:"d/m/Y" }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                             </small>
                                         </div>
                                     </div>
@@ -148,6 +158,7 @@
 
                                 <td>
                                     <div class="small">
+<<<<<<< HEAD
                                         {% if technicien.employe.telephone %}
                                         <div>
                                             <i class="fas fa-phone me-1 text-muted"></i>
@@ -165,11 +176,42 @@
                                         </div>
                                         {% endif %}
                                         {% if not technicien.employe.telephone and not technicien.employe.email %}
+=======
+                                        {% if technicien.telephone %}
+                                        <div>
+                                            <i class="fas fa-phone me-1 text-muted"></i>
+                                            <a href="tel:{{ technicien.telephone }}" class="text-decoration-none text-dark">
+                                                {{ technicien.telephone }}
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                        {% if technicien.email %}
+                                        <div>
+                                            <i class="fas fa-envelope me-1 text-muted"></i>
+                                            <a href="mailto:{{ technicien.email }}" class="text-decoration-none text-dark">
+                                                {{ technicien.email|truncatechars:20 }}
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                        {% if not technicien.telephone and not technicien.email %}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                         <span class="text-muted">-</span>
                                         {% endif %}
                                     </div>
                                 </td>
 
+<<<<<<< HEAD
+=======
+                                <!-- Spécialité -->
+                                <td>
+                                    {% if technicien.specialite %}
+                                    <span class="badge bg-info">{{ technicien.specialite }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                 <!-- Statut -->
                                 <td>
                                     {% if technicien.statut == 'actif' %}
@@ -194,8 +236,13 @@
                                 <!-- Quartier -->
                                 <td>
                                     <span class="text-truncate d-inline-block" style="max-width: 120px;"
+<<<<<<< HEAD
                                           title="{{ technicien.employe.quartier }}">
                                         {{ technicien.employe.quartier|truncatechars:15 }}
+=======
+                                          title="{{ technicien.quartier }}">
+                                        {{ technicien.quartier|truncatechars:15 }}
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                     </span>
                                 </td>
 
@@ -234,7 +281,11 @@
                                                 <div class="modal-body">
                                                     <p>Supprimer le technicien :</p>
                                                     <p class="h5 text-center my-3">
+<<<<<<< HEAD
                                                         <strong>{{ technicien.employe.nom }} {{ technicien.employe.prenom }}</strong>
+=======
+                                                        <strong>{{ technicien.nom }} {{ technicien.prenom }}</strong>
+>>>>>>> 435052a26b2376cb21df734e1cce035036c00fad
                                                     </p>
                                                     <p class="text-danger text-center">
                                                         <small><i class="fas fa-exclamation-circle me-1"></i>
